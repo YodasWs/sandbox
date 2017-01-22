@@ -1,0 +1,31 @@
+{
+  "name": "sandbox",
+  "version": "1.0.0",
+  "description": "Fun side projects exploring what is possible with HTML5, JavaScript, CSS3, ECMAScript2016, CSS4, D3.js, Node.js, and others.",
+  "main": "gulpfile.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YodasWs/sandbox.git"
+  },
+  "author": "Samuel B Grundman",
+  "bugs": {
+    "url": "https://github.com/YodasWs/sandbox/issues"
+  },
+  "homepage": "https://github.com/YodasWs/sandbox#readme",
+  "devDependencies": {
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-change": "^1.0.0",
+    "gulp-changed": "^1.3.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-delete-lines": "0.0.7",
+    "gulp-git": "^1.12.0",
+    "gulp-header": "^1.8.8",
+    "gulp-ignore": "^2.0.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-ssi": "^0.1.2"
+  }
+}
