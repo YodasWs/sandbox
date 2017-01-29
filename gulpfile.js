@@ -50,7 +50,7 @@ const options = {
 		// Save in build directory
 		build:'build/',
 		// Save in dist(rubutable) directory
-		dist:'dist/'
+		dist:'docs/'
 	},
 	header:{
 		css:(function(){
