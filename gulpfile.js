@@ -19,7 +19,7 @@ const options = {
 		cwd: __dirname
 	},
 	ignore:{
-		html:'{components/**/*.html}',
+		html:'**/components/**/*.html',
 		css:'{*.min.css,min.css}',
 		js:'{*.min.js}'
 	},
@@ -46,10 +46,12 @@ const options = {
 		],
 		cascade: false
 	},
-	// Save in build directory
-	build:'build/',
-	// Save in dist(rubutable) directory
-	dest:'dist/',
+	dest:{
+		// Save in build directory
+		build:'build/',
+		// Save in dist(rubutable) directory
+		dist:'dist/'
+	},
 	header:{
 		css:(function(){
 			let str = "/**\n"
@@ -69,26 +71,26 @@ const options = {
 gulp.task('sass', () => {
 	// Compile and Minify CSS Files
 	return gulp.src('src/**/*.{,s}css')
+		// Compile only updated files
+		.pipe(filterUpdatedFiles(options.dest.build), options.filterUpdatedFiles)
 		// Compile Sass into CSS
 		.pipe(compileSass(options.compileSass))
-		// Autoprefix CSS for Backwards Compatibility
-		.pipe(prefixCSS(options.prefixCSS))
 		// Save in build directory
-		.pipe(gulp.dest(options.build))
+		.pipe(gulp.dest(options.dest.build))
 });
 
 gulp.task('mergeCSS', () => {
 	return gulp.src('build/**/*.css')
 		// Ignore minified files
-		.pipe(ignore(options.ignore.css))
-		// Minify only updated files
-//		.pipe(filterUpdatedFiles(options.dest), options.filterUpdatedFiles)
+		.pipe(ignore.exclude(options.ignore.css))
 		// Add File Headers
 		.pipe(header(options.header.css))
+		// Autoprefix CSS for Backwards Compatibility
+		.pipe(prefixCSS(options.prefixCSS))
 		// Combine into one File
 		.pipe(concat('min.css'))
 		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest))
+		.pipe(gulp.dest(options.dest.dist))
 });
 
 gulp.task('css', gulp.series('sass', 'mergeCSS'));
@@ -97,27 +99,27 @@ gulp.task('js', () => {
 	// Minify JavaScript Files
 	return gulp.src('src/**/*.js')
 		// Ignore minified files
-		.pipe(ignore(options.ignore.js))
+		.pipe(ignore.exclude(options.ignore.js))
 		// Minify only updated files
-		.pipe(filterUpdatedFiles(options.dest), options.filterUpdatedFiles)
+		.pipe(filterUpdatedFiles(options.dest.dist), options.filterUpdatedFiles)
 		// Minify!
 		.pipe(minifyJS(options.minifyJS))
 		// Add Project and License Header
 		.pipe(header(options.header.js))
 		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest))
+		.pipe(gulp.dest(options.dest.dist))
 });
 
 gulp.task('html', () => {
 	return gulp.src('src/**/*.html')
 		// Ignore include files
-		.pipe(ignore(options.ignore.html))
+		.pipe(ignore.exclude(options.ignore.html))
 		// Include include files
 		.pipe(ssi({root:'src'}))
 		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest))
+		.pipe(gulp.dest(options.dest.dist))
 });
 
 // TODO: Need a watch task
 
-gulp.task('default', gulp.parallel('js', 'css'));
+gulp.task('default', gulp.parallel('html', 'js', 'css'));
