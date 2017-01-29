@@ -46,6 +46,8 @@ const options = {
 		],
 		cascade: false
 	},
+	// Save in build directory
+	build:'build/',
 	// Save in dist(rubutable) directory
 	dest:'dist/',
 	header:{
@@ -71,12 +73,12 @@ gulp.task('sass', () => {
 		.pipe(compileSass(options.compileSass))
 		// Autoprefix CSS for Backwards Compatibility
 		.pipe(prefixCSS(options.prefixCSS))
-		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest))
+		// Save in build directory
+		.pipe(gulp.dest(options.build))
 });
 
 gulp.task('mergeCSS', () => {
-	return gulp.src('dist/**/*.css')
+	return gulp.src('build/**/*.css')
 		// Ignore minified files
 		.pipe(ignore(options.ignore.css))
 		// Minify only updated files
@@ -115,5 +117,7 @@ gulp.task('html', () => {
 		// Save in dist(rubutable) directory
 		.pipe(gulp.dest(options.dest))
 });
+
+// TODO: Need a watch task
 
 gulp.task('default', gulp.parallel('js', 'css'));
