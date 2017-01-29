@@ -1,0 +1,8 @@
+nav {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-around;
+}
+nav > * {
+	flex-grow: 1;
+}
