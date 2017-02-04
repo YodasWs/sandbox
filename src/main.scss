@@ -15,3 +15,13 @@ body {
 	border: solid black;
 	border-width: 0 1px;
 }
+a:link,
+a:visited {
+	text-decoration: none;
+	color: blue;
+}
+a:link:active,
+a:link:focus,
+a:link:hover {
+	text-decoration: underline;
+}

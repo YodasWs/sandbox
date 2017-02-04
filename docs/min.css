@@ -1,9 +1,5 @@
-/**
- * main.css
- */
-*{box-sizing:border-box}:root{font-size:12pt}html,body{margin:0;padding:0}body{width:100%;max-width:1200px;border:solid black;border-width:0 1px}
+/* main.css */
+*{box-sizing:border-box}:root{font-size:12pt}html,body{margin:0;padding:0}body{width:100%;max-width:1200px;border:solid black;border-width:0 1px}a:link,a:visited{text-decoration:none;color:blue}a:link:active,a:link:focus,a:link:hover{text-decoration:underline}
 
-/**
- * components/nav/nav.css
- */
+/* components/nav/nav.css */
 nav{display:-webkit-flex;display:flex;-webkit-flex-flow:row nowrap;flex-flow:row nowrap;-webkit-justify-content:space-around;justify-content:space-around}nav>*{-webkit-flex-grow:1;flex-grow:1}
