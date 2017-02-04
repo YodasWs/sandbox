@@ -20,8 +20,17 @@ const options = {
 	},
 	ignore:{
 		html:'**/components/**/*.html',
-		css:'{*.min.css,min.css}',
-		js:'{*.min.js}'
+		css:{
+			merge:[
+				'**/*.min.css',
+				'**/min.css'
+			],
+			dist:[
+				'**/components/**/*.css',
+				'**/main.css'
+			]
+		},
+		js:'{**/*.min.js}'
 	},
 	minifyJS:{
 		comments:false,
@@ -54,11 +63,8 @@ const options = {
 	},
 	header:{
 		css:(function(){
-			let str = "/**\n"
 			// properties found at https://github.com/gulpjs/vinyl
-			str += ` * <%= file.relative %>\n`
-			str += " */\n"
-			return str
+			return '/* <%= file.relative %> */\n'
 		})(),
 		js:(function(){
 			return ''
@@ -79,10 +85,18 @@ gulp.task('sass', () => {
 		.pipe(gulp.dest(options.dest.build))
 });
 
-gulp.task('mergeCSS', () => {
+gulp.task('css:dist', () => {
 	return gulp.src('build/**/*.css')
+		// Ignore Component Files
+		.pipe(ignore.exclude(options.ignore.css.dist))
+		// Save in dist(rubutable) directory
+		.pipe(gulp.dest(options.dest.dist))
+});
+
+gulp.task('css:merge', () => {
+	return gulp.src(['build/main.css','build/**/*.css'])
 		// Ignore minified files
-		.pipe(ignore.exclude(options.ignore.css))
+		.pipe(ignore.exclude(options.ignore.css.merge))
 		// Add File Headers
 		.pipe(header(options.header.css))
 		// Autoprefix CSS for Backwards Compatibility
@@ -93,7 +107,7 @@ gulp.task('mergeCSS', () => {
 		.pipe(gulp.dest(options.dest.dist))
 });
 
-gulp.task('css', gulp.series('sass', 'mergeCSS'));
+gulp.task('css', gulp.series('sass', gulp.parallel('css:merge', 'css:dist')));
 
 gulp.task('js', () => {
 	// Minify JavaScript Files
@@ -119,7 +133,5 @@ gulp.task('html', () => {
 		// Save in dist(rubutable) directory
 		.pipe(gulp.dest(options.dest.dist))
 });
-
-// TODO: Need a watch task
 
 gulp.task('default', gulp.parallel('html', 'js', 'css'));

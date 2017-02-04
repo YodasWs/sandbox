@@ -2,6 +2,9 @@
 *~
 *.swp
 
+# Build files
+build
+
 # Logs
 logs
 *.log
