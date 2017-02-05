@@ -2,19 +2,38 @@
 	box-sizing: border-box;
 }
 :root {
+	font-family: "Trebuchet MS", Arial, sans-serif;
 	font-size: 12pt;
 }
 html,
-body {
+body,
+main {
 	margin: 0;
 	padding: 0;
+	width: 100%;
+	height: 100%;
 }
 body {
-	width: 100%;
-	max-width: 1200px;
+	width: 1200px;
+	max-width: 97%;
 	border: solid black;
 	border-width: 0 1px;
+	margin: 0 auto;
 }
+
+main {
+	> * {
+		$padding: 1rem;
+		padding-right: $padding;
+		padding-left: $padding;
+	}
+}
+
+h1 {
+	text-align: center;
+	margin-top: 0;
+}
+
 a:link,
 a:visited {
 	text-decoration: none;
