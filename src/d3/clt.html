@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Charlotte Transit Network</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>if (typeof $ === 'undefined') {
+	document.write("<script src='/resources/pres/legacy/global/js/lib/jquery-1.9.1.js'><\/script>");
+}</script>
+<style>
+* {
+	box-sizing: border-box;
+}
+:root,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	font-family: "Trebuchet MS", "Open Sans", sans-serif;
+	background-color: #f4fff4;
+}
+body {
+	margin: 0 auto;
+	padding: 0;
+	width: calc(2023px * 2 / 3);
+	max-width: 100%;
+	min-height: 100%;
+	border: solid black;
+	border-width: 0 1px;
+	background-color: #fefffe;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+@media (max-width: 1348.66667px) {
+	body {
+		border: 0 none;
+	}
+}
+body > * {
+	padding: 0 10px;
+}
+h1 {
+	background-color: #ddffdd;
+	padding: 5px 10px 0;
+	margin: 0;
+}
+header {
+	width: calc(2023px * 2 / 3 - 2px);
+	max-width: 100%;
+	position: fixed;
+	padding: 0 0 4rem;
+	background: inherit;
+	top: 0;
+	border-bottom: 1px solid darkgrey;
+	background-color: whitesmoke;
+}
+header > h2 {
+	background: inherit;
+	transition: all 1s;
+	opacity: 0;
+	left: 20px;
+}
+header > form,
+header > h2 {
+	margin-bottom: 0.83em;
+	position: absolute;
+	bottom: 0;
+}
+header > form {
+	left: 200px;
+}
+svg {
+	display: block;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 100%;
+	height: auto;
+}
+path {
+	stroke-linejoin: round;
+	stroke-linecap: round;
+	fill: none;
+	transition: all 1s;
+}
+[class*="yr"] {
+	transition: all 1s;
+	opacity: 0;
+}
+.yr2007,
+h2.yr2007 {
+	opacity: 1;
+}
+g.stations circle.silver,
+g.silver path.route {
+	stroke: silver;
+}
+g.alt path.route {
+	stroke-dasharray: 10, 15;
+}
+g path.overlay {
+	stroke-dasharray: 10, 15;
+	stroke-dashoffset: 12;
+}
+g.stations circle.red,
+g.red path.route {
+	stroke: red;
+}
+g.stations circle.blue,
+g.blue path.route {
+	stroke: blue;
+}
+g.stations circle.lockwood-line,
+g.lockwood-line path.route {
+	stroke: #0039A6;
+	stroke: #00A1DE;
+}
+g.stations circle.ne-2,
+g.ne-2 path.route {
+	stroke: #00A1DE;
+	stroke: #0039A6;
+}
+g.ne-2 path.route.white {
+	stroke-dasharray: 0;
+	stroke: white;
+}
+g.stations circle.orange,
+g.orange path.route {
+	stroke: orange;
+}
+g.stations circle.green,
+g.green path.route {
+	stroke: #00933c;
+	stroke: green;
+}
+g.stations circle.g-line,
+g.g-line path.route {
+	stroke: #6cbe45;
+}
+g.stations circle.south-feeder,
+g.south-feeder path.route {
+	stroke: #00A1DE;
+}
+g.stations circle.gold,
+g.gold path.route {
+	stroke: gold;
+}
+rect.gold {
+	stroke: black;
+	fill: gold;
+}
+g.streetcar path.route,
+path.route.streetcar {
+	stroke-width: 6px;
+}
+g.light-rail path.route,
+path.route.light-rail {
+	stroke-width: 8px;
+}
+g path.outline {
+	stroke: black;
+}
+g path.plan {
+	stroke-width: 4px;
+	stroke: green;
+}
+g.streetcar path.outline,
+path.outline.streetcar {
+	stroke-width: 8px;
+}
+g.light-rail path.outline,
+path.outline.light-rail {
+	stroke-width: 11px;
+}
+g.stations circle {
+	stroke-width: 5px;
+	stroke: #bbbbbb;
+	fill: white;
+	r: 9px;
+}
+g.stations circle.transfer {
+	stroke-width: 14px;
+	fill: none;
+	r: 7px;
+}
+g.stations > g.streetcar > circle.transfer,
+g.stations > circle.streetcar {
+	stroke-width: 4px;
+	r: 8px;
+}
+g.stations > g.streetcar > circle.transfer:first-child,
+g.stations > circle.streetcar {
+	fill: white;
+}
+g.stations > g.streetcar > circle.transfer:first-child {
+}
+g.stations > g > circle.transfer {
+	transition: all 1s;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(2),
+g.stations > g > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer {
+	stroke-dasharray: 10.8;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer:nth-child(2) {
+	stroke-dashoffset: 10.8;
+}
+g.stations > g.streetcar > circle.transfer:first-child:nth-last-child(2),
+g.stations > g.streetcar > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer {
+	stroke-dasharray: 13;
+}
+g.stations > g.streetcar > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer:nth-child(2) {
+	stroke-dashoffset: 13;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(3),
+g.stations > g > circle.transfer:first-child:nth-last-child(3) ~ circle.transfer {
+	stroke-dasharray: 6.5, 13;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(3) ~ circle.transfer:nth-child(2) {
+	stroke-dashoffset: 6.5;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(3) ~ circle.transfer:nth-child(3) {
+	stroke-dashoffset: 13;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(4),
+g.stations > g > circle.transfer:first-child:nth-last-child(4) ~ circle.transfer {
+	stroke-dasharray: 7, 21;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(4) ~ circle.transfer:nth-child(2) {
+	stroke-dashoffset: 7;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(4) ~ circle.transfer:nth-child(3) {
+	stroke-dashoffset: 14;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(4) ~ circle.transfer:nth-child(4) {
+	stroke-dashoffset: 21;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(5),
+g.stations > g > circle.transfer:first-child:nth-last-child(5) ~ circle.transfer {
+	stroke-dasharray: 7, 35;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(5) ~ circle.transfer:nth-child(2) {
+	stroke-dashoffset: 7;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(5) ~ circle.transfer:nth-child(3) {
+	stroke-dashoffset: 14;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(5) ~ circle.transfer:nth-child(4) {
+	stroke-dashoffset: 21;
+}
+g.stations > g > circle.transfer:first-child:nth-last-child(5) ~ circle.transfer:nth-child(5) {
+	stroke-dashoffset: 35;
+}
+/* Station Labels */
+g.stations > g.station > text {
+	transition: all 500ms;
+	opacity: 0;
+}
+g.stations > g.station > circle:hover ~ text,
+g.stations > g.station > text:hover {
+	opacity: 1;
+}
+</style>
+<script>
+const years = [2007,2015,2017,2020,2023,2030,2035,2050,2060,2070,2080];
+const lynxRoutes = {
+	'gold':{
+		'2015':'M1080,500l110,115l170,164l20-20',
+		'2020':'M787,20l0,25q-25,20-35,85q8,45,0,85q-10,35,55,50q20-5,64,25l65,61L1080,500l110,115l170,164l108-108q8-10,11-20l5-25'
+	}
+};
+$(()=>{
+	const $svg = $('svg')
+	const $h2 = $('header > h2')
+
+	// Add padding for sticky header
+	$(window).on('resize', function() {
+		$('body').css('padding-top', $('body > header').outerHeight(true) + 'px')
+	}).trigger('resize')
+
+	// Build Year Selectors
+	let $yrLinear = $('#selYear > input[type="range"].linear').attr('min', years[0]).attr('max', years[years.length-1]),
+		$yrSpecial = $('#selYear > input[type="range"].special').attr('min', 0).attr('max', years.length-1)
+
+	// Update Display on change
+	$yrLinear.on('change', function() {
+		// Snap to closest year
+		let $val = $(this).val(),
+			curr = years[0],
+			key = 0
+		for (let i=1; i<years.length; i++) {
+			if (Math.abs($val - years[i]) < Math.abs($val - curr)) {
+				curr = years[i]
+				key = i
+			}
+		}
+
+		// Update Year Display
+		$yrSpecial.val(key)
+		$yrLinear.val(curr)
+
+		// Fade in/out
+		$svg.find('[class*="yr"]').css('opacity', 0).filter('.yr' + curr).css('opacity', 1)
+		$h2.css('opacity', 0).filter('.yr' + curr).css('opacity', 1)
+	})
+
+	// Match Year
+	$yrSpecial.on('change', function() {
+		$yrLinear.val(years[$(this).val()]).trigger('change')
+	}).trigger('change')
+
+	// Give each route an outline
+	$('path.route').each(function() {
+		let $this = $(this)
+		if (!$this.is('.overlay')) {
+			$this.clone().removeClass('route').addClass('outline').prependTo($this.parent())
+		}
+	})
+
+	$yrSpecial.val($yrSpecial.attr('max')).trigger('change')
+})</script>
+</head>
+<body>
+<header>
+	<h1>Charlotte Transit Network</h1>
+	<h2 class="yr2007">2007</h2>
+	<h2 class="yr2015">2015</h2>
+	<h2 class="yr2017">2017</h2>
+	<h2 class="yr2020">2020</h2>
+	<h2 class="yr2023">2023</h2>
+	<h2 class="yr2030">2030</h2>
+	<h2 class="yr2035">2035</h2>
+	<h2 class="yr2050">2050</h2>
+	<h2 class="yr2060">2060</h2>
+	<h2 class="yr2070">2070</h2>
+	<h2 class="yr2080">2080</h2>
+	<form id="selYear">
+		<input class="special" type="range" min="0" max="" value="0" autofocus/>
+		<input class="linear" type="range" min="0" max="" value="0" disabled/>
+	</form>
+</header>
+
+<h2>Center City Rail Network</h2>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2023 1350" preserveAspectRatio="xMaxYMax">
+	<image id="DowntownCLT" xlink:href="DowntownCLT.png" x="0" y="0" width="2023" height="1212"/>
+	<g class="gold streetcar">
+		<g class="alt yr2030 yr2035 yr2050 yr2060 yr2070 yr2080 yr2080">
+			<path class="route" d="M912,329l-122,137c-10-15-55-47-68-47c-20-6-45,6-87-5c-30-5-80,30-100,30c-50-10-80,5-100,36l-46,56l-88-6l-100-4l-43-2.5l-100-4l-50-2.5l-7-.5"/>
+		</g>
+		<g class="alt yr2060 yr2070 yr2080">
+			<path class="route" d="M1490,591c-58-13-100-25-151-53c-30-25-35-28-43-31q0,5-10,20l-98,83"/>
+		</g>
+		<g class="yr2015 yr2017">
+			<path class="route" d="M1080,500l110,115l170,164l20-20"/>
+		</g>
+		<g class="yr2020">
+			<path class="route" d="M787,20l0,25q-25,20-35,85q8,45,0,85q-10,35,55,50q20-5,64,25l65,61L1080,500l110,115l170,164l108-108q8-10,11-20l5-25"/>
+		</g>
+		<g class="yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<path class="route" d="M790,0L787,20l0,25q-25,20-35,85q8,45,0,85q-10,35,55,50q20-5,64,25l65,61L1080,500l110,115l170,164l108-108q8-10,11-20l17-95l33-38l30,34l-9,54l30,6l53,3l200,20q50,5,80,23q75,35,110,36"/>
+		</g>
+	</g>
+	<g class="red light-rail">
+		<g class="yr2030 yr2035 yr2050 yr2060">
+			<path class="route" d="M930,368l85-90l56-70c100-105,150-130,200-210"/>
+		</g>
+		<g class="yr2070 yr2080">
+			<path class="route" d="M930,368l85-90l56-70c100-105,150-130,200-210M-1,564l600,7.5q142,6,200-62L873,428l57-60"/>
+		</g>
+	</g>
+	<g class="blue light-rail">
+		<g class="yr2007 yr2015">
+			<path class="route" d="M485,1212l121-200l185-270l150-130l90-70l55-50L1127,454"/>
+		</g>
+		<g class="yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<path class="route" d="M485,1212l121-200l185-270l150-130l90-70l55-50l165-150l80-70l55-25l215-200l25-47"/>
+		</g>
+	</g>
+	<g class="green streetcar">
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route" d="M1029,1042l-256-236l-20-18l-128-73c-15-10-30-5-60-17l-30-20c-15-6-22-15-80-2c-40,20-80,17-95,18c-20,0-40,5-65,12l9-175
+				M1029,1042l45,40c27,17,26,51,50,70q30,28,28,60v40M1152,1252l139,17l40-107c45-120,50-180,53-203q17-68-28-106q-15-20-31-26q0-10,19-30l16-18"/>
+			<path class="route overlay" d="M1360,779l108-108q8-10,11-20l17-95l33-38"/>
+			<path class="route" d="M1529,518l35-38c35-35,40-60,46-72l16-77l-50-8q-30-5-48-16l-77-30Q1425,248,1395,240"/>
+		</g>
+	</g>
+	<g class="silver">
+		<g class="alt yr2050 yr2060 yr2070 yr2080">
+			<path class="route streetcar" d="M955,393l12-11l63-54l51,56l113,120c15,13,15,20,28,36q20,12,26,18l53,55l60,50l45,35l100,100l58,49c50,33,70,127,130,127l70,0q26,0,52,17l40-2c30,0,16-30,42-15l31,30c20,20,40-20,67,0q20,10,30,10"/>
+		</g>
+		<g class="yr2035 yr2050 yr2060 yr2070 yr2080">
+			<path class="route streetcar" d="M955,393l-61,56q-15,15,3,40l100,118l146,150l7-2l55,13q30,10,55-10l35-35l53-68"/>
+			<path class="route light-rail" d="M1348,655q25-30,100-5l60,13q30,7,50,6q40,0,62,15l150,95q28,24,41,55q20,40,40,50l0,20q-25,10-42,40q5,20,20,20q40-10,70,10l30,30c20,20,40-20,67,0q20,10,30,10"/>
+		</g>
+	</g>
+	<g class="g-line streetcar">
+		<g class="yr2050">
+			<path class="route" d="M1084,939l-75,85M1143,757c13,20,5,40,5,60q3,17-15,33l-30,30c-20,10-10,50-19,59l-20,60l-35,43l-256-236l-20-18l-128-73c-15-10-30-5-60-17l-30-20c-15-6-22-15-80-2c-40,20-80,17-95,18c-20,0-40,5-65,12l9-175"/>
+		</g>
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route" d="M1143,757c13,20,5,40,5,60q3,17-15,33l-30,30c-20,10-10,50-19,59l-20,60l-35,43c-25,24-20,10-50,48l-27,35q-15,18-40,25l-20,15l-20,50M1084,939l-75,85l-5,4l-78,95l-12,24M1087,698l100-86"/>
+			<path class="route overlay" d="M1143,757l-56-59"/>
+		</g>
+	</g>
+	<g class="orange light-rail">
+		<g class="yr2060 yr2070">
+			<path class="route" d="M823,428l-117-83q-25-17-42-38l-63-123c-40-58-70-36-82-85q-20-40-49-49l-102-51"/>
+		</g>
+		<g class="yr2080">
+			<path class="route" d="M823,428l-117-83q-25-17-42-38l-63-123c-40-58-70-36-82-85q-20-40-49-49l-102-51M823,428q25,20,50,0"/>
+			<path class="route overlay" d="M873,428L930,368"/>
+		</g>
+	</g>
+	<g class="ne-2 streetcar">
+		<g class="alt yr2070 yr2080">
+			<path class="route" d="M955,393l12-11l63-54l55-49l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l31-34l-81-72l-60-25l-100,160l-30,48l-15,21q-15,18-30,30L955,393"/>
+		</g>
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route" d="M955,393l12-11l63-54l55-49l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l45-49l50-56l18-18"/>
+		</g>
+	</g>
+	<g class="lockwood-line streetcar">
+		<g class="yr2050">
+			<path class="route" d="M1030,328l55-49l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l31-34l-81-72l-60-25l-100,160l-30,48l-15,21q-15,18-30,30L1030,328"/>
+			<path class="route overlay" d="M955,393l12-11l63-54"/>
+		</g>
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route overlay" d="M955,393l12-11l63-54L1030,328L1085,279l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l31-34"/>
+			<path class="route" d="M1430,90l-81-72l-60-25l-100,160l-30,48l-15,21q-15,18-30,30L1085,279"/>
+		</g>
+	</g>
+	<g class="stations">
+		<!-- Blue Line Stations -->
+		<circle cx="1127" cy="454" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1080" cy="500" class="blue yr2007"/>
+		<g transform="translate(1080, 500)" class="yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<!-- CTC/Arena -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="gold transfer"/>
+		</g>
+		<circle cx="1035" cy="538" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="965" cy="592" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030"/>
+		<g transform="translate(965, 592)" class="yr2035 yr2050 yr2060 yr2070 yr2080">
+			<!-- Stonewall/College Station -->
+			<circle cx="5" cy="-10" class="blue transfer"/>
+			<circle cx="5" cy="-10" class="silver transfer"/>
+		</g>
+		<circle cx="900" cy="648" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="822" cy="715" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="751" cy="800" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035"/>
+		<g transform="translate(756, 793)" class="yr2050">
+			<!-- East/West Blvd Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="g-line transfer"/>
+		</g>
+		<g transform="translate(756, 793)" class="yr2060 yr2070 yr2080">
+			<!-- East/West Blvd Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="green transfer"/>
+		</g>
+		<circle cx="567" cy="1075" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- Blue Line Extension Stations -->
+		<circle cx="1182" cy="404" class="blue yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1395" cy="240" class="blue yr2017 yr2020 yr2023 yr2030 yr2035 yr2050"/>
+		<g transform="translate(1395, 240)" class="yr2060 yr2070 yr2080">
+			<!-- Parkwood Ave Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="green transfer"/>
+		</g>
+		<circle cx="1510" cy="131" class="blue yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- Gold Line Stations -->
+		<circle cx="1140" cy="562" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1177" cy="602" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1257" cy="680" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1345" cy="765" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1380" cy="760" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050"/>
+		<!-- Gold Line Phase 2 Stations to West End -->
+		<circle cx="1040" cy="458" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="985" cy="402" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="947" cy="363" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="902" cy="318" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="855" cy="280" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="752" cy="225" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="755" cy="176" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="757" cy="103" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="787" cy="20" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- Gold Line Phase 2 Stations to Sunnyside Ave -->
+		<circle cx="1437" cy="702" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050"/>
+		<circle cx="1482" cy="632" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050"/>
+		<!-- Gold Line Phase 3 Stations -->
+		<circle cx="1538" cy="529" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1562" cy="609" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1618" cy="614" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1670" cy="619" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1770" cy="629" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1835" cy="635" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<g transform="translate(1937, 669)" class="station yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<rect x="0" y="-15" width="55" height="15" fill="#eaeaea"/>
+			<circle cx="0" cy="0" class="streetcar gold"/>
+			<text transform="translate(-20,-17)">Chinatown</text>
+		</g>
+		<circle cx="2010" cy="693" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- Red Line Gateway Station -->
+		<circle cx="930" cy="368" class="red yr2030 yr2035 yr2050 yr2060 yr2070"/>
+		<g transform="translate(930, 368)" class="yr2080">
+			<!-- Gateway Station -->
+			<circle cx="0" cy="0" class="orange transfer"/>
+			<circle cx="0" cy="0" class="red transfer"/>
+		</g>
+		<!-- West Line Stations -->
+		<circle cx="780" cy="455" class="streetcar gold yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="670" cy="419" class="streetcar gold yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="443" cy="470" class="streetcar gold yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="305" cy="531" class="streetcar gold yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="150" cy="524" class="streetcar gold yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- Silver Line Stations -->
+		<circle cx="955" cy="393" class="streetcar silver yr2035"/>
+		<g transform="translate(955, 393)" class="streetcar yr2050">
+			<!-- Graham St Gateway Station -->
+			<circle cx="0" cy="0" class="silver transfer"/>
+			<circle cx="0" cy="0" class="lockwood-line transfer"/>
+		</g>
+		<g transform="translate(955, 393)" class="streetcar yr2060 yr2070 yr2080">
+			<!-- Graham St Gateway Station -->
+			<circle cx="0" cy="0" class="ne-2 transfer"/>
+			<circle cx="0" cy="0" class="lockwood-line transfer"/>
+			<circle cx="0" cy="0" class="silver transfer"/>
+		</g>
+		<circle cx="1333" cy="675" class="streetcar silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1550" cy="668" class="silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1793" cy="803" class="silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1897" cy="973" class="silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- Gold-Green Transfer Stations -->
+		<g transform="translate(1380, 760) rotate(20)" class="streetcar yr2060 yr2070 yr2080">
+			<!-- Hawthorne & 5th / Presbyterian Hospital Station -->
+			<circle cx="0" cy="0" class="gold transfer"/>
+			<circle cx="0" cy="0" class="green transfer"/>
+		</g>
+		<g transform="translate(1437, 702)" class="streetcar yr2060 yr2070 yr2080">
+			<!-- Hawthorne & 8th Station -->
+			<circle cx="0" cy="0" class="green transfer"/>
+			<circle cx="0" cy="0" class="gold transfer"/>
+		</g>
+		<g transform="translate(1482, 632)" class="streetcar yr2060 yr2070 yr2080">
+			<!-- Sunnyside Ave Station -->
+			<circle cx="0" cy="0" class="gold transfer"/>
+			<circle cx="0" cy="0" class="green transfer"/>
+		</g>
+		<g transform="translate(305, 531)" class="streetcar yr2050">
+			<!-- Remount & Wilkinson Station -->
+			<circle cx="0" cy="0" class="gold transfer"/>
+			<circle cx="0" cy="0" class="g-line transfer"/>
+		</g>
+		<g transform="translate(305, 531)" class="streetcar yr2060 yr2070 yr2080">
+			<!-- Remount & Wilkinson Station -->
+			<circle cx="0" cy="0" class="gold transfer"/>
+			<circle cx="0" cy="0" class="green transfer"/>
+		</g>
+		<!-- Orange Line Stations -->
+		<g transform="translate(822, 425)" class="yr2060 yr2070 yr2080">
+			<!-- Cedar & 1st Station -->
+			<circle cx="0" cy="0" class="gold transfer"/>
+			<circle cx="0" cy="0" class="orange transfer"/>
+		</g>
+		<circle cx="637" cy="255" class="orange yr2060 yr2070 yr2080"/>
+	</g>
+
+	<rect x="0" y="1213" width="2023" height="287" fill="white" style="display:none"/>
+	<g transform="translate(1170, 1258) rotate(7.3)">
+		<rect x="0" y="0" width="120" height="60" fill="#e4e4df"/>
+		<text transform="translate(16, 25)">
+			<tspan x="11" dy="0">Queens</tspan>
+			<tspan x="0" dy="25">University</tspan>
+		</text>
+	</g>
+</svg>
+
+<h2>West End</h2>
+<style>
+path.sidewalk {
+	stroke-width: 20px;
+	stroke: antiquewhite;
+	stroke-linecap: butt;
+}
+path.grass {
+	stroke-width: 16px;
+	stroke: green;
+	stroke-linecap: butt;
+}
+polygon.grass {
+	fill: #44523b;
+}
+path.road {
+	stroke-width: 9px;
+	stroke: grey;
+}
+path.ramp {
+	stroke-width: 10px;
+	stroke: #aaa18f;
+}
+</style>
+<script>
+$(()=>{
+	// Give each road a sidewalk
+	$('path.road').each(function() {
+		let $this = $(this)
+		$this.clone().removeClass('road').addClass('grass').prependTo($this.parent())
+		$this.clone().removeClass('road').addClass('sidewalk').prependTo($this.parent())
+	})
+})</script>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" viewBox="0 0 1292 1061" preserveAspectRatio="xMaxYMax">
+	<defs>
+		<image id="ParkingDeck" xlink:href="parkingdeck.png" x="0" y="0" width="140" height="61"/>
+		<linearGradient id="TreeGradient">
+			<stop offset=" 0%" stop-color="#151c15" />
+			<stop offset="30%" stop-color="#2b3922" />
+			<stop offset="40%" stop-color="#2b3922" />
+			<stop offset="80%" stop-color="#3c4b36" />
+		</linearGradient>
+		<circle id="tree" fill="url(#TreeGradient)" r="20" transform="rotate(45)"/>
+	</defs>
+	<image id="WestEnd" xlink:href="WestEnd.jpg" x="0" y="0" width="1292" height="1061"/>
+	<g transform="translate(300,450)" class="yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+		<!-- Frazier Ave Realignment -->
+		<polygon class="grass" points="105,10 120,10 110,40 90,30"/>
+		<path class="road" d="M20,27l80-30q25-10,30-20l11-20"/>
+	</g>
+	<g transform="translate(1140,55)" class="yr2035 yr2050 yr2060 yr2070 yr2080">
+		<!-- Southbound Ramp -->
+		<polygon class="grass" transform="translate(-700,550)" points="0,0 -25,25 -55,240 45,220 145,130 145,50 100,40 50,25"/>
+		<polygon class="grass" points="0-10 -100,40 -330,170 -330,175 -250,250 -100,100"/>
+		<polygon class="grass" transform="translate(-600,200)" points="225-10 130,55 80,130 0,200 -80,330 -20,350 50,365 170,350 240,260 290,180 320,110 335,95"/>
+		<path class="ramp" d="M0,0l-295,230l-250,360c-100,130-160,90-205,200q-20,80-70,170"/>
+	</g>
+	<g transform="translate(400,200)" class="yr2035 yr2050 yr2060 yr2070 yr2080">
+		<!-- Foliage! -->
+		<use xlink:href="#tree" transform="scale(0.7)" x="250" y="265"/>
+		<use xlink:href="#tree" transform="scale(0.7)" x="275" y="245"/>
+		<use xlink:href="#tree" transform="scale(0.6)" x="345" y="265"/>
+		<use xlink:href="#tree" transform="scale(0.5)" x="440" y="290"/>
+	</g>
+	<g transform="translate(433,600)" class="yr2035 yr2050 yr2060 yr2070 yr2080">
+		<!-- N Summit Ave Connection -->
+		<path class="road" d="M10-10C80-100,60-110,170-205C230-250,260-380,280-410"/>
+		<text style="font-weight: bold; stroke-width: 2px; transform: rotate(-55deg) translate(60px, 8px); font-size: 0.8rem;">Jiaxin Ave</text>
+	</g>
+	<g transform="translate(363,680)" class="yr2050 yr2060 yr2070 yr2080">
+		<!-- S Summit Ave Connection -->
+		<path class="road" d="M0,0l66-76"/>
+	</g>
+	<g style="transform: translate(600px, 500px) rotate(-55deg);" class="yr2060 yr2070 yr2080">
+		<!-- Parking Decks -->
+		<path class="road" d="M-120,40Q-100,33-100,20h380q0,17,20,20"/>
+		<use x="-100" y="7" xlink:href="#ParkingDeck"/>
+		<use x="25" y="7" xlink:href="#ParkingDeck"/>
+		<use x="150" y="7" xlink:href="#ParkingDeck"/>
+	</g>
+	<g class="gold streetcar yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+		<rect x="117" y="498" width="20" height="40" class="gold" style="transform: rotate(-20deg);"/>
+		<rect x="3" y="1380" width="20" height="40" class="gold" style="transform: rotate(-53deg);"/>
+		<path class="route" d="M345,0c0,320-130,350,0,532c100,90,200,100,350,140c150,50,240,40,340,100q100,55,257,200"/>
+	</g>
+</svg>
+
+<h2>South Corridor</h2>
+<style>
+#SouthCorridor ~ g path.plan {
+	stroke-width: 1px;
+}
+#SouthCorridor ~ g.stations circle {
+	stroke-width: 3px;
+	r: 5px;
+}
+#SouthCorridor ~ g.stations > g.light-rail > circle.transfer,
+#SouthCorridor ~ g.stations > circle.light-rail {
+	stroke-width: 4px;
+	r: 7px;
+}
+#SouthCorridor ~ g.stations circle.transfer:first-of-type {
+	fill: white;
+}
+#SouthCorridor ~ g.streetcar path.route,
+#SouthCorridor ~ g path.route.streetcar {
+	stroke-width: 3px;
+}
+#SouthCorridor ~ g.light-rail path.route,
+#SouthCorridor ~ g path.route.light-rail {
+	stroke-width: 4px;
+}
+#SouthCorridor ~ g.streetcar path.outline,
+#SouthCorridor ~ g path.outline.streetcar {
+	stroke-width: 4.5px;
+}
+#SouthCorridor ~ g.light-rail path.outline,
+#SouthCorridor ~ g path.outline.light-rail {
+	stroke-width: 6px;
+}
+#SouthCorridor ~ g.stations > g:not(.light-rail) > circle.transfer:first-child:nth-last-child(2),
+#SouthCorridor ~ g.stations > g:not(.light-rail) > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer {
+	stroke-dasharray: 7.4;
+}
+#SouthCorridor ~ g.stations > g:not(.light-rail) > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer:nth-child(2) {
+	stroke-dashoffset: 7.4;
+}
+</style>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="730" viewBox="0 0 730 1326" preserveAspectRatio="xMaxYMax">
+	<image id="SouthCorridor" xlink:href="SouthCorridor.jpg" x="0" y="0" width="730" height="1326"/>
+	<g class="blue light-rail">
+		<g class="yr2007 yr2015">
+			<path class="route" d="M199,1242c-10-60-15-85,8-118l34-80q19-35,8-72c-10-65-20-100-8-165c10-30,0-60,0-94c0-100-15-120-15-143c0-50,15-75,33-122q21-47,48-86l76-116Q400,220,428,200l120-99"/>
+		</g>
+		<g class="yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<path class="route" d="M199,1242c-10-60-15-85,8-118l34-80q19-35,8-72c-10-65-20-100-8-165c10-30,0-60,0-94c0-100-15-120-15-143c0-50,15-75,33-122q21-47,48-86l76-116Q400,220,428,200l120-99l85-76l25-14l10-10"/>
+		</g>
+	</g>
+	<g class="silver">
+		<g class="alt yr2050 yr2060 yr2070 yr2080">
+			<path class="route streetcar" d="M471,75l32-27l79,85q13,12,26,25Q628,176,637,187c10,8,21,14,32,23q30,31,62,58"/>
+		</g>
+		<g class="yr2035 yr2050 yr2060 yr2070 yr2080">
+			<path class="route streetcar" d="M471,75l-20,20q-12,8-3,21Q466,139,485,159q40,44,66,69q10,1,30,7q18,1,28-13l28-35"/>
+			<path class="route light-rail" d="M637,187q10-14,23-8q35,10,70,13"/>
+		</g>
+	</g>
+	<g class="gold streetcar">
+		<g class="alt yr2030 yr2035 yr2050 yr2060 yr2070 yr2080 yr2080">
+			<path class="route" d="M0,117q15,8,100,12L197,133l36,3q22-30,36-39q28,4,52-10q10-4,23-2c10,4,20-3,32,2q15,5,26,19c10-12,40-44,50-59"/>
+		</g>
+		<g class="alt yr2060 yr2070 yr2080 yr2080">
+			<path class="route" d="M570,167.5l39.5-34.5l6-10l20,15q18,10,40,15l55,14"/>
+		</g>
+		<g class="yr2015 yr2017">
+			<path class="route" d="M525,121q49,51,100,100l18,18l5-6"/>
+		</g>
+		<g class="yr2020">
+			<path class="route" d="M385,0q0,13,10,16l22,6q11,3,20,10l51,50L525,121q49,51,100,100l18,18l39-40q12-10,13-25"/>
+		</g>
+		<g class="yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<path class="route" d="M385,0q0,13,10,16l22,6q11,3,20,10l51,50L525,121q49,51,100,100l18,18l39-40q12-10,13-25l3-19q1-10,9-20l4-5c15,7,15,15,15,22l-4,13l10,2"/>
+		</g>
+	</g>
+	<g class="g-line streetcar">
+		<g class="yr2050">
+			<path class="route" d="M493.5,341.5l32-36M197,135c0,40-7,60-3,72q12-4,37-6c20,3,30-12,53-9q49,15,100,50q50,43,118,107l15-16q9-24,13-47l21-23q6-17,0-35"/>
+		</g>
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route" d="M454,394q10-20,39.5-52.5l32-36M445,625c-3-20,4-45-1-75c-1-10-17-50-13-80c-4-20-5-25,7-50l6-18l12-10l8-3L502,349l15-16q9-24,13-47l21-23q6-17,0-35"/>
+		</g>
+		<g class="yr2070 yr2080">
+			<path class="route" d="M408,1148l12-50q-5-30,12-145l20-59c8-25-1-25,9-55l7-60c-1-50-22-120-22-155"/>
+		</g>
+		<g class="yr2080">
+			<path class="route" d="M380,1326l13-50c14-33-15-36,0-70L408,1148"/>
+		</g>
+	</g>
+	<g class="green streetcar">
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route" d="M197,135c0,40-7,60-3,72q12-4,37-6c20,3,30-12,53-9q49,15,100,50q50,43,118,107c40,20,40,50,53,60l0,21l51,33q21-50,43-125c5-10,8-45,0-59q-10-14-22-22l16-18M712,130l18-20M660,10q25,25,30,20c12,0,28,15,40,15"/>
+			<path class="route overlay" d="M643,239l39-40q12-10,13-25l3-19q1-10,9-20l4-5"/>
+		</g>
+	</g>
+	<g class="south-feeder streetcar">
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route" d="M245,690q30,14,64,23q10,1,25,9l85,41c30,10,25,40,45,43l70,17c20,0,51,22,68,25"/>
+		</g>
+		<g class="yr2080">
+			<path class="route" d="M240,577q33,17,70,33q45,17,60,11c5-5,60,5,74,3.2"/>
+			<path class="route" d="M207,1124q10,0,21,5c10,3,20,18,49,8q30-7,60,0c25,10,25,12,50,5q10-5,23.5-5l10,2"/>
+		</g>
+		<g class="yr2080">
+			<path class="route" d="M419,1100l1-2c15-18,27-38,45-46c15-12,36-5,42-30q15-25,32-27q-7-43,17-70q20-10,29-35l17-41"/>
+			<path class="route overlay" d="M410.5,1137L419,1100"/>
+		</g>
+		<g class="yr2050 yr2060 yr2070 yr2080">
+			<path class="route" d="M259,448l-4,19q17,7,30,17q35,33,70,74q20,20,24,62M379,620c10,0,55,5,66,5c20,0,28-9,37,4s25,2,40,7l17,5q12,3,14,15q5,26,11.5,28.5c-5,13-5,30-15,39q-18,22,0,42q7,6,11,13q7-4,15-4q5,0,58,34Q604,838,602,848"/>
+		</g>
+	</g>
+	<g class="stations">
+		<!-- Blue Line Stations -->
+		<circle cx="199" cy="1242" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="207" cy="1124" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070"/>
+		<g transform="translate(207, 1124)" class="yr2080 light-rail">
+			<!-- Sharon Rd W Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="south-feeder transfer"/>
+		</g>
+		<circle cx="249" cy="972" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="241" cy="807" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="241" cy="713" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="229" cy="593" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="259" cy="448" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035"/>
+		<g transform="translate(259, 448)" class="light-rail yr2050 yr2060 yr2070 yr2080">
+			<!-- Scaleybark Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="south-feeder transfer"/>
+		</g>
+		<circle cx="307" cy="362" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="383" cy="247" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035"/>
+		<g transform="translate(385, 245)" class="light-rail yr2050">
+			<!-- East/West Blvd Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="g-line transfer"/>
+		</g>
+		<g transform="translate(385, 245)" class="light-rail yr2060 yr2070 yr2080">
+			<!-- East/West Blvd Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="green transfer"/>
+		</g>
+		<circle cx="415" cy="211" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="447" cy="184" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="478" cy="159" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030"/>
+		<g transform="translate(480, 159)" class="light-rail yr2035 yr2050 yr2060 yr2070 yr2080">
+			<!-- Stonewall/College Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="silver transfer"/>
+		</g>
+		<circle cx="502" cy="139.5" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="522" cy="122.5" class="blue light-rail yr2007"/>
+		<g transform="translate(523, 123)" class="light-rail yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<!-- CTC/Arena Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="gold transfer"/>
+		</g>
+		<circle cx="545" cy="103" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="572" cy="80" class="blue light-rail yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="660" cy="10" class="blue light-rail yr2017 yr2020 yr2023 yr2030 yr2035 yr2050"/>
+		<g transform="translate(660, 10)" class="light-rail yr2060 yr2070 yr2080">
+			<!-- Parkwood Ave Station -->
+			<circle cx="0" cy="0" class="blue transfer"/>
+			<circle cx="0" cy="0" class="green transfer"/>
+		</g>
+		<!-- Gold Line Stations -->
+		<circle cx="650" cy="232" class="gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050"/>
+		<g transform="translate(650, 232)" class="yr2060 yr2070 yr2080">
+			<!-- Hawthorne & 5th / Presbyterian Hospital Station -->
+			<circle cx="0" cy="0" class="green transfer"/>
+			<circle cx="0" cy="0" class="gold transfer"/>
+		</g>
+		<circle cx="636" cy="232" class="gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- Green Line Stations -->
+		<circle cx="585" cy="449" class="green yr2060 yr2070 yr2080"/>
+		<!-- G-Line Stations -->
+		<circle cx="445" cy="625" class="g-line yr2060 yr2070"/>
+		<circle cx="445" cy="625" class="south-feeder yr2050"/>
+		<g transform="translate(445, 625) rotate(45)" class="yr2060 yr2070 yr2080">
+			<!-- Park Rd & Woodlawn Station -->
+			<circle cx="0" cy="0" class="south-feeder transfer"/>
+			<circle cx="0" cy="0" class="g-line transfer"/>
+		</g>
+		<g transform="translate(464, 806) rotate(50)" class="yr2070 yr2080">
+			<!-- Park Rd & Tyvola & Fairview Station -->
+			<circle cx="0" cy="0" class="south-feeder transfer"/>
+			<circle cx="0" cy="0" class="g-line transfer"/>
+		</g>
+		<circle cx="408" cy="1148" class="g-line yr2070 yr2080"/>
+		<!-- South Feeder Stations -->
+		<circle cx="240" cy="577" class="south-feeder yr2080"/>
+		<circle cx="245" cy="690" class="south-feeder yr2060 yr2070 yr2080"/>
+		<circle cx="464" cy="806" class="south-feeder yr2060"/>
+		<circle cx="602" cy="848" class="south-feeder yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="421" cy="1140" class="south-feeder yr2080"/>
+	</g>
+</svg>
+</body>
+</html>
