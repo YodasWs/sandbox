@@ -84,13 +84,15 @@ path {
 	fill: none;
 	transition: all 1s;
 }
+g.stations circle.quarter-mile,
+g.stations circle.half-mile,
 [class*="yr"] {
 	transition: all 1s;
-	opacity: 0;
 }
-.yr2007,
-h2.yr2007 {
-	opacity: 1;
+g.stations circle.quarter-mile[hidden],
+g.stations circle.half-mile[hidden],
+[class*="yr"][hidden] {
+	opacity: 0;
 }
 g.stations circle.silver,
 g.silver path.route {
@@ -252,13 +254,31 @@ g.stations > g > circle.transfer:first-child:nth-last-child(5) ~ circle.transfer
 	stroke-dashoffset: 35;
 }
 /* Station Labels */
-g.stations > g.station > text {
+g.stations > g.station[hidden] > text {
 	transition: all 500ms;
 	opacity: 0;
 }
-g.stations > g.station > circle:hover ~ text,
-g.stations > g.station > text:hover {
+g.stations > g.station:not([hidden]) > circle:hover ~ text,
+g.stations > g.station:not([hidden]) > text:hover {
 	opacity: 1;
+}
+g.stations circle.quarter-mile,
+g.stations circle.half-mile {
+	stroke: grey;
+	fill: lightgrey;
+	opacity: 0.5;
+}
+#DowntownCLT g.stations circle.quarter-mile {
+	stroke-width: 5px;
+	r: 75;
+}
+#DowntownCLT g.stations circle.half-mile {
+	stroke-width: 10px;
+	r: 160;
+}
+#DowntownCLT g.stations circle.quarter-mile:not([hidden]),
+#DowntownCLT g.stations circle.half-mile:not([hidden]) {
+	opacity: 0.2;
 }
 </style>
 <script>
@@ -300,7 +320,7 @@ $(()=>{
 		$yrLinear.val(curr)
 
 		// Fade in/out
-		$svg.find('[class*="yr"]').css('opacity', 0).filter('.yr' + curr).css('opacity', 1)
+		$svg.find('[class*="yr"]').attr('hidden', true).filter('.yr' + curr).removeAttr('hidden')
 		$h2.css('opacity', 0).filter('.yr' + curr).css('opacity', 1)
 	})
 
@@ -341,8 +361,8 @@ $(()=>{
 </header>
 
 <h2>Center City Rail Network</h2>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2023 1350" preserveAspectRatio="xMaxYMax">
-	<image id="DowntownCLT" xlink:href="DowntownCLT.png" x="0" y="0" width="2023" height="1212"/>
+<svg id="DowntownCLT" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2023 1350" preserveAspectRatio="xMaxYMax">
+	<image xlink:href="DowntownCLT.png" x="0" y="0" width="2023" height="1212"/>
 	<g class="gold streetcar">
 		<g class="alt yr2030 yr2035 yr2050 yr2060 yr2070 yr2080 yr2080">
 			<path class="route" d="M912,329l-122,137c-10-15-55-47-68-47c-20-6-45,6-87-5c-30-5-80,30-100,30c-50-10-80,5-100,36l-46,56l-88-6l-100-4l-43-2.5l-100-4l-50-2.5l-7-.5"/>
@@ -664,10 +684,10 @@ $(()=>{
 
 <h2>South Corridor</h2>
 <style>
-#SouthCorridor ~ g path.plan {
+#SouthCorridor g path.plan {
 	stroke-width: 1px;
 }
-#SouthCorridor ~ g.stations circle {
+#SouthCorridor g.stations circle {
 	stroke-width: 3px;
 	r: 5px;
 }
@@ -679,32 +699,60 @@ $(()=>{
 #SouthCorridor ~ g.stations circle.transfer:first-of-type {
 	fill: white;
 }
-#SouthCorridor ~ g.streetcar path.route,
-#SouthCorridor ~ g path.route.streetcar {
+#SouthCorridor g.streetcar path.route,
+#SouthCorridor g path.route.streetcar {
 	stroke-width: 3px;
 }
-#SouthCorridor ~ g.light-rail path.route,
-#SouthCorridor ~ g path.route.light-rail {
+#SouthCorridor g.light-rail path.route,
+#SouthCorridor g path.route.light-rail {
 	stroke-width: 4px;
 }
-#SouthCorridor ~ g.streetcar path.outline,
-#SouthCorridor ~ g path.outline.streetcar {
+#SouthCorridor g.streetcar path.outline,
+#SouthCorridor g path.outline.streetcar {
 	stroke-width: 4.5px;
 }
-#SouthCorridor ~ g.light-rail path.outline,
-#SouthCorridor ~ g path.outline.light-rail {
+#SouthCorridor g.light-rail path.outline,
+#SouthCorridor g path.outline.light-rail {
 	stroke-width: 6px;
 }
-#SouthCorridor ~ g.stations > g:not(.light-rail) > circle.transfer:first-child:nth-last-child(2),
-#SouthCorridor ~ g.stations > g:not(.light-rail) > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer {
+#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-child(2),
+#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-child(2) ~ circle {
 	stroke-dasharray: 7.4;
 }
 #SouthCorridor ~ g.stations > g:not(.light-rail) > circle.transfer:first-child:nth-last-child(2) ~ circle.transfer:nth-child(2) {
 	stroke-dashoffset: 7.4;
 }
+#SouthCorridor g.stations circle.quarter-mile {
+	stroke-width: 4px;
+	r: 35;
+}
+#SouthCorridor g.stations circle.half-mile {
+	stroke-width: 4px;
+	r: 70;
+}
 </style>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="730" viewBox="0 0 730 1326" preserveAspectRatio="xMaxYMax">
-	<image id="SouthCorridor" xlink:href="SouthCorridor.jpg" x="0" y="0" width="730" height="1326"/>
+<script>
+$(()=>{
+	const $svg = $('svg')
+	$svg.children('g.stations').children().each((i, station) => {
+		const $st = $(station)
+		const $svg = $st.parents('svg')
+		let cl = 'quarter-mile'
+		if ($svg.is('#SouthCorridor')) {
+			cl = 'half-mile'
+		}
+		if ($st.is('circle')) {
+			$st.clone().addClass(cl).prependTo($svg.children('g.stations'))
+		} else if ($st.is('g')) {
+			let g = $st.clone().removeClass('light-rail streetcar')
+			g.children(':nth-child(n + 2)').remove()
+			g.children().addClass(cl).removeClass('light-rail streetcar')
+			g.prependTo($st.parents('svg').children('g.stations'))
+		}
+	})
+})</script>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="SouthCorridor" width="730" viewBox="0 0 730 1326" preserveAspectRatio="xMaxYMax">
+	<image xlink:href="SouthCorridor.jpg" x="0" y="0" width="730" height="1326"/>
 	<g class="blue light-rail">
 		<g class="yr2007 yr2015">
 			<path class="route" d="M199,1242c-10-60-15-85,8-118l34-80q19-35,8-72c-10-65-20-100-8-165c10-30,0-60,0-94c0-100-15-120-15-143c0-50,15-75,33-122q21-47,48-86l76-116Q400,220,428,200l120-99"/>
