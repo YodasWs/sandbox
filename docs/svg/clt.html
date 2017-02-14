@@ -69,7 +69,13 @@ header > h2 {
 	bottom: 0;
 }
 header > form {
-	left: 200px;
+	left: 8rem;
+}
+header > form > * {
+	vertical-align: middle;
+}
+header > form > label {
+	font-size: 0.6em;
 }
 svg {
 	display: block;
@@ -84,13 +90,11 @@ path {
 	fill: none;
 	transition: all 1s;
 }
-g.stations circle.quarter-mile,
-g.stations circle.half-mile,
+g.stations circle.tod,
 [class*="yr"] {
 	transition: all 1s;
 }
-g.stations circle.quarter-mile[hidden],
-g.stations circle.half-mile[hidden],
+g.stations circle.tod[hidden],
 [class*="yr"][hidden] {
 	opacity: 0;
 }
@@ -144,6 +148,11 @@ g.stations circle.south-feeder,
 g.south-feeder path.route {
 	stroke: #00A1DE;
 }
+g.stations circle.south-blvd,
+g.south-blvd path.route {
+	stroke: #00A1DE;
+	stroke: #0039A6;
+}
 g.stations circle.gold,
 g.gold path.route {
 	stroke: gold;
@@ -186,12 +195,14 @@ g.stations > g > circle {
 	fill: none;
 	r: 7px;
 }
+g.stations > g > circle:only-of-type,
 g.stations > g.streetcar > circle,
 g.stations > circle.streetcar {
 	stroke-width: 4px;
 	r: 8px;
 }
-g.stations > g.streetcar > circle:not(.half-mile):first-child,
+g.stations > g.streetcar > circle:not(.tod):first-child,
+g.stations > g > circle:not(.tod):only-of-type,
 g.stations > circle.streetcar {
 	fill: white;
 }
@@ -200,85 +211,86 @@ g.stations > g.streetcar > circle:first-child {
 g.stations > g > circle {
 	transition: all 1s;
 }
-g.stations > g > circle:first-child:nth-last-child(2),
-g.stations > g > circle:first-child:nth-last-child(2) ~ circle {
+g.stations > g > circle:first-child:nth-last-of-type(2),
+g.stations > g > circle:first-child:nth-last-of-type(2) ~ circle {
 	stroke-dasharray: 10.8;
 }
-g.stations > g > circle:first-child:nth-last-child(2) ~ circle:nth-child(2) {
+g.stations > g > circle:first-child:nth-last-of-type(2) ~ circle:nth-of-type(2) {
 	stroke-dashoffset: 10.8;
 }
-g.stations > g.streetcar > circle:first-child:nth-last-child(2),
-g.stations > g.streetcar > circle:first-child:nth-last-child(2) ~ circle {
+g.stations > g.streetcar > circle:first-child:nth-last-of-type(2),
+g.stations > g.streetcar > circle:first-child:nth-last-of-type(2) ~ circle {
 	stroke-dasharray: 13;
 }
-g.stations > g.streetcar > circle:first-child:nth-last-child(2) ~ circle:nth-child(2) {
+g.stations > g.streetcar > circle:first-child:nth-last-of-type(2) ~ circle:nth-of-type(2) {
 	stroke-dashoffset: 13;
 }
-g.stations > g > circle:first-child:nth-last-child(3),
-g.stations > g > circle:first-child:nth-last-child(3) ~ circle {
+g.stations > g > circle:first-child:nth-last-of-type(3),
+g.stations > g > circle:first-child:nth-last-of-type(3) ~ circle {
 	stroke-dasharray: 6.5, 13;
 }
-g.stations > g > circle:first-child:nth-last-child(3) ~ circle:nth-child(2) {
+g.stations > g > circle:first-child:nth-last-of-type(3) ~ circle:nth-of-type(2) {
 	stroke-dashoffset: 6.5;
 }
-g.stations >  circle:first-child:nth-last-child(3) ~ circle:nth-child(3) {
+g.stations > g > circle:first-child:nth-last-of-type(3) ~ circle:nth-of-type(3) {
 	stroke-dashoffset: 13;
 }
-g.stations > g > circle:first-child:nth-last-child(4),
-g.stations > g > circle:first-child:nth-last-child(4) ~ circle {
+g.stations > g > circle:first-child:nth-last-of-type(4),
+g.stations > g > circle:first-child:nth-last-of-type(4) ~ circle {
 	stroke-dasharray: 7, 21;
 }
-g.stations > g > circle:first-child:nth-last-child(4) ~ circle:nth-child(2) {
+g.stations > g > circle:first-child:nth-last-of-type(4) ~ circle:nth-of-type(2) {
 	stroke-dashoffset: 7;
 }
-g.stations > g > circle:first-child:nth-last-child(4) ~ circle:nth-child(3) {
+g.stations > g > circle:first-child:nth-last-of-type(4) ~ circle:nth-of-type(3) {
 	stroke-dashoffset: 14;
 }
-g.stations > g > circle:first-child:nth-last-child(4) ~ circle:nth-child(4) {
+g.stations > g > circle:first-child:nth-last-of-type(4) ~ circle:nth-of-type(4) {
 	stroke-dashoffset: 21;
 }
-g.stations > g > circle:first-child:nth-last-child(5),
-g.stations > g > circle:first-child:nth-last-child(5) ~ circle {
+g.stations > g > circle:first-child:nth-last-of-type(5),
+g.stations > g > circle:first-child:nth-last-of-type(5) ~ circle {
 	stroke-dasharray: 7, 35;
 }
-g.stations > g > circle:first-child:nth-last-child(5) ~ circle:nth-child(2) {
+g.stations > g > circle:first-child:nth-last-of-type(5) ~ circle:nth-of-type(2) {
 	stroke-dashoffset: 7;
 }
-g.stations > g > circle:first-child:nth-last-child(5) ~ circle:nth-child(3) {
+g.stations > g > circle:first-child:nth-last-of-type(5) ~ circle:nth-of-type(3) {
 	stroke-dashoffset: 14;
 }
-g.stations > g > circle:first-child:nth-last-child(5) ~ circle:nth-child(4) {
+g.stations > g > circle:first-child:nth-last-of-type(5) ~ circle:nth-of-type(4) {
 	stroke-dashoffset: 21;
 }
-g.stations > g > circle:first-child:nth-last-child(5) ~ circle:nth-child(5) {
+g.stations > g > circle:first-child:nth-last-of-type(5) ~ circle:nth-of-type(5) {
 	stroke-dashoffset: 35;
 }
 /* Station Labels */
-g.stations > g.station[hidden] > text {
+g.stations > g > text {
 	transition: all 500ms;
 	opacity: 0;
 }
-g.stations > g.station:not([hidden]) > circle:hover ~ text,
-g.stations > g.station:not([hidden]) > text:hover {
+g.stations > g:not([hidden]) > circle:hover ~ text,
+g.stations > g:not([hidden]) > text:hover {
 	opacity: 1;
 }
-g.stations circle.quarter-mile,
-g.stations circle.half-mile {
+g.stations circle.tod {
 	stroke: grey;
 	fill: lightgrey;
 	opacity: 0.5;
 }
-#DowntownCLT g.stations circle.quarter-mile {
+#DowntownCLT g.stations > g.streetcar > circle.tod,
+#DowntownCLT g.stations circle.streetcar.tod {
 	stroke-width: 5px;
 	r: 75;
 }
-#DowntownCLT g.stations circle.half-mile {
+#DowntownCLT g.stations > g.light-rail > circle.tod,
+#DowntownCLT g.stations circle.light-rail.tod,
+#DowntownCLT g.stations circle.tod {
 	stroke-width: 10px;
 	r: 160;
 }
-#DowntownCLT g.stations circle.quarter-mile:not([hidden]),
-#DowntownCLT g.stations circle.half-mile:not([hidden]) {
-	opacity: 0.2;
+#DowntownCLT g.stations circle.tod:not([hidden]) {
+	opacity: 0.3;
 }
 </style>
 <script>
@@ -297,6 +309,21 @@ $(()=>{
 	$(window).on('resize', function() {
 		$('body').css('padding-top', $('body > header').outerHeight(true) + 'px')
 	}).trigger('resize')
+
+	// Build TOD Circles
+	$svg.children('g.stations').children().each((i, station) => {
+		const $st = $(station)
+		if ($st.is('.no-tod')) return
+		const $svg = $st.parents('svg')
+		if ($st.is('circle')) {
+			$st.clone().addClass('tod').prependTo($svg.children('g.stations'))
+		} else if ($st.is('g')) {
+			let g = $st.clone()
+			g.children(':not(circle), circle:nth-of-type(n + 2)').remove()
+			g.children().addClass('tod').removeClass('light-rail streetcar')
+			g.prependTo($st.parents('svg').children('g.stations'))
+		}
+	})
 
 	// Build Year Selectors
 	let $yrLinear = $('#selYear > input[type="range"].linear').attr('min', years[0]).attr('max', years[years.length-1]),
@@ -322,12 +349,28 @@ $(()=>{
 		// Fade in/out
 		$svg.find('[class*="yr"]').attr('hidden', true).filter('.yr' + curr).removeAttr('hidden')
 		$h2.css('opacity', 0).filter('.yr' + curr).css('opacity', 1)
+
+		// Hide TOD Circles
+		if (!$('[name="tod"]').prop('checked')) {
+			$('svg .tod').closest('.yr' + curr).attr('hidden', true)
+		}
 	})
 
 	// Match Year
 	$yrSpecial.on('change', function() {
 		$yrLinear.val(years[$(this).val()]).trigger('change')
 	}).trigger('change')
+
+	// Hide/Display TOD Circles
+	$('[name="tod"]').on('change', function() {
+		const year = $yrLinear.val()
+		const checked = $(this).prop('checked')
+		if (checked) {
+			$('svg .tod').closest('.yr' + year).removeAttr('hidden')
+		} else {
+			$('svg .tod').closest('.yr' + year).attr('hidden', true)
+		}
+	})
 
 	// Give each route an outline
 	$('path.route').each(function() {
@@ -357,6 +400,10 @@ $(()=>{
 	<form id="selYear">
 		<input class="special" type="range" min="0" max="" value="0" autofocus/>
 		<input class="linear" type="range" min="0" max="" value="0" disabled/>
+		<label>
+			Transit-Oriented Development:
+			<input name="tod" type="checkbox"/>
+		</label>
 	</form>
 </header>
 
@@ -457,9 +504,10 @@ $(()=>{
 			<!-- CTC/Arena -->
 			<circle cx="0" cy="0" class="blue"/>
 			<circle cx="0" cy="0" class="gold"/>
+			<text transform="translate(0,0)">CTC/Arena</text>
 		</g>
-		<circle cx="1035" cy="538" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<circle cx="965" cy="592" class="blue yr2007 yr2015 yr2017 yr2020 yr2023 yr2030"/>
+		<circle cx="1035" cy="538" class="blue no-tod yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="965" cy="592" class="blue no-tod yr2007 yr2015 yr2017 yr2020 yr2023 yr2030"/>
 		<g transform="translate(965, 592)" class="yr2035 yr2050 yr2060 yr2070 yr2080">
 			<!-- Stonewall/College Station -->
 			<circle cx="5" cy="-10" class="blue"/>
@@ -489,14 +537,14 @@ $(()=>{
 		</g>
 		<circle cx="1510" cy="131" class="blue yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<!-- Gold Line Stations -->
-		<circle cx="1140" cy="562" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1140" cy="562" class="streetcar gold no-tod yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1177" cy="602" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1257" cy="680" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1345" cy="765" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1380" cy="760" class="streetcar gold yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050"/>
 		<!-- Gold Line Phase 2 Stations to West End -->
-		<circle cx="1040" cy="458" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<circle cx="985" cy="402" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1040" cy="458" class="streetcar gold no-tod yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="985" cy="402" class="streetcar gold no-tod yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="947" cy="363" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="902" cy="318" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="855" cy="280" class="streetcar gold yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
@@ -514,7 +562,7 @@ $(()=>{
 		<circle cx="1670" cy="619" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1770" cy="629" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1835" cy="635" class="streetcar gold yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<g transform="translate(1937, 669)" class="station yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+		<g transform="translate(1937, 669)" class="yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
 			<rect x="0" y="-15" width="55" height="15" fill="#eaeaea"/>
 			<circle cx="0" cy="0" class="streetcar gold"/>
 			<text transform="translate(-20,-17)">Chinatown</text>
@@ -546,10 +594,19 @@ $(()=>{
 			<circle cx="0" cy="0" class="lockwood-line"/>
 			<circle cx="0" cy="0" class="silver"/>
 		</g>
+		<circle cx="1198" cy="766" class="streetcar silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<g transform="translate(1298, 718)" class="streetcar no-tod yr2035 yr2050 yr2060 yr2070 yr2080">
+			<!-- Charlottetown & Elizabeth Station -->
+			<circle cx="0" cy="0" class="silver"/>
+			<circle cx="0" cy="0" class="gold"/>
+		</g>
 		<circle cx="1333" cy="675" class="streetcar silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1550" cy="668" class="silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1793" cy="803" class="silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1897" cy="973" class="silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<!-- G-line Stations -->
+		<circle cx="1139" cy="844" class="streetcar g-line yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="1083" cy="940" class="streetcar g-line yr2050 yr2060 yr2070 yr2080"/>
 		<!-- Gold-Green Transfer Stations -->
 		<g transform="translate(1380, 760) rotate(20)" class="streetcar yr2060 yr2070 yr2080">
 			<!-- Hawthorne & 5th / Presbyterian Hospital Station -->
@@ -696,7 +753,7 @@ $(()=>{
 	stroke-width: 4px;
 	r: 7px;
 }
-#SouthCorridor g.stations > g > circle:not(.half-mile):first-of-type {
+#SouthCorridor g.stations > g > circle:not(.tod):first-of-type {
 	fill: white;
 }
 #SouthCorridor g.streetcar path.route,
@@ -715,41 +772,39 @@ $(()=>{
 #SouthCorridor g path.outline.light-rail {
 	stroke-width: 6px;
 }
-#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-child(2),
-#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-child(2) ~ circle {
+#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-of-type(2),
+#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-of-type(2) ~ circle {
 	stroke-dasharray: 7.4;
 }
-#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-child(2) ~ circle:nth-child(2) {
+#SouthCorridor g.stations > g:not(.light-rail) > circle:first-child:nth-last-of-type(2) ~ circle:nth-of-type(2) {
 	stroke-dashoffset: 7.4;
 }
-#SouthCorridor g.stations circle.quarter-mile {
+#SouthCorridor g.stations > g > circle:first-child:nth-last-of-type(3),
+#SouthCorridor g.stations > g > circle:first-child:nth-last-of-type(3) ~ circle {
+	stroke-dasharray: 7.4, 14.8;
+}
+#SouthCorridor g.stations > g > circle:first-child:nth-last-of-type(3) ~ circle:nth-of-type(2) {
+	stroke-dashoffset: 7.4;
+}
+#SouthCorridor g.stations > g > circle:first-child:nth-last-of-type(3) ~ circle:nth-of-type(3) {
+	stroke-dashoffset: 14.8;
+}
+#SouthCorridor g.stations circle.tod {
 	stroke-width: 4px;
 	r: 35;
 }
-#SouthCorridor g.stations circle.half-mile {
+#SouthCorridor g.stations g.light-rail circle.tod,
+#SouthCorridor g.stations circle.light-rail.tod {
 	stroke-width: 4px;
+	opacity: 0.3;
 	r: 70;
+}
+#SouthCorridor g.stations circle.tod[hidden] {
+	opacity: 0;
 }
 </style>
 <script>
 $(()=>{
-	const $svg = $('svg')
-	$svg.children('g.stations').children().each((i, station) => {
-		const $st = $(station)
-		const $svg = $st.parents('svg')
-		let cl = 'quarter-mile'
-		if ($svg.is('#SouthCorridor')) {
-			cl = 'half-mile'
-		}
-		if ($st.is('circle')) {
-			$st.clone().addClass(cl).prependTo($svg.children('g.stations'))
-		} else if ($st.is('g')) {
-			let g = $st.clone().removeClass('light-rail streetcar')
-			g.children(':nth-child(n + 2)').remove()
-			g.children().addClass(cl).removeClass('light-rail streetcar')
-			g.prependTo($st.parents('svg').children('g.stations'))
-		}
-	})
 })</script>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="SouthCorridor" width="730" viewBox="0 0 730 1326" preserveAspectRatio="xMaxYMax">
 	<image xlink:href="SouthCorridor.jpg" x="0" y="0" width="730" height="1326"/>
@@ -823,24 +878,46 @@ $(()=>{
 			<path class="route" d="M259,448l-4,19q17,7,30,17q35,33,70,74q20,20,24,62M379,620c10,0,55,5,66,5c20,0,28-9,37,4s25,2,40,7l17,5q12,3,14,15q5,26,11.5,28.5c-5,13-5,30-15,39q-18,22,0,42q7,6,11,13q7-4,15-4q5,0,58,34Q604,838,602,848"/>
 		</g>
 	</g>
+	<g class="south-blvd streetcar">
+		<g class="yr2035 yr2050 yr2060 yr2070 yr2080">
+			<path class="route" d="M259,448l-4,19q-5,150-5,350Q245,950,253,972q10,33-4,66L215,1117L207,1124"/>
+		</g>
+	</g>
 	<g class="stations">
 		<!-- Blue Line Stations -->
 		<circle cx="199" cy="1242" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<circle cx="207" cy="1124" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070"/>
-		<g transform="translate(207, 1124)" class="yr2080 light-rail">
+		<circle cx="207" cy="1124" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030"/>
+		<g transform="translate(207, 1124)" class="light-rail yr2035 yr2050 yr2060 yr2070">
+			<!-- Sharon Rd W Station -->
+			<circle cx="0" cy="0" class="blue"/>
+			<circle cx="0" cy="0" class="south-blvd"/>
+		</g>
+		<g transform="translate(207, 1124)" class="light-rail yr2080">
 			<!-- Sharon Rd W Station -->
 			<circle cx="0" cy="0" class="blue"/>
 			<circle cx="0" cy="0" class="south-feeder"/>
+			<circle cx="0" cy="0" class="south-blvd"/>
 		</g>
-		<circle cx="249" cy="972" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="249" cy="972" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030"/>
+		<g transform="translate(249, 972)" class="light-rail yr2035 yr2050 yr2060 yr2070 yr2080">
+			<!-- Arrowood Station -->
+			<circle cx="0" cy="0" class="blue"/>
+			<circle cx="0" cy="0" class="south-blvd"/>
+		</g>
 		<circle cx="241" cy="807" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="241" cy="713" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="229" cy="593" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<circle cx="259" cy="448" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035"/>
+		<circle cx="259" cy="448" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030"/>
+		<g transform="translate(259, 448)" class="light-rail yr2035">
+			<!-- Scaleybark Station -->
+			<circle cx="0" cy="0" class="blue"/>
+			<circle cx="0" cy="0" class="south-blvd"/>
+		</g>
 		<g transform="translate(259, 448)" class="light-rail yr2050 yr2060 yr2070 yr2080">
 			<!-- Scaleybark Station -->
 			<circle cx="0" cy="0" class="blue"/>
 			<circle cx="0" cy="0" class="south-feeder"/>
+			<circle cx="0" cy="0" class="south-blvd"/>
 		</g>
 		<circle cx="307" cy="362" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="383" cy="247" class="blue light-rail yr2007 yr2015 yr2017 yr2020 yr2023 yr2030 yr2035"/>
@@ -888,8 +965,6 @@ $(()=>{
 		<!-- Green Line Stations -->
 		<circle cx="585" cy="449" class="green yr2060 yr2070 yr2080"/>
 		<!-- G-Line Stations -->
-		<circle cx="445" cy="625" class="g-line yr2060 yr2070"/>
-		<circle cx="445" cy="625" class="south-feeder yr2050"/>
 		<g transform="translate(445, 625) rotate(45)" class="yr2060 yr2070 yr2080">
 			<!-- Park Rd & Woodlawn Station -->
 			<circle cx="0" cy="0" class="south-feeder"/>
@@ -902,11 +977,18 @@ $(()=>{
 		</g>
 		<circle cx="408" cy="1148" class="g-line yr2070 yr2080"/>
 		<!-- South Feeder Stations -->
-		<circle cx="240" cy="577" class="south-feeder yr2080"/>
-		<circle cx="245" cy="690" class="south-feeder yr2060 yr2070 yr2080"/>
-		<circle cx="464" cy="806" class="south-feeder yr2060"/>
+		<circle cx="445" cy="625" class="south-feeder yr2050"/>
 		<circle cx="602" cy="848" class="south-feeder yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="464" cy="806" class="south-feeder yr2060"/>
+		<circle cx="245" cy="690" class="south-feeder no-tod yr2060 yr2070 yr2080"/>
+		<circle cx="240" cy="577" class="south-feeder no-tod yr2080"/>
 		<circle cx="421" cy="1140" class="south-feeder yr2080"/>
+		<!-- South Blvd Stations -->
+		<circle cx="253.5" cy="524" class="south-blvd yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="253" cy="593" class="south-blvd no-tod yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="251" cy="713" class="south-blvd no-tod yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="250" cy="815" class="south-blvd no-tod yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<circle cx="242" cy="1054" class="south-blvd yr2035 yr2050 yr2060 yr2070 yr2080"/>
 	</g>
 </svg>
 </body>
