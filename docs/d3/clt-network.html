@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8"/>
+<title>Charlotte Rail Network</title>
+<script src="https://d3js.org/d3.v4.min.js" async></script>
+<script src="https://d3js.org/d3-collection.v1.min.js" async></script>
+<script src="https://d3js.org/d3-dispatch.v1.min.js" async></script>
+<script src="https://d3js.org/d3-quadtree.v1.min.js" async></script>
+<script src="https://d3js.org/d3-timer.v1.min.js" async></script>
+<script src="https://d3js.org/d3-force.v1.min.js" async></script>
+<script src="https://d3js.org/d3-selection.v1.min.js" async></script>
+<script src="https://d3js.org/d3-drag.v1.min.js" async></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script>
+// For anything requiring a loaded dependency
+window.onReady = function(cb){
+	var c=0,a=function(){if(!c){if(document.readyState=='complete'){cb();c=true}}}
+	if(Element.prototype.addEventListener)document.addEventListener('readystatechange',a)
+	else if(Element.prototype.attachEvent)document.attachEvent('onreadystatechange',a)
+};
+</script>
+<link rel="stylesheet" href="scss/d3.css"/>
+</head>
+<body>
+<h1>Charlotte Rail Network</h1>
+<svg class="web" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<filter x="0" y="0" width="1" height="1" id="bg-white">
+			<feFlood flood-color="white"/>
+			<feComposite in="SourceGraphic"/>
+		</filter>
+	</defs>
+</svg>
+<script>
+var map = {
+	sim:null,
+	polarX: (d) => d.y * Math.sin(d.x) + map.svg.width() / 2,
+	polarY: (d) => -1 * d.y * Math.cos(d.x) + map.svg.height() / 2
+}
+var json = {
+	"nodes":[
+		{
+			"id":"CTC/Arena",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"3rd St/Convention Center",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"Stonewall",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"Carson",
+			"borough":"City Center",
+			"neighborhood":"South End"
+		},
+		{
+			"id":"Bland St",
+			"borough":"City Center",
+			"neighborhood":"South End"
+		},
+		{
+			"id":"East/West Blvd",
+			"borough":"City Center",
+			"neighborhood":"South End"
+		},
+		{
+			"id":"New Bern",
+			"borough":"City Center",
+			"neighborhood":"South End"
+		},
+		{
+			"id":"Scaleybark"
+		},
+		{
+			"id":"Woodlawn"
+		},
+		{
+			"id":"Tyvola"
+		},
+		{
+			"id":"Archdale"
+		},
+		{
+			"id":"Arrowood"
+		},
+		{
+			"id":"Sharon Rd W"
+		},
+		{
+			"id":"I-485"
+		},
+		{
+			"id":"7th St",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"9th St",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"Parkwood",
+			"borough":"City Center",
+			"neighborhood":"Optimist Park"
+		},
+		{
+			"id":"25th St",
+			"borough":"City Center",
+			"neighborhood":"Optimist Park"
+		},
+		{
+			"id":"36th St",
+			"borough":"City Center",
+			"neighborhood":"NoDa"
+		},
+		{
+			"id":"Sugar Creek"
+		},
+		{
+			"id":"Old Concord Rd"
+		},
+		{
+			"id":"Tom Hunter"
+		},
+		{
+			"id":"University City Blvd",
+			"borough":"University City",
+			"neighborhood":"University City"
+		},
+		{
+			"id":"McCullough",
+			"borough":"University City",
+			"neighborhood":"University City"
+		},
+		{
+			"id":"JW Clay Blvd",
+			"borough":"University City",
+			"neighborhood":"University City"
+		},
+		{
+			"id":"UNC Charlotte",
+			"borough":"University City",
+			"neighborhood":"University City"
+		},
+		{
+			"id":"CPCC",
+			"borough":"City Center",
+			"neighborhood":"Elizabeth"
+		},
+		{
+			"id":"Plaza Midwood"
+		},
+		{
+			"id":"Chinatown"
+		},
+		{
+			"id":"Eastland"
+		},
+		{
+			"id":"Tryon St",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"Mint St",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"Gateway Station",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"JC Smith University",
+			"borough":"City Center",
+			"neighborhood":"West End"
+		},
+		{
+			"id":"Rosa Parks"
+		},
+		{
+			"id":"Stadium",
+			"borough":"City Center",
+			"neighborhood":"Uptown"
+		},
+		{
+			"id":"Midtown",
+			"borough":"City Center",
+			"neighborhood":"Elizabeth"
+		},
+		{
+			"id":"Pecan"
+		},
+		{
+			"id":"Morningside"
+		},
+		{
+			"id":"Coliseum"
+		},
+		{
+			"id":"Amity Gardens"
+		},
+		{
+			"id":"Sharon Amity"
+		},
+		{
+			"id":"Conference"
+		},
+		{
+			"id":"Village Lake"
+		},
+		{
+			"id":"Galleria"
+		},
+		{
+			"id":"Matthews Twp Pkwy"
+		},
+		{
+			"id":"Dwtn Matthews"
+		},
+		{
+			"id":"Sportsplex"
+		},
+		{
+			"id":"CPCC Levine"
+		},
+		{
+			"id":"Dilworth"
+		},
+		{
+			"id":"Montford Park"
+		},
+		{
+			"id":"SouthPark"
+		},
+		{
+			"id":"Quail Corners"
+		},
+		{
+			"id":"Ballantyne"
+		},
+		{
+			"id":"Rea Rd"
+		},
+		{
+			"id":"Providence Rd"
+		},
+		{
+			"id":"Rea Farms"
+		},
+		{
+			"id":"Waverly"
+		},
+		{
+			"id":"Concord"
+		},
+		{
+			"id":"Ayrsley"
+		},
+		{
+			"id":"S Cedar St"
+		},
+		{
+			"id":"S Clarkson St"
+		},
+		{
+			"id":"S Summit Ave"
+		},
+		{
+			"id":"Morton St"
+		},
+		{
+			"id":"Remount Rd"
+		},
+		{
+			"id":"Ashley Rd"
+		},
+		{
+			"id":"Wesley Heights"
+		},
+		{
+			"id":"Seversville"
+		},
+		{
+			"id":"Lakewood"
+		}
+	],
+	"routes":[
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"CTC/Arena",
+			"target":"CPCC"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"CPCC",
+			"target":"Plaza Midwood"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Plaza Midwood",
+			"target":"Chinatown"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Chinatown",
+			"target":"Eastland"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Gateway Station",
+			"target":"Stadium"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"source":"Stadium",
+			"target":"Stonewall"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Stonewall",
+			"target":"Midtown"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"source":"Midtown",
+			"target":"CPCC"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"CPCC",
+			"target":"Pecan"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Pecan",
+			"target":"Morningside"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Morningside",
+			"target":"Coliseum"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Coliseum",
+			"target":"Amity Gardens"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Amity Gardens",
+			"target":"Sharon Amity"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Sharon Amity",
+			"target":"Conference"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Conference",
+			"target":"Village Lake"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Village Lake",
+			"target":"Galleria"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Galleria",
+			"target":"Matthews Twp Pkwy"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Matthews Twp Pkwy",
+			"target":"Dwtn Matthews"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"tree":true,
+			"source":"Dwtn Matthews",
+			"target":"Sportsplex"
+		},
+		{
+			"name":"I",
+			"class":"silver",
+			"source":"Sportsplex",
+			"target":"CPCC Levine"
+		},
+		{
+			"name":"P",
+			"class":"g-line",
+			"tree":true,
+			"source":"Midtown",
+			"target":"Dilworth"
+		},
+		{
+			"name":"P",
+			"class":"g-line",
+			"tree":true,
+			"source":"Dilworth",
+			"target":"Montford Park"
+		},
+		{
+			"name":"P",
+			"class":"g-line",
+			"tree":true,
+			"source":"Montford Park",
+			"target":"SouthPark"
+		},
+		{
+			"name":"P",
+			"class":"g-line",
+			"tree":true,
+			"source":"SouthPark",
+			"target":"Quail Corners"
+		},
+		{
+			"name":"P",
+			"class":"g-line",
+			"tree":true,
+			"source":"Quail Corners",
+			"target":"Ballantyne"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"CTC/Arena",
+			"target":"3rd St/Convention Center"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"3rd St/Convention Center",
+			"target":"Stonewall"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Stonewall",
+			"target":"Carson"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Carson",
+			"target":"Bland St"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Bland St",
+			"target":"East/West Blvd"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"East/West Blvd",
+			"target":"New Bern"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"New Bern",
+			"target":"Scaleybark"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Scaleybark",
+			"target":"Woodlawn"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Woodlawn",
+			"target":"Tyvola"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Tyvola",
+			"target":"Archdale"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Archdale",
+			"target":"Arrowood"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Arrowood",
+			"target":"Sharon Rd W"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Sharon Rd W",
+			"target":"I-485"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"CTC/Arena",
+			"target":"Tryon St"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Tryon St",
+			"target":"Mint St"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Mint St",
+			"target":"Gateway Station"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Gateway Station",
+			"target":"S Cedar St"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"S Cedar St",
+			"target":"S Clarkson St"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"S Clarkson St",
+			"target":"S Summit Ave"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"S Summit Ave",
+			"target":"Morton St"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Morton St",
+			"target":"Remount Rd"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Remount Rd",
+			"target":"Ashley Rd"
+		},
+		{
+			"name":"L",
+			"class":"orange",
+			"tree":true,
+			"source":"S Cedar St",
+			"target":"Wesley Heights"
+		},
+		{
+			"name":"L",
+			"class":"orange",
+			"tree":true,
+			"source":"Wesley Heights",
+			"target":"Seversville"
+		},
+		{
+			"name":"L",
+			"class":"orange",
+			"tree":true,
+			"source":"Seversville",
+			"target":"Lakewood"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"Gateway Station",
+			"target":"JC Smith University"
+		},
+		{
+			"name":"G",
+			"class":"gold",
+			"tree":true,
+			"source":"JC Smith University",
+			"target":"Rosa Parks"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"CTC/Arena",
+			"target":"7th St"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"7th St",
+			"target":"9th St"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"9th St",
+			"target":"Parkwood"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Parkwood",
+			"target":"25th St"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"25th St",
+			"target":"36th St"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"36th St",
+			"target":"Sugar Creek"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Sugar Creek",
+			"target":"Old Concord Rd"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Old Concord Rd",
+			"target":"Tom Hunter"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"Tom Hunter",
+			"target":"University City Blvd"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"University City Blvd",
+			"target":"McCullough"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"McCullough",
+			"target":"JW Clay Blvd"
+		},
+		{
+			"name":"B",
+			"class":"blue",
+			"tree":true,
+			"source":"JW Clay Blvd",
+			"target":"UNC Charlotte"
+		},
+		{
+			"name":"80X",
+			"class":"express",
+			"tree":true,
+			"source":"JW Clay Blvd",
+			"target":"Concord"
+		},
+		{
+			"name":"W",
+			"class":"south-feeder",
+			"source":"Woodlawn",
+			"target":"Montford Park"
+		},
+		{
+			"name":"T",
+			"class":"south-feeder",
+			"source":"Tyvola",
+			"target":"SouthPark"
+		},
+		{
+			"name":"S",
+			"class":"south-feeder",
+			"source":"Sharon Rd W",
+			"target":"Quail Corners"
+		},
+		{
+			"name":"A",
+			"class":"arrowood",
+			"tree":true,
+			"source":"Arrowood",
+			"target":"Ayrsley"
+		},
+		{
+			"name":"485",
+			"class":"south-crosstown",
+			"source":"Ayrsley",
+			"target":"I-485"
+		},
+		{
+			"name":"485",
+			"class":"south-crosstown",
+			"source":"I-485",
+			"target":"Ballantyne"
+		},
+		{
+			"name":"485",
+			"class":"south-crosstown",
+			"tree":true,
+			"source":"Ballantyne",
+			"target":"Rea Rd"
+		},
+		{
+			"name":"485",
+			"class":"south-crosstown",
+			"tree":true,
+			"source":"Rea Rd",
+			"target":"Providence Rd"
+		},
+		{
+			"name":"485",
+			"class":"south-crosstown",
+			"tree":true,
+			"source":"Providence Rd",
+			"target":"CPCC Levine"
+		},
+		{
+			"name":"P",
+			"class":"south-feeder",
+			"tree":true,
+			"target":"Waverly",
+			"source":"Providence Rd"
+		},
+		{
+			"name":"P",
+			"class":"south-feeder",
+			"tree":true,
+			"source":"Providence Rd",
+			"target":"Rea Farms"
+		},
+		{
+			"name":"P",
+			"class":"south-feeder",
+			"source":"Rea Farms",
+			"target":"Waverly"
+		}
+	],
+	"periphery":[
+		{
+			"target":"I-485"
+		},
+		{
+			"target":"Ballantyne"
+		},
+		{
+			"target":"Ayrsley",
+			"dist":90
+		},
+		{
+			"target":"Waverly",
+			"dist":110
+		},
+		{
+			"target":"Coliseum",
+			"dist":30
+		},
+		{
+			"target":"Matthews Twp Pkwy",
+			"dist":80
+		},
+		{
+			"target":"CPCC Levine"
+		},
+		{
+			"target":"Ashley Rd"
+		},
+		{
+			"target":"Lakewood"
+		},
+		{
+			"target":"Eastland"
+		},
+		{
+			"target":"Concord",
+			"dist":110
+		},
+		{
+			"target":"UNC Charlotte",
+			"dist":90
+		},
+	],
+	"spacing":[
+		{
+			"source":"CTC/Arena",
+			"target":"CPCC",
+			"dist":10
+		}
+	],
+	"currentLocation":"CTC/Arena"
+}
+
+window.onReady(()=>{
+	map.d3 = d3.select('svg')
+	map.svg = $('svg')
+
+let link, forces = []
+
+json.routes = json.routes.filter((r) => {
+	return 1
+	return r.class == 'local'
+})
+// Filter Out Unconnected Map Locations
+json.nodes = json.nodes.filter((node) => {
+	let r = json.routes.filter((r) => {
+		return r.source == node.id || r.target == node.id
+	})
+	return r.length > 0
+})
+
+const svgNS = 'http://www.w3.org/2000/svg';
+
+map.clearSim = () => {
+	// Initialize Simulation
+	if (map.sim && map.sim.stop) map.sim.stop()
+	map.sim = d3.forceSimulation().stop().alphaMin(0.01)
+	map.d3.selectAll("path.link").remove()
+	map.d3.selectAll('g.point').remove()
+	map.d3.selectAll('g.node').remove()
+	map.d3.selectAll("line").remove()
+	map.svg.children(':not(defs)').remove()
+}
+
+map.buildSim = () => {
+
+	map.clearSim()
+
+	if (!map.sim.removeFixedPoints) {
+		map.sim.removeFixedPoints = (function() {
+			this.nodes().forEach((node) => {
+				if (node == map.center) return
+				delete node.fx
+				delete node.fy
+			})
+		}).bind(map.sim)
+	}
+
+	// Normalize Periphery Data
+	json.periphery.forEach((link) => {
+		link.source = 'CTC/Arena'
+		if (!link.dist) {
+			link.dist = 100;
+		}
+	});
+
+	// Build Forces
+	forces.push(
+		d3.forceCollide((d) => {
+			return (d.size || 5) * 2
+		})
+	)
+	forces.push(
+		d3.forceLink()
+			.id((d) => {
+				return d.id
+			})
+			.distance((d) => {
+				if (d.dist) {
+					return d.dist;
+				}
+				if (d.source.neighborhood == d.target.neighborhood) {
+					switch (d.source.neighborhood) {
+					case 'South End':
+						return 10;
+					}
+				}
+				if (d.source.borough == d.target.borough) {
+					switch (d.source.borough) {
+					case 'City Center':
+						return 20;
+					}
+				}
+				switch (d.class) {
+				case 'south-crosstown':
+					return 150;
+				}
+				return 50;
+			})
+			.links(json.routes)
+	)
+	forces.push(
+		d3.forceLink()
+			.id((d) => {
+				return d.id
+			})
+			.distance((d) => {
+				return Math.min(map.svg.width(), map.svg.height()) / 2 * d.dist / 100
+			})
+			.strength((d) => {
+				return 2
+			})
+			.links(json.spacing.concat(json.periphery))
+	)
+
+	// Add to Simulation
+	map.sim.nodes(json.nodes)
+	for (let i=0, l=forces.length; i<l; i++) {
+		map.sim.force(i, forces.pop())
+	}
+
+	// Fix Center
+	map.center = map.sim.nodes().filter((node) => {
+		return node.id == json.currentLocation
+	})[0]
+	map.center.fx = map.svg.width() / 2
+	map.center.fy = map.svg.height() / 2
+
+	// Release Center
+	map.sim.on('end.fixedpoint', () => {
+		console.log('ended!')
+		map.sim.removeFixedPoints()
+		map.sim.on('end.fixedpoint', null)
+	})
+}
+
+map.classifyLinks = (links) => {
+	;['express','blue','gold','silver','orange','g-line','south-feeder','arrowood','south-crosstown'].forEach((routeType) => {
+		links.classed(routeType, function(d) {
+			return d.class == routeType
+		})
+	})
+	links.append((d) => {
+		let txtNode = document.createElementNS(svgNS, 'text')
+		txtNode.setAttribute('filter', 'url(#bg-white)')
+		return txtNode
+	}).text((d) => {
+		return d.name
+	})
+}
+
+map.initSim = () => {
+	// Draw Routes
+	map.links = map.d3.selectAll('g.line')
+		.data(json.routes)
+		.enter().append('g')
+		.classed('line', true)
+//		.style("opacity", function(d) { return Math.atan(d.weight * 100) / 2 / Math.PI })
+
+	map.classifyLinks(map.links)
+
+	map.links.append('line').lower()
+	map.links.append('path').lower()
+
+
+	// Draw Nodes
+	let node = map.d3.selectAll('g.node')
+		.data(map.sim.nodes())
+		.enter().append('g')
+		.classed('node', true)
+	node.append('circle').attr('r', (d) => {
+		return d.size || 5
+	})
+	node.append("text")
+		.attr("dx", (d) => {
+			return 4 + d.size || 5
+		})
+		.attr("dy", ".35em")
+		.text(function(d) {
+			return d.also || d.id
+		})
+
+	// Make Nodes Draggable
+	map.d3.call(d3.drag()
+		.container(map.svg[0])
+		.subject(() => {
+			return map.sim.find(d3.event.x, d3.event.y)
+		})
+		.on("start", () => {
+			if (!d3.event.active) map.sim.alphaTarget(0.3).restart()
+			map.sim.removeFixedPoints()
+			d3.event.subject.fx = d3.event.subject.x
+			d3.event.subject.fy = d3.event.subject.y
+		})
+		.on("drag", () => {
+			d3.event.subject.fx = d3.event.x
+			d3.event.subject.fy = d3.event.y
+		})
+		.on("end", () => {
+			if (!d3.event.active) map.sim.alphaTarget(0)
+			let p = { x: d3.event.subject.fx, y: d3.event.subject.fy }
+			map.sim.removeFixedPoints()
+//			d3.event.subject.fx = p.x
+//			d3.event.subject.fy = p.y
+		})
+	)
+
+	// Update Map
+	map.sim.on("tick", function() {
+		// Draw Lines
+		map.links.select('line').attr("x1", (d) => {
+			return d.source.x
+		}).attr("y1", (d) => {
+			return d.source.y
+		}).attr("x2", (d) => {
+			return d.target.x
+		}).attr("y2", (d) => {
+			return d.target.y
+		})
+		map.links.select('path').attr("d", (d) => {
+			let points = []
+			points.push([d.source.x, d.source.y])
+			points.push([d.target.x, d.target.y])
+			return 'M' + points.map((p) => {
+				return p.join(',')
+			}).join('L') + 'Z'
+		})
+		// Update Text Location on Lines
+		map.links.select('text').attr("x", (d) => {
+			return (d.source.x + d.target.x) / 2
+		}).attr("y", (d) => {
+			return (d.source.y + d.target.y) / 2
+		})
+		// Move Node Circles
+		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
+	})
+	map.sim.on('tick')()
+}
+map.startSim = () => {
+	map.sim.restart()
+}
+
+// Build Map as a Tree Chart
+map.buildTree = function() {
+	let tree = {
+		name:json.currentLocation,
+		children:[]
+	}
+	let inTree = [tree.name]
+	let i = 0
+	let findChildren = (tree) => {
+		if (i++ > 100) return false
+		json.routes.forEach((r) => {
+			if (i > 100) return false
+			if (!r.tree) return true
+			let child = false
+			;['source','target'].forEach((prop) => {
+				let val = r[prop]
+				let other = prop == 'source' ? 'target' : 'source'
+				if (typeof val !== 'string' && val.id) val = val.id
+				if (val === tree.name) child = r[other]
+				if (typeof child !== 'string' && child.id) child = child.id
+			})
+			if (!child) return
+			if (inTree.indexOf(child) > -1) return
+			inTree.push(child)
+			let node = {
+				name:child,
+				children:[]
+			}
+			tree.children.push(node)
+		})
+		if (!tree.children.length) delete tree.children
+	}
+	let nodes = [tree]
+	do {
+		let node = nodes.shift()
+		findChildren(node)
+		if (node.children && node.children.length) {
+			node.children.forEach((node) => { nodes.push(node) })
+		}
+	} while (nodes.length)
+	$('<pre>').text(JSON.stringify(tree, null, 2)).appendTo('body')
+	return tree
+}
+map.layoutTree = function() {
+
+	map.clearSim()
+
+	let root = d3.hierarchy(map.buildTree())
+	let tree = d3.tree().size([2 * Math.PI, Math.min(map.svg.width(), map.svg.height()) / 2 - 10])(root)
+
+	// Draw Radial Tree
+	map.d3.selectAll("path.link")
+		.data(tree.descendants().slice(1))
+		.enter().append("path")
+		.classed('link', true)
+		.attr("d", function(d) {
+//			console.log('d', d)
+			let nodes = [
+				{ x: map.polarX(d), y: map.polarY(d) },
+				{ x: map.polarX(d.parent), y: map.polarY(d.parent) }
+			],
+			points = []
+			points.push("M" + nodes[0].x + "," + nodes[0].y)
+			if (Math.abs(nodes[1].x - nodes[0].x) > Math.abs(nodes[1].y - nodes[0].y)) {
+				points.push("C" + (nodes[0].x + nodes[1].x) / 2 + "," + nodes[0].y)
+				points.push((nodes[0].x + nodes[1].x) / 2 + "," + nodes[1].y)
+			} else {
+				points.push("C" + nodes[0].x + ',' + (nodes[0].y + nodes[1].y) / 2)
+				points.push(nodes[1].x + ',' + (nodes[0].y + nodes[1].y) / 2)
+			}
+			points.push(nodes[1].x + "," + nodes[1].y)
+			return points.join(' ')
+		})
+
+	// Draw Nodes
+	let node = map.d3.selectAll('g.point')
+		.data(root.descendants())
+		.enter().append("g")
+		.classed('point', true)
+		.classed('leaf', function(d) { return !d.children })
+		.attr("transform", function(d) {
+			return "translate(" + map.polarX(d) + "," + map.polarY(d) + ")"
+		})
+	node.append('circle').attr('r', 5)
+	node.append('text')
+		.attr("dx", (d) => {
+			return 4 + d.size || 5
+		})
+		.attr("dy", ".35em")
+		.text((d) => d.data.name)
+
+	if (map.sim && typeof map.sim.on === 'function') {
+		let on = map.sim.on('tick')
+		if (typeof on === 'function') on()
+	}
+
+	return root.descendants()
+}
+
+map.tree = map.layoutTree()
+
+map.simTree = () => {
+
+	if (!map.getCoords) {
+		map.getCoords = (name) => {
+			let coords = {}
+			map.tree.forEach((node) => {
+				if (node.data.name == name) {
+					coords.x = node.x
+					coords.y = node.y
+				}
+			})
+			return coords
+		}
+	}
+
+	map.sim.nodes().forEach((node) => {
+		let c = map.getCoords(node.id)
+//		delete node.fx
+//		delete node.fy
+		node.x = map.polarX(c)
+		node.y = map.polarY(c)
+	})
+
+	map.buildSim()
+
+	map.initSim()
+}
+map.simTree()
+map.simTree()
+});
+$(document).ready(()=>{
+	// Build Stop/Restart Menu
+	let menu = $('<div class="menu">')
+	$('<input type="button" value="Static Tree Layout"/>').appendTo(menu).on('click', () => {
+		map.layoutTree()
+	})
+	$('<input type="button" value="Sim Tree Layout"/>').appendTo(menu).on('click', () => {
+		map.simTree()
+	})
+	$('<input type="button" value="Run Sim"/>').appendTo(menu).on('click', () => {
+		map.startSim()
+	})
+	$('body').append(menu)
+});
+</script>
+</body>
+</html>
