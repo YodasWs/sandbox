@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<meta charset="UTF-8"/>
+<title>Sam's Super Useful Calculators</title>
+<link rel="stylesheet" href="scss/main.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+Number.isNumeric=function(n){return !Number.isNaN(Number.parseFloat(n))&&isFinite(n)};
+Number.isFinite=Number.isFinite||function(n){return typeof n==='number'&&isFinite(n)};
+String.prototype.padLeft = function (p) {
+	return String(p + this).slice(-p.length);
+};
+String.prototype.padRight = function (p) {
+	return String(this + p).slice(0, p.length);
+};
+Math.round10 = function(v,e) {
+	if (typeof e === 'undefined' || +e === 0) return Math.round(v)
+	v = +v
+	e = +e
+	if (Number.isNaN(v) || !Number.isInteger(e)) return NaN
+	v = v.toString().split('e')
+	v = Math.round(+(v[0]+'e'+(v[1]?(+v[1]-e):-e)))
+	v = v.toString().split('e')
+	v = (+(v[0]+'e'+(v[1]?(+v[1]+e):e))+'').split('.')
+	return v[0] + '.' + (v.length > 1 ? v[1].padRight('00') : '00')
+};
+Number.Currency=Number.Currency||{};
+Number.Percent=Number.Percent||{};
+String.toFloat = function(n) {
+	if (typeof n == 'string') {
+		if (!Number.isNumeric(n)) return '&empty;'
+		n = +n
+	}
+	if (Number.isNaN(n)) return '&empty;'
+	if (!Number.isFinite(n)) return '&infin;'
+	return n
+}
+Number.Currency.format = function(n) {
+	n = String.toFloat(n)
+	return typeof n == 'number' ? '$' + Math.round10(n, -2) : n
+};
+Number.Percent.format = function(n) {
+	n = String.toFloat(n)
+	return typeof n == 'number' ? Math.round10(n * 100, -2) + '%' : n
+};
+Date.intMon = function(n) {
+	n = String.toFloat(n)
+	return typeof n == 'number' ? Math.ceil(n) + ' months' : n
+};
+$(document).ready(function(){
+	// Uniform Calculator Input Validation and Calculation Start
+	$(document).on('input', 'input,select', function(e) {
+		$t = $(this)
+		if ($t.attr('type') == 'number' && !Number.isNumeric($t.val())) {
+			$(e.target).parents('section').find('output').html('&#x26a0;')
+			return false
+		}
+		$(e.target).parents('section').trigger({
+			target:e.target,
+			type:'calc'
+		})
+	// Uniform Event Fire
+	}).on('click', '[data-action]', function(e) {
+		$(e.target).parents('section').trigger({
+			calc: $(e.target).closest('section'),
+			type:$(e.target).attr('data-action'),
+			target:e.target
+		})
+	})
+	// Uniform Calculator Resource Gathering
+	$('section').on('calc', function(e) {
+		e.calc = $(e.target).closest('section')
+		e.$o = e.calc.find('output')
+		e.out = []
+	}).on('save', function(e) {
+		if (!e.calc.children('table').length) return
+		e.$o = e.calc.find('output')
+	})
+	// Uniform Calculator Results Output
+	$('section').on('output', function(e) {
+		if (e.out.length && e.out.length <= e.$o.length) e.out.forEach(function(o, i) {
+			var el = $(e.$o[i])
+			if (el.is('.money')) o = Number.Currency.format(o)
+			else if (el.is('.months')) o = Date.intMon(o)
+			else if (el.is('.percent')) o = Number.Percent.format(o)
+			el.html(o)
+		})
+	})
+	$('section#bounds').on('calc', function(e) {
+		e.calc = $(e.target).closest('label')
+		e.out = e.calc.next('output')
+		var bnd = [e.calc.find('input[name="min"]'), e.calc.find('input[name="max"]')],
+			bkg = e.calc.data('color'),
+			sel = ''
+		bnd.forEach(function(a,i){
+			if (a.length) bnd[i] = Number.parseInt(a.val(), 10)
+			else bnd[i] = NaN
+		})
+		switch (e.calc.attr('id')) {
+		case 'ge':
+			sel = ':nth-last-child( n + ' + bnd[0] + ')'
+			break;
+		case 'le':
+			sel = ':nth-last-child(-n + ' + bnd[1] + '):first-child'
+			break;
+		case 'bound':
+			sel = ':nth-last-child( n + ' + bnd[0] + '):nth-last-child(-n + ' + bnd[1] + '):first-child'
+			break;
+		case 'equals':
+			sel = ':nth-last-child(' + bnd[0] + '):first-child'
+			break;
+		}
+		if (sel.length) {
+			e.out.html(sel + ',<br/>' + sel + ' ~ *')
+			$('section.boxes label *').removeClass(bkg)
+			;['','~*'].forEach(function(i){
+				$('section.boxes label ' + sel + i).addClass(bkg)
+			})
+		}
+	})
+	$('section.loan').on('calc', function(e) {
+		var pmt = e.calc.find('input[name="payment"]').val() || 0,
+			p = e.calc.find('input[name="principal"]').val() || 0,
+			r = e.calc.find('input[name="interest"]').val() || 0,
+			t = e.calc.find('input[name="period"]').val() || 0
+		r /= 1200
+		switch (e.calc.attr('id')) {
+		case 'total':
+			e.out.push(r * p * t / (1 - Math.pow(1 + r, -t)))
+			e.out.unshift(e.out[0] - p)
+			break;
+		case 'monthly':
+			e.out.push(r * p / (1 - Math.pow(1 + r, -t)))
+			break;
+		case 'period':
+			if (!Number.isNumeric(r)) e.out.push('&empty;')
+			else if (r !== 0)
+				e.out.push((Math.log(pmt / p) - Math.log(pmt / p - r)) / Math.log(1 + r))
+			else e.out.push(p / pmt)
+			break;
+		}
+		e.type = 'output'
+		$(this).trigger(e)
+	}).on('save', function(e){
+		var pmt = e.calc.find('input[name="payment"]').val() || 0,
+			p = e.calc.find('input[name="principal"]').val() || 0,
+			r = e.calc.find('input[name="interest"]').val() || 0,
+			t = e.calc.find('input[name="period"]').val() || 0,
+			row = $('<tr>')
+		r /= 1200
+		switch (e.calc.attr('id')) {
+		case 'total':
+			row.append('<td>' + p)
+			row.append('<td>' + $(e.$o[0]).val())
+			break;
+		}
+		if (row.children('td,th').length) $(e.calc.children('table')[0]).append(row).show()
+	})
+	$('section.finance').on('calc', function(e) {
+		var inf = e.calc.find('input[name="inflation"]').val() || 0,
+			pmt = e.calc.find('input[name="payment"]').val() || 0,
+			inc = e.calc.find('input[name="income"]').val() || 0,
+			t = e.calc.find('input[name="period"]').val() || 0
+		inf /= 100
+		switch (e.calc.attr('id')) {
+		case 'leverage':
+			e.out.push(pmt * 12 / inc)
+			e.$o.css('color', e.out[0] > 1/3 ? 'red' : 'black')
+			break;
+		case 'realreturn':
+			e.out.push(inc / pmt / (1 + inf) - 1)
+			break;
+		case 'annuity':
+			if (inf != 0) {
+				e.out.push(pmt * (1 / inf - 1 / (inf * Math.pow(1 + inf, t))))
+				e.out.push(pmt * (Math.pow(1 + inf, t) - 1) / inf)
+			} else {
+				e.out.push(pmt * t)
+				e.out.push(pmt * t)
+			}
+			break;
+		}
+		e.type = 'output'
+		$(this).trigger(e)
+	})
+	$('section.invest').on('calc', function(e) {
+		var commission = e.calc.find('input[name="commission"]').val() || 0,
+			sellPrice = e.calc.find('input[name="sell_price"]').val() || 0,
+			buyPrice = e.calc.find('input[name="buy_price"]').val() || 0,
+			shares = e.calc.find('input[name="shares"]').val() || 0,
+			roi = e.calc.find('input[name="roi"]').val() || 0,
+			totalBuy = 0
+		commission = Number.parseFloat(commission)
+		buyPrice = Number.parseFloat(buyPrice)
+		shares = Number.parseInt(shares, 10)
+		roi = Number.parseFloat(roi) / 100
+		switch (e.calc.attr('id')) {
+		case 'roi':
+			totalBuy = buyPrice * shares + commission
+			e.out.push(totalBuy)
+			if (shares > 0) {
+				sellPrice = (2 + roi) * totalBuy / shares
+			} else {
+				sellPrice = '&empty;'
+			}
+			e.out.push(sellPrice)
+			break;
+		}
+		e.type = 'output'
+		$(this).trigger(e)
+	})
+	$('section, #ge, #le').each(function(){
+		$(this).trigger({
+			target:this,
+			type:'calc'
+		})
+	})
+})
+</script>
+<body>
+<h1>Sam's Super Useful Calculators</h1>
+<section id="bounds" class="boxes">
+	<label><span>1</span></label>
+	<label><span>1</span><span>2</span></label>
+	<label><span>1</span><span>2</span><span>3</span></label>
+	<label><span>1</span><span>2</span><span>3</span><span>4</span></label>
+	<label><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></label>
+	<label><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></label>
+	<label><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></label>
+	<label><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></label>
+	<label><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></label>
+	<label><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></label>
+	<label id="equals" data-color="red">
+		<input style="visibility: hidden" />
+		<span>&nbsp;&emsp;m&emsp;=</span>
+		<input name="min" type="number" min="0" max="11" step="1" value="0" />
+	</label>
+	<output></output>
+	<label id="le" data-color="lightgreen">
+		<input style="visibility: hidden" />
+		<span>&nbsp;&emsp;m&emsp;&le;</span>
+		<input name="max" type="number" min="0" max="10" step="1" value="6" />
+	</label>
+	<output></output>
+	<label id="ge" data-color="lightblue">
+		<input name="min" type="number" min="1" max="11" step="1" value="5" />
+		<span>&le;&emsp;m&emsp;&nbsp;</span>
+		<input style="visibility: hidden" />
+	</label>
+	<output></output>
+	<label id="bound" data-color="orange">
+		<input name="min" type="number" min="1" max="10" step="1" value="5" />
+		<span>&le;&emsp;m&emsp;&le;</span>
+		<input name="max" type="number" min="0" max="10" step="1" value="6" />
+	</label>
+	<output></output>
+</section>
+<section id="roi" class="invest">
+	<h1>Investment ROI</h1>
+	<label>
+		<span>Number of Shares</span>
+		<span class=""><input name="shares" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Buy Price</span>
+		<span class="money"><input name="buy_price" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Commission Charged</span>
+		<span class="money"><input name="commission" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Cost of Investment</span>
+		<output class="money"></output>
+	</label>
+	<label>
+		<span>Desired ROI</span>
+		<span class="percent"><input name="roi" type="number" min="0" max="100" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Sell Price</span>
+		<output class="money"></output>
+	</label>
+</section>
+<section id="monthly" class="loan">
+	<h1>Monthly Payment</h1>
+	<label>
+		<span>Principal</span>
+		<span class="money"><input name="principal" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Interest Rate</span>
+		<span class="percent"><input name="interest" type="number" min="0" max="100" step="0.1" value="0" /></span>
+	</label>
+	<label>
+		<span>Period</span>
+		<span class="months"><input name="period" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Monthly Payment</span>
+		<output class="money"></output>
+	</label>
+</section>
+<section id="period" class="loan">
+	<h1>Remaining Period</h1>
+	<label>
+		<span>Principal</span>
+		<span class="money"><input name="principal" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Interest Rate</span>
+		<span class="percent"><input name="interest" type="number" min="0" max="100" step="0.1" value="0" /></span>
+	</label>
+	<label>
+		<span>Monthly Payments</span>
+		<span class="money"><input name="payment" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Remaining Period</span>
+		<output class="months"></output>
+	</label>
+</section>
+<section id="total" class="loan">
+	<h1>Loan Interest</h1>
+	<label>
+		<span>Principal</span>
+		<span class="money"><input name="principal" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Interest Rate</span>
+		<span class="percent"><input name="interest" type="number" min="0" max="100" step="0.1" value="0" /></span>
+	</label>
+	<label>
+		<span>Period</span>
+		<span class="months"><input name="period" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Interest Paid</span>
+		<output class="money"></output>
+	</label>
+	<label>
+		<span>Total Cost</span>
+		<output class="money"></output>
+	</label>
+	<input type="button" value="Save" data-action="save"/>
+	<table>
+		<thead>
+			<tr>
+				<th>Principal</th>
+				<th>Interest Paid</th>
+			</tr>
+		</thead>
+	</table>
+</section>
+<section id="leverage" class="finance">
+	<h1>Debt Ratio</h1>
+	<label>
+		<span>Total Debt Payments<small>each month</small></span>
+		<span class="money"><input name="payment" type="number" min="0" step="100" value="0" /></span>
+	</label>
+	<label>
+		<span>Income<small>each year</small></span>
+		<span class="money"><input name="income" type="number" min="0" step="100" value="0" /></span>
+	</label>
+	<label>
+		<span>Debt Ratio</span>
+		<output class="percent"></output>
+	</label>
+</section>
+<section id="realreturn" class="finance">
+	<h1>Real Return</h1>
+	<label>
+		<span>Amount Invested</span>
+		<span class="money"><input name="payment" type="number" min="0" step="100" value="0" /></span>
+	</label>
+	<label>
+		<span>Expected Return</span>
+		<span class="money"><input name="income" type="number" min="0" step="100" value="0" /></span>
+	</label>
+	<label>
+		<span>Expected Inflation<small>average</small></span>
+		<span class="percent"><input name="inflation" type="number" min="-100" max="100" step="1" value="3" /></span>
+	</label>
+	<label><span>Inflation-Adjusted Return</span><output class="percent"></output></label>
+</section>
+<section id="annuity" class="finance">
+	<h1>Value of Annuity</h1>
+	<label>
+		<span>Yearly Payment</span>
+		<span class="money"><input name="payment" type="number" min="0" step="100" value="0" /></span>
+	</label>
+	<label>
+		<span>Interest Rate<small>or inflation</small></span>
+		<span class="percent"><input name="inflation" type="number" min="-100" max="100" step="1" value="0" /></span>
+	</label>
+	<label>
+		<span>Years</span>
+		<span class="years"><input name="period" type="number" min="0" step="1" value="0" /></span>
+	</label>
+	<label><span>Present Value</span><output class="money"></output></label>
+	<label><span>Future Value</span><output class="money"></output></label>
+</section>
+</body>
+</html>
