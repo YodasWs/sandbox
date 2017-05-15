@@ -1,0 +1,224 @@
+@import "base/scss/utilities";
+@media (pointer: coarse) {
+}
+:root {
+	font-family: 'Trebuchet MS', 'Helvetica Neue', sans-serif;
+	font-size: 12pt;
+}
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+html,body {
+	padding: 0;
+	margin: 0;
+}
+body {
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: flex-start;
+	@media #{$medium} {
+		flex-flow: row wrap;
+		align-items: flex-start;
+	}
+	> header {
+		min-width: 100%;
+		padding: 5px 10px;
+	}
+}
+
+[itemtype$="ItemList"] {
+	position: relative;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	min-width: 300px;
+	margin: 10px;
+	border: 1px solid dimgrey;
+	padding: 2px 5px 5px;
+	&.drop-option {
+		background: honeydew;
+	}
+	&.drop-option::after {
+		display: block;
+		content: '\a0';
+		border: 2px dashed grey;
+	}
+	> [itemprop="name"] {
+		text-align: center;
+		margin-bottom: 5px;
+	}
+	[data-action="add"] {
+		position: absolute;
+		right: 5px;
+		top: 0px;
+		cursor: pointer;
+	}
+}
+[itemtype$="ListItem"] {
+	background: whitesmoke;
+	border: 2px outset transparent;
+	padding: 2px 5px;
+	transition: border 500ms;
+	cursor: pointer;
+	&:invalid-drop {
+		cursor: no-drop;
+	}
+	&:valid-drop {
+		cursor: copy;
+	}
+	@media (hover: hover) {
+		&:hover {
+			border: 2px outset grey;
+		}
+	}
+	> [itemprop="name"] {
+		font-weight: normal;
+		font-size: 1rem;
+		display: block;
+	}
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+}
+
+form {
+	position: fixed;
+	bottom: 25%;
+	right: 25%;
+	left: 25%;
+	top: 25%;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-around;
+	align-content: stretch;
+	align-items: flex-start;
+	padding: 10px 15px;
+	border: 2px outset grey;
+	border-radius: 20px;
+	box-shadow: 5px 5px 10px dimgrey, inset 5px 5px 10px dimgrey;
+	background: white;
+	overflow: auto;
+	z-index: 2;
+	a[data-action="close"] {
+		position: absolute;
+		right: 10px;
+		color: red;
+		top: 8px;
+	}
+	> label,
+	> [itemprop="name"] {
+		flex-basis: 100%;
+		margin-bottom: 10px;
+	}
+	> label {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+		align-content: center;
+		align-items: center;
+		> * {
+			flex-basis: 24%;
+		}
+		> span:nth-child(1) {
+			cursor: pointer;
+		}
+		> :nth-child(1) {
+			align-self: flex-start;
+			margin-right: 10px;
+			text-align: right;
+		}
+		> :nth-child(2):nth-last-child(1) {
+			flex-basis: 50%;
+			text-align: left;
+		}
+		> a[data-action] {
+			text-align: center;
+			cursor: pointer;
+			min-width: 40px;
+			flex-basis: 5%;
+			margin: 0;
+		}
+		> textarea:nth-child(n + 2),
+		> select:nth-child(n + 2),
+		> input:nth-child(n + 2) {
+			flex-basis: 50%;
+		}
+		> textarea:nth-child(n + 3),
+		> select:nth-child(n + 3),
+		> input:nth-child(n + 3) {
+			margin-top: 10px;
+		}
+		> input:nth-child(2) ~ input {
+			margin-left: calc(24% + 10px);
+		}
+		> textarea {
+			align-self: flex-start;
+		}
+	}
+	[itemprop="description"] {
+		flex-basis: 100%;
+	}
+	select,
+	textarea,
+	input[type="url"],
+	input[type="text"],
+	input[type="email"] {
+		border: 1px inset dimgrey;
+		background: whitesmoke;
+		font-size: 0.8rem;
+		border-radius: 0;
+		padding: 2px 5px;
+		&:focus {
+			background: white;
+		}
+	}
+	input[type="button"],
+	input[type="submit"] {
+		background-color: #006898;
+		border-radius: 0;
+		padding: 5px 10px;
+		border: 0 none;
+		color: white;
+		font-size: 0.8rem;
+		&:hover {
+			background-color: #328FC2;
+		}
+		&:focus {
+			background-color: #2D79A8;
+		}
+		&:active {
+			background-color: #2D79A8;
+			padding: 6px 9px 4px 11px;
+			outline: 0 none;
+		}
+	}
+}
+label[for],
+select,
+input[type="button"],
+input[type="submit"],
+[data-action="add"],
+a[data-action="close"] {
+	cursor: pointer;
+}
+div#grey-bg {
+	position: fixed;
+	display: none;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	top: 0;
+	z-index: 1;
+	background: dimgrey;
+	opacity: 0.4;
+	content: '';
+}
