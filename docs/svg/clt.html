@@ -226,10 +226,12 @@ g.south-feeder path.route {
 }
 figure li.arrowood::before {
 	background-color: #B933AD;
+	background-color: #9364CC;
 }
 g.stations circle.arrowood,
 g.arrowood path.route {
 	stroke: #B933AD;
+	stroke: #9364CC;
 }
 figure li.tryon::before {
 	background-color: #B933AD;
@@ -240,12 +242,12 @@ g.tryon path.route {
 }
 figure li.south-blvd::before {
 	background-color: #006983;
+	background-color: #B933AD;
 }
 g.stations circle.south-blvd,
 g.south-blvd path.route {
-	stroke: #00A1DE;
-	stroke: #0039A6;
 	stroke: #006983;
+	stroke: #B933AD;
 }
 figure li.south-crosstown::before {
 	background-color: #1BAC6E;
@@ -400,7 +402,7 @@ g.stations circle.light-rail.mile:not([hidden]) {
 }
 </style>
 <script>
-const years = [2007,2015,2018,2020,2023,2030,2035,2050,2060,2070,2080];
+const years = [1996,2004,2007,2015,2018,2020,2023,2030,2035,2050,2060,2070,2080];
 const lynxRoutes = {
 	'gold':{
 		'2015':'M1080,500l110,115l170,164l20-20',
@@ -572,6 +574,8 @@ $(()=>{
 <body>
 <header>
 	<h1>Charlotte Transit Network</h1>
+	<h2 class="yr1996">1996</h2>
+	<h2 class="yr2004">2004</h2>
 	<h2 class="yr2007">2007</h2>
 	<h2 class="yr2015">2015</h2>
 	<h2 class="yr2018">2018</h2>
@@ -595,28 +599,29 @@ $(()=>{
 
 <figure>
 	<ul>
-		<li><span data-tooltip="Long-distance routes providing intercity travel.">Commuter Rail Lines</span><ul>
+		<li><span data-tooltip="Long-distance routes providing intercity travel.">&#x1f686; Commuter Rail Lines</span><ul>
 			<li class="red yr2030 yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="R">Red Line</li>
 		</ul></li>
-		<li><span data-tooltip="Trains running in a dedicated right-of-way but potentially with at-level crossings. Cannot share tracks with frieght trains.">Light Rail Lines</span><ul>
+		<li><span data-tooltip="Trains running in a dedicated right-of-way but potentially with at-level crossings. Cannot share tracks with frieght trains.">&#x1f688; Light Rail Lines</span><ul>
+			<li class="gold yr1996 yr2004" data-letter="T">Charlotte Trolley</li>
 			<li class="blue yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="B">Blue Line</li>
-			<li class="orange yr2023 yr2030 yr2035 yr2050" data-letter="L">Lockwood Trolley</li>
+			<li class="orange yr2023 yr2030 yr2035 yr2050" data-letter="L">Lakewood Trolley</li>
 			<li class="orange yr2060 yr2070 yr2080" data-letter="O">Orange Line</li>
 			<li class="silver yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="I">Silver Line</li>
 			<li class="south-crosstown yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="485">South Crosstown</li>
 		</ul></li>
-		<li><span data-tooltip="Streetcars with limited stops to connect walkable neighborhoods more quickly than local streetcars or buses.">Express Streetcar Lines</span><ul>
+		<li><span data-tooltip="Streetcars with limited stops to connect walkable neighborhoods more quickly than local streetcars or buses.">&#x1f68a; Express Streetcar Lines</span><ul>
 			<li class="g-line yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="P">Park Rd</li>
 			<li class="arrowood yr2060 yr2070 yr2080" data-letter="A">Arrowood Rd</li>
 		</ul></li>
-		<li><span data-tooltip="Streetcar lines with stops approximately a quarter-mile to half-a-mile apart from each other.">Local Streetcar Lines</span><ul>
+		<li><span data-tooltip="Streetcar lines with stops approximately a quarter-mile to half-a-mile apart from each other.">&#x1f68b; Local Streetcar Lines</span><ul>
 			<li class="gold yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="G">Gold Line</li>
 			<li class="green yr2050 yr2060 yr2070 yr2080" data-letter="G">Green Line</li>
-			<li class="south-blvd yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="S">South Blvd</li>
-			<li class="south-blvd yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="P">Pineville</li>
 			<li class="tryon yr2050 yr2060 yr2070 yr2080" data-letter="T">Tryon St</li>
+			<li class="south-blvd yr2035 yr2050 yr2060 yr2070 yr2080" data-letter="S">South Blvd</li>
+			<li class="south-blvd yr2060 yr2070 yr2080" data-letter="P">Pineville</li>
 		</ul></li>
-		<li><span data-tooltip="Circular streetcar lines primarily aimed to connect walkable neighborhoods to a nearby light rail station.">Streetcar Feeders</span><ul>
+		<li><span data-tooltip="Circulator trollybus lines primarily aimed to connect walkable neighborhoods to a nearby light rail station.">&#x1f68e; Trollybus Feeders</span><ul>
 			<li class="lockwood-line yr2050 yr2060 yr2070 yr2080" data-letter="L">Lockwood Neighborhood</li>
 			<li class="south-feeder yr2070 yr2080" data-letter="L">LoSo Neighborhood</li>
 			<li class="south-feeder yr2080" data-letter="W">Woodlawn Rd</li>
@@ -660,6 +665,15 @@ $(()=>{
 			<feComposite in="SourceGraphic"/>
 		</filter>
 	</defs>
+
+	<g class="gold streetcar">
+		<g class="yr1996">
+			<path class="route" d="M965,592L900,648L822,715L756,793"/>
+		</g>
+		<g class="yr2004">
+			<path class="route" d="M1182,404L1127,454L1035,538L965,592L900,648L822,715L756,793"/>
+		</g>
+	</g>
 
 	<g class="gold alt streetcar">
 		<!-- West Corridor Line -->
@@ -748,15 +762,28 @@ $(()=>{
 	</g>
 
 	<g class="tryon streetcar">
-		<g class="alt yr2070 yr2080">
+		<g class="alt yr2070 yr2080" style="display:none">
 			<path class="route" d="M955,393l12-11l63-54l55-49l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l31-34l-81-72l-60-25l-100,160l-30,48l-15,21q-15,18-30,30L955,393"/>
 		</g>
 		<g class="yr2060 yr2070 yr2080">
 			<path class="route" d="M955,393l12-11l63-54l55-49l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l45-49l50-56l18-18"/>
 		</g>
 		<g class="yr2050 yr2060 yr2070 yr2080">
-			<path class="route" d="M380,1212q75-120,150-226l50-80q19-25,24-60q0-39,36-60q25-20,120-60q30,20,62-11q25-19,4-38l-72-65l85-75l18-12q39-2,40-35"/>
-			<path class="route overlay" d="M955,393l-61,56q-15,15,3,40"/>
+			<path class="route" d="
+M380,1212
+q75-120,150-226
+l50-80
+q19-25,24-60
+q0-39,36-60
+q25-20,120-60
+q45-17,66-49
+l-72-65
+l85-75
+l18-12
+q39-2,40-35
+"/>
+			<path class="plan" style="display:none" d="M380,1212q75-120,150-226l50-80q19-25,24-60q0-39,36-60q25-20,120-60q30,20,62-11q25-19,4-38l-72-65l85-75l18-12q39-2,40-35"/>
+			<path class="route overlay" d="M955,393l-61,56q-15,15,3,40" style="display:none"/>
 		</g>
 	</g>
 
@@ -766,23 +793,46 @@ $(()=>{
 			<path class="route overlay" d="M955,393l12-11l63-54"/>
 		</g>
 		<g class="yr2060 yr2070 yr2080">
-			<path class="route overlay" d="M955,393l12-11l63-54L1030,328L1085,279l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l31-34"/>
+			<path class="route overlay" d="M955,393l12-11l63-54L1085,279"/>
+			<path class="route overlay" d="M1085,279l20,19l35,35l19,21l42-37l41-38l45-45l52-51l60-59l31-34" style="display:none"/>
 			<path class="route" d="M1430,90l-81-72l-60-25l-100,160l-30,48l-15,21q-15,18-30,30L1085,279"/>
 		</g>
 	</g>
 
 	<g class="stations">
 		<!-- Blue Line Stations -->
-		<circle cx="1127" cy="454" class="blue yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<circle cx="1080" cy="500" class="blue yr2007"/>
-		<g transform="translate(1080, 500)" class="yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
-			<!-- CTC/Arena -->
-			<circle cx="0" cy="0" class="blue"/>
-			<circle cx="0" cy="0" class="gold"/>
+		<g transform="translate(1127, 454)" class="light-rail yr2004 yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2004">
+				<circle cx="0" cy="0" class="gold"/>
+			</g>
+			<g class="yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="blue"/>
+			</g>
+			<text transform="translate(15,0)" filter="url(#bg-white)">7th St</text>
+		</g>
+		<g transform="translate(1080, 500)" class="light-rail yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2007">
+				<circle cx="0" cy="0" class="blue"/>
+			</g>
+			<g class="yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="blue"/>
+				<circle cx="0" cy="0" class="gold"/>
+			</g>
 			<text transform="translate(15,0)" filter="url(#bg-white)">CTC/Arena</text>
 		</g>
-		<circle cx="1035" cy="538" class="blue no-tod yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<g transform="translate(965, 592)" class="light-rail yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+		<g transform="translate(1035, 538)" class="light-rail yr2004 yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2004">
+				<circle cx="-5" cy="7" class="gold"/>
+			</g>
+			<g class="no-tod yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="blue"/>
+			</g>
+			<text transform="translate(20, 0)" filter="url(#bg-white)">3rd St / Convention Center</text>
+		</g>
+		<g transform="translate(965, 592)" class="light-rail yr1996 yr2004 yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr1996 yr2004">
+				<circle cx="0" cy="0" class="gold"/>
+			</g>
 			<g class="no-tod yr2007 yr2015 yr2018 yr2020 yr2023 yr2030">
 				<circle cx="0" cy="0" class="blue"/>
 			</g>
@@ -793,19 +843,31 @@ $(()=>{
 			</g>
 			<text transform="translate(20, 0)" filter="url(#bg-white)">Stonewall</text>
 		</g>
-		<circle cx="900" cy="648" class="blue yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<g transform="translate(822, 715)" class="light-rail yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
-			<g class="yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035">
+		<g transform="translate(900, 648)" class="light-rail yr1996 yr2004 yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr1996 yr2004">
+				<circle cx="0" cy="0" class="gold"/>
+			</g>
+			<g class="yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
 				<circle cx="0" cy="0" class="blue"/>
 			</g>
-			<g class="yr2050 yr2060 yr2070 yr2080">
-				<circle cx="0" cy="0" class="tryon"/>
+			<text transform="translate(20, 0)" filter="url(#bg-white)">Carson</text>
+		</g>
+		<g transform="translate(822, 715)" class="light-rail yr1996 yr2004 yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr1996 yr2004">
+				<circle cx="0" cy="0" class="gold"/>
+			</g>
+			<g class="yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
 				<circle cx="0" cy="0" class="blue"/>
 			</g>
 			<text transform="translate(15, 5)" filter="url(#bg-white)">Bland St</text>
 		</g>
-		<g transform="translate(756, 793)" class="light-rail yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
-			<circle cx="-5" cy="7" class="blue yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035"/>
+		<g transform="translate(756, 793)" class="light-rail yr1996 yr2004 yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr1996 yr2004">
+				<circle cx="-5" cy="7" class="gold"/>
+			</g>
+			<g class="yr2007 yr2015 yr2018 yr2020 yr2023 yr2030 yr2035">
+				<circle cx="-5" cy="7" class="blue"/>
+			</g>
 			<g class="yr2050 yr2060 yr2070 yr2080">
 				<circle cx="0" cy="0" class="blue"/>
 				<circle cx="0" cy="0" class="green"/>
@@ -816,15 +878,34 @@ $(()=>{
 			<circle cx="0" cy="0" class="blue"/>
 			<text transform="translate(20, 0)" filter="url(#bg-white)">New Bern</text>
 		</g>
+
 		<!-- Blue Line Extension Stations -->
-		<circle cx="1182" cy="404" class="blue yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
-		<circle cx="1395" cy="240" class="blue yr2018 yr2020 yr2023 yr2030 yr2035 yr2050"/>
-		<g transform="translate(1395, 240)" class="yr2060 yr2070 yr2080">
-			<circle cx="0" cy="0" class="blue"/>
-			<circle cx="0" cy="0" class="green"/>
+		<g transform="translate(1182, 404)" class="light-rail yr2004 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2004">
+				<circle cx="0" cy="0" class="gold"/>
+			</g>
+			<g class="yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="blue"/>
+			</g>
+			<text transform="translate(15, 0)" filter="url(#bg-white)">9th St</text>
+		</g>
+		<g transform="translate(1395, 240)" class="light-rail yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2018 yr2020 yr2023 yr2030 yr2035 yr2050">
+				<circle cx="0" cy="0" class="blue"/>
+			</g>
+			<g class="yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="blue"/>
+				<circle cx="0" cy="0" class="green"/>
+			</g>
 			<text transform="translate(18, 0)" filter="url(#bg-white)">Parkwood Ave</text>
 		</g>
-		<circle cx="1510" cy="131" class="blue yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<g transform="translate(1510, 131)" class="light-rail yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="blue"/>
+			</g>
+			<text transform="translate(15, 0)" filter="url(#bg-white)">25th St</text>
+		</g>
+
 		<!-- Gold Line Stations -->
 		<circle cx="1140" cy="562" class="streetcar gold no-tod yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="1177" cy="602" class="streetcar gold yr2015 yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
@@ -883,16 +964,18 @@ $(()=>{
 		<circle cx="150" cy="524" class="streetcar gold yr2030 yr2035 yr2050 yr2060 yr2070 yr2080"/>
 		<!-- Silver Line Stations -->
 		<circle cx="955" cy="393" class="streetcar silver yr2035"/>
-		<g transform="translate(955, 393)" class="streetcar yr2050">
+		<g transform="translate(955, 393)" class="streetcar yr2050 yr2060 yr2070 yr2080">
 			<!-- Graham St Gateway Station -->
-			<circle cx="0" cy="0" class="silver"/>
-			<circle cx="0" cy="0" class="lockwood-line"/>
-		</g>
-		<g transform="translate(955, 393)" class="streetcar yr2060 yr2070 yr2080">
-			<!-- Graham St Gateway Station -->
-			<circle cx="0" cy="0" class="tryon"/>
-			<circle cx="0" cy="0" class="lockwood-line"/>
-			<circle cx="0" cy="0" class="silver"/>
+			<g class="yr2050">
+				<circle cx="0" cy="0" class="silver"/>
+				<circle cx="0" cy="0" class="lockwood-line"/>
+			</g>
+			<g class="yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="tryon"/>
+				<circle cx="0" cy="0" class="lockwood-line"/>
+				<circle cx="0" cy="0" class="silver"/>
+			</g>
+			<text transform="translate(15, 5)" filter="url(#bg-white)">Gateway Station</text>
 		</g>
 		<g transform="translate(1198, 766)" class="streetcar yr2035 yr2050 yr2060 yr2070 yr2080">
 			<circle cx="0" cy="0" class="silver"/>
@@ -935,6 +1018,13 @@ $(()=>{
 			<text transform="translate(15, 0)" filter="url(#bg-white)">Romany Rd</text>
 		</g>
 
+		<!-- Tryon St Streetcar Stations -->
+		<g transform="translate(795, 707)" class="streetcar yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="tryon"/>
+			</g>
+		</g>
+
 		<!-- Gold-Green Transfer Stations -->
 		<g transform="translate(1380, 760)" class="streetcar yr2060 yr2070 yr2080">
 			<!-- Hawthorne & 5th / Presbyterian Hospital Station -->
@@ -965,6 +1055,7 @@ $(()=>{
 			<circle cx="0" cy="0" class="gold"/>
 			<circle cx="0" cy="0" class="green"/>
 		</g>
+
 		<!-- Orange Line Stations -->
 		<g transform="translate(575, 153)" class="yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
 			<g class="yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
@@ -974,10 +1065,10 @@ $(()=>{
 		</g>
 		<g transform="translate(822, 425)" class="yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
 			<!-- Cedar & 1st Station -->
-			<g class="yr2023 yr2030 yr2035 yr2050">
+			<g class="yr2023">
 				<circle cx="0" cy="0" class="orange"/>
 			</g>
-			<g class="yr2060 yr2070 yr2080">
+			<g class="yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
 				<circle cx="0" cy="0" class="gold"/>
 				<circle cx="0" cy="0" class="orange"/>
 				<text transform="translate(15,25)" filter="url(#bg-white)">&amp; 1st St</text>
@@ -1265,8 +1356,12 @@ $(()=>{
 	</g>
 
 	<g class="arrowood streetcar" transform="translate(394,0)">
-		<g class="yr2060 yr2070 yr2080">
-			<path class="route" d="M-215,883l10,8q12-3,28,1q13-4,27-3l10-23M-215,883l1-13l18-16q9,9,26,6q18-4,30,5q12,6,22,14l30,21l-4.5,6.5l6.5,7.5l11,29c20,3,35-5,40-14M-88,900l12,7l14-19q7,0,15,20l13,14l-1,7l17,9c44,26,29,16,89,51q13,6,20,0q10-8,20-10l90-23c23-7,35-0,45-2L249,972"/>
+		<g class="yr2070 yr2080">
+			<path class="route" d="M-331,806q25-9,49-21q22-12,39,16c17,28,27,17,38,38q3,7,9,15q9,9,26,6q18-4,30,5"/>
+			<path class="route" d="M-140,865q12,6,22,14l30,21l-4.5,6.5l6.5,7.5l11,29c20,3,35-5,40-14M-88,900l12,7l14-19q7,0,15,20l13,14l-1,7l17,9c44,26,29,16,89,51q13,6,20,0q10-8,20-10l90-23c23-7,35-0,45-2L249,972"/>
+		</g>
+		<g class="yr2060">
+			<path class="route" d="M-140,865q12,6,22,14l30,21l-4.5,6.5l6.5,7.5l11,29c20,3,35-5,40-14M-88,900l12,7l14-19q7,0,15,20l13,14l-1,7l17,9c44,26,29,16,89,51q13,6,20,0q10-8,20-10l90-23c23-7,35-0,45-2L249,972"/>
 		</g>
 	</g>
 
@@ -1291,6 +1386,10 @@ $(()=>{
 		<g class="yr2050 yr2060 yr2070 yr2080" style="display:none">
 			<!-- Scaleybark – SouthPark Line -->
 			<path class="route" d="M259,448l-4,19q17,7,30,17q35,33,70,74q20,20,24,62M379,620c10,0,55,5,66,5c20,0,28-9,37,4s25,2,40,7l17,5q12,3,14,15q5,26,11.5,28.5c-5,13-5,30-15,39q-18,22,0,42q7,6,11,13q7-4,15-4q5,0,58,34Q604,838,602,848"/>
+		</g>
+		<g class="yr2080">
+			<!-- Whitehall Park Dr -->
+			<path class="route" d="M-331,806l8,20q12,15,25,21q13,3,28,20c7,5,16,35,23,35c15,0,23,35,32,42l8,6l17-4l17,11"/>
 		</g>
 	</g>
 
@@ -1341,6 +1440,17 @@ $(()=>{
 			<!-- Gateway – N Tryon -->
 			<path class="route overlay" d="M471,75l32-27"/>
 			<path class="route" d="M471,75m32-27l25-22l30,33q37-30,62-60"/>
+		</g>
+	</g>
+
+	<g class="lockwood-line streetcar" transform="translate(394,0)">
+		<g class="yr2050">
+			<path class="route overlay" d="M471,75l32-27"/>
+			<path class="route" d="M471,75m32-27l25-22l30,33q37-30,62-60M471,75m32-27m25-22l27-26"/>
+		</g>
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route overlay" d="M471,75l32-27l25-22"/>
+			<path class="route" d="M471,75m32-27m25-22l27-26"/>
 		</g>
 	</g>
 
@@ -1478,8 +1588,15 @@ $(()=>{
 				<circle cx="0" cy="0" class="gold"/>
 				<circle cx="0" cy="0" class="silver"/>
 			</g>
-			<g class="yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2050">
 				<circle cx="0" cy="0" class="red"/>
+				<circle cx="0" cy="0" class="silver"/>
+				<circle cx="0" cy="0" class="lockwood-line"/>
+				<circle cx="0" cy="0" class="gold"/>
+			</g>
+			<g class="yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="red"/>
+				<circle cx="0" cy="0" class="lockwood-line"/>
 				<circle cx="0" cy="0" class="tryon"/>
 				<circle cx="0" cy="0" class="silver"/>
 				<circle cx="0" cy="0" class="gold"/>
@@ -1549,7 +1666,10 @@ $(()=>{
 
 		<!-- South Crosstown Stations -->
 		<g transform="translate(-173, 957)" class="light-rail yr2035 yr2050 yr2060 yr2070 yr2080">
-			<circle cx="0" cy="0" class="south-crosstown"/>
+			<g class="yr2035 yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="south-crosstown"/>
+			</g>
+			<text transform="translate(13, 3)" filter="url(#bg-white)">Ayrsley</text>
 		</g>
 	</g>
 </svg>
@@ -1663,16 +1783,19 @@ $(()=>{
 		</g>
 	</g>
 
-	<g class="lockwood-line streetcar">
-		<g class="yr2050 yr2060 yr2070 yr2080">
-			<path class="route" d="M94,1075l56-50q40-32,52-55l58-93c30,3,50,30,71,47l-44,45l-62,60l-30,27l-35-38"/>
+	<g class="tryon streetcar">
+		<g class="yr2060 yr2070 yr2080">
+			<path class="route" d="M94,1075l56-50L160,1017l35,39l30-27l62-60l44-45"/>
+			<path class="route" d="M331,924l35-39q27-30,50-43l50-27c25-17,55-10,76-32q28-28,55-27l80,5q42,5,91-40Q780,730,797,730"/>
 		</g>
 	</g>
 
-	<g class="tryon streetcar">
+	<g class="lockwood-line streetcar">
+		<g class="yr2050">
+			<path class="route" d="M94,1075l56-50q40-32,52-55l58-93c30,3,50,30,71,47l-44,45l-62,60l-30,27l-35-38"/>
+		</g>
 		<g class="yr2060 yr2070 yr2080">
-			<path class="route overlay" d="M94,1075l56-50L160,1017l35,39l30-27l62-60l44-45"/>
-			<path class="route" d="M331,924l35-39q27-30,50-43l50-27c25-17,55-10,76-32q28-28,55-27l80,5q42,5,91-40Q780,730,797,730"/>
+			<path class="route" d="M94,1075l56-50q40-32,52-55l58-93c30,3,50,30,71,47"/>
 		</g>
 	</g>
 
@@ -1700,7 +1823,9 @@ $(()=>{
 			<text transform="translate(15, 5)" filter="url(#bg-white)">7th St</text>
 		</g>
 		<g transform="translate(211, 1080)" class="light-rail yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
-			<circle cx="0" cy="0" class="blue"/>
+			<g class="yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
+				<circle cx="0" cy="0" class="blue"/>
+			</g>
 			<text transform="translate(15, 5)" filter="url(#bg-white)">9th St</text>
 		</g>
 		<g transform="translate(311, 1003)" class="light-rail yr2018 yr2020 yr2023 yr2030 yr2035 yr2050 yr2060 yr2070 yr2080">
@@ -1933,11 +2058,20 @@ $(()=>{
 	</g>
 
 	<g class="south-feeder streetcar">
+		<!-- Providence – Rea Farm – Waverly -->
 		<g class="yr2050 yr2060 yr2070 yr2080">
 			<path class="route" d="M820,724m-30,23m-22,4q-10,5-5,25c0,10,5,15,5,22q13,3,32,0l2,26l23-4q-1-80-5-96"/>
 		</g>
 		<g class="alt yr2050 yr2060 yr2070 yr2080">
 			<path class="route" d="M820,724m-30,23m-22,4c10-0,20-20,30-23q10-4,22-4"/>
+		</g>
+	</g>
+
+	<g class="south-feeder streetcar">
+		<!-- Village Lake – Galleria – Sardis Rd N -->
+		<g class="yr2070 yr2080">
+			<path class="route" d="M948,64c8-5,4-20,13-23q27,1,37-8M948,64l-20,12l10,20l1,10q5,15,23,15M1015,230q15-10,4-27q15-10,7-16c17-20,35-25,60-45"/>
+			<path class="route overlay" d="M962,121c0,26,28,35,39,78q7,20,14,31"/>
 		</g>
 	</g>
 
@@ -2003,12 +2137,22 @@ $(()=>{
 		</g>
 
 		<!-- Silver Line Stations -->
-		<g transform="translate(948, 64)" class="light-rail">
-			<circle cx="0" cy="0" class="silver yr2035 yr2050 yr2060 yr2070 yr2080"/>
+		<g transform="translate(948, 64)" class="light-rail yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2035 yr2050 yr2060">
+				<circle cx="0" cy="0" class="silver"/>
+			</g>
+			<g class="yr2070 yr2080">
+				<circle cx="0" cy="0" class="silver"/>
+				<circle cx="0" cy="0" class="south-feeder"/>
+			</g>
 			<text transform="translate(15, 0)" filter="url(#bg-white)">Village Lake</text>
 		</g>
 		<g transform="translate(1015, 230)" class="light-rail yr2035 yr2050 yr2060 yr2070 yr2080">
-			<g class="yr2035 yr2050 yr2060 yr2070 yr2080">
+			<g class="yr2035 yr2050 yr2060">
+				<circle cx="0" cy="0" class="silver"/>
+			</g>
+			<g transform="rotate(15)" class="yr2070 yr2080">
+				<circle cx="0" cy="0" class="south-feeder"/>
 				<circle cx="0" cy="0" class="silver"/>
 			</g>
 			<text transform="translate(15, 0)" filter="url(#bg-white)">Galleria</text>
@@ -2059,6 +2203,11 @@ $(()=>{
 		<circle cx="471" cy="133" class="south-feeder streetcar yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="305" cy="353" class="south-feeder streetcar no-tod yr2050 yr2060 yr2070 yr2080"/>
 		<circle cx="335" cy="348" class="south-feeder streetcar no-tod yr2050 yr2060 yr2070 yr2080"/>
+
+		<!-- Village Lake – Sardis Rd N Stations -->
+		<circle cx="998" cy="33" class="south-feeder streetcar yr2070 yr2080"/>
+		<circle cx="938" cy="96" class="south-feeder no-tod streetcar yr2070 yr2080"/>
+		<circle cx="1086" cy="142" class="south-feeder streetcar yr2070 yr2080"/>
 
 		<!-- Rea Farms / Waverly Stations -->
 		<circle cx="825" cy="815" class="south-feeder streetcar yr2050 yr2060 yr2070 yr2080"/>
