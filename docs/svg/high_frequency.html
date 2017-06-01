@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Charlotte Transit Network</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<style>
+* {
+	box-sizing: border-box;
+}
+:root,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	font-family: "Trebuchet MS", "Open Sans", sans-serif;
+	background-color: #f4fff4;
+}
+body {
+	margin: 0 auto;
+	padding: 0;
+	width: calc(2023px * 2 / 3);
+	max-width: 100%;
+	min-height: 100%;
+	border: solid black;
+	border-width: 0 1px;
+	background-color: #fefffe;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+@media (max-width: 1348.66667px) {
+	body {
+		border: 0 none;
+	}
+}
+body > * {
+	padding: 0 10px;
+}
+h1 {
+	flex-basis: 100%;
+	background-color: #ddffdd;
+	padding: 5px 10px 0;
+	margin: 0;
+}
+
+header {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+	width: calc(2023px * 2 / 3 - 2px);
+	max-width: 100%;
+	position: fixed;
+	top: 0;
+	border-bottom: 1px solid darkgrey;
+	padding: 0;
+	background: inherit;
+	background-color: whitesmoke;
+}
+header > h2 {
+	background: inherit;
+	transition: all 1s;
+	margin-left: 20px;
+}
+header > form,
+header > h2 {
+	margin-bottom: 1rem;
+	margin-top: 1rem;
+}
+header > form {
+	display: flex;
+	flex-flow: column nowrap;
+	margin-left: 2rem;
+}
+header > form > * {
+	vertical-align: middle;
+	font-size: smaller;
+}
+header > form + p {
+	flex-basis: 40%;
+	padding-left: 2rem;
+}
+
+svg {
+	display: block;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 100%;
+	height: auto;
+}
+path {
+	stroke-linejoin: round;
+	stroke-linecap: round;
+	fill: none;
+	transition: all 1s;
+}
+
+g.local path.route,
+g.express path.route,
+g.streetcar path.route,
+g path.route.streetcar {
+	stroke-width: 5.5px;
+}
+g.light-rail path.route,
+g path.route.light-rail {
+	stroke-width: 7px;
+}
+g path.outline {
+	stroke: black;
+}
+g.local path.outline {
+	display: none;
+}
+g.streetcar path.outline {
+	stroke-width: 7.5px;
+}
+g.light-rail path.outline {
+	stroke-width: 8px;
+}
+
+svg > g {
+	opacity: 1;
+	transition: opacity 500ms;
+}
+svg > g[hidden] {
+	opacity: 0;
+}
+
+/* Route Colors */
+g.stations circle.blue,
+g.blue path.route {
+	stroke: blue;
+}
+g.stations circle.gold,
+g.gold path.route {
+	stroke: gold;
+}
+g.stations circle.local,
+g.local path.route {
+	stroke: #007954
+}
+g.stations circle.express,
+g.express path.route {
+	stroke: #E41057;
+}
+
+g.plan path.route,
+g path.plan {
+	stroke-width: 1px;
+	stroke: green;
+}
+g.plan[hidden] {
+	opacity: 1;
+}
+
+/* Station Styling */
+g.stations circle {
+	stroke-width: 4px;
+	stroke: #bbbbbb;
+	fill: none;
+	r: 6px;
+}
+g.stations > g circle:first-child {
+	fill: white;
+}
+g.stations > g circle:not(:only-of-type),
+g.stations > g.ctc circle {
+	stroke-width: 6px;
+	r: 9px;
+}
+g.stations > g circle:first-child:nth-last-of-type(2),
+g.stations > g circle:first-child:nth-last-of-type(2) ~ circle {
+	stroke-dasharray: 13;
+}
+g.stations > g circle:first-child:nth-last-of-type(2) ~ circle:nth-of-type(2) {
+	stroke-dashoffset: 13;
+}
+
+/* Station Labels */
+g.stations > g text {
+	font-family: "Trebuchet MS", "Open Sans", sans-serif;
+	font-size: 1.4rem;
+	transition: all 500ms;
+	opacity: 0;
+	cursor: default;
+}
+g.stations > g:hover text {
+	opacity: 1;
+}
+
+</style>
+<script>
+$(()=>{
+	const $svg = $('svg')
+
+	// Add padding for sticky header
+	$(window).on('resize', () => {
+		$('body').css('padding-top', $('body > header').outerHeight(true) + 'px');
+	}).trigger('resize');
+
+	// Give each route an outline
+	$('path.route').each(function() {
+		const $this = $(this);
+		if (!$this.is('.overlay')) {
+			$this.clone().removeClass('route').addClass('outline').prependTo($this.parent());
+		}
+	});
+
+	// Display User-selected Frequency
+	$('input#rushhour-per-hour').on('change input', function() {
+		const $this = $(this);
+		const busesPerHour = Number.parseInt($this.val(), 10);
+		$('output[name="buses-per-hour"]').text(busesPerHour);
+		$('output[name="headway"]').text(Math.round(60 / busesPerHour, 1));
+		const max = Number.parseInt($this.attr('max'), 10);
+		const min = Number.parseInt($this.attr('min'), 10);
+		for (let k=min; k<busesPerHour; k++) {
+			$svg.children(`g.rushhour-${k}-per-hour`).attr('hidden', true);
+		}
+		for (let k=busesPerHour; k<=max; k++) {
+			$svg.children(`g.rushhour-${k}-per-hour`).removeAttr('hidden');
+		}
+	}).trigger('change');
+})</script>
+</head>
+<body>
+<header>
+	<h1>Charlotte Transit Network</h1>
+	<h2>High Frequency Map</h2>
+	<form id="selFrequency">
+		<label for="rushhour-per-hour">Minimum Rush-hour Frequency:</label>
+		<input id="rushhour-per-hour" type="range" min="3" max="6" value="6" step="1" autofocus/>
+		<label>
+			<output for="rushhour-per-hour" name="buses-per-hour"></output> buses per hour
+		</label>
+		<label>
+			<output for="rushhour-per-hour" name="headway"></output>-minute headway
+		</label>
+	</form>
+	<p>Rush-hour Frequency is 7am&ndash;9am and 4pm&ndash;6pm. Routes shown drop to no less than 3 buses per hour midday and no less than 2 buses per hour 6pm&ndash;10pm</p>
+</header>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2400 2566" preserveAspectRatio="xMaxYMax">
+	<image xlink:href="CLT.png" x="0" y="0" width="2400" height="2566"/>
+	<defs>
+		<filter x="0" y="0" width="1" height="1" id="bg-white">
+			<feFlood flood-color="white"/>
+			<feComposite in="SourceGraphic"/>
+		</filter>
+	</defs>
+
+	<g class="blue light-rail rushhour-6-per-hour">
+		<path class="route" d="M1000,1127l-70,60q-15,10-25,21t-100,147q-20,35-40,88q-15,35-5,80q8,50,8,100q5,50-4,100q-5,25,3,55q18,80,0,120l-30,60q-15,23-8,55l5,43M1000,1127l84-70c20-17,27-15,40-25l70-65q30-25,70-34l70-13q105-15,126-110c15-50,20-130,50-160q37-35,40-70q10-53,60-115c50-63,30-20,90-10"/>
+	</g>
+
+	<g class="local rushhour-3-per-hour midday-3-per-hour">
+		<!-- Route 5 -->
+		<path class="route" d="M1000,1128l-60-60q-25-25-35-23q-23,20-31,55q-20-3-40,0q-20,10-45,9l-28,32l-160-9q-25,0-45-13q-95-50-109-50l-86-16"/>
+	</g>
+
+	<g class="local rushhour-5-per-hour midday-4-per-hour">
+		<!-- Route 7 -->
+		<path class="route" d="M1000,1128l-60-60q-25-25-35-23q-25-3-20-30c5-25,13-40,13-53q10-100,16-140q4-10,2-50q-2-30-20-95q-12-27,0-65q22-70,0-100l-5-8"/>
+	</g>
+
+	<g class="local rushhour-4-per-hour midday-3-per-hour">
+		<!-- Route 8 -->
+		<path class="route" d="M1000,1128l-55-55l-6,6c-17-17-40-2-72-30l0-40l-75,5q-10-10-6,-30l-15-7l-8,19q-50-30-90-34q-5,15-25,19q-6-13-23-18q0-33,3-33"/>
+	</g>
+
+	<g class="local rushhour-6-per-hour midday-4-per-hour">
+		<!-- Route 9 -->
+		<path class="route" d="M1000,1128l58,57q20-20,70-29q25,10,66,12c110,8,94,20,142,30c90,10,80,10,150,29q40,10,85,50q25,24,50,24l114,8"/>
+	</g>
+
+	<g class="local rushhour-4-per-hour midday-4-per-hour">
+		<!-- Route 10 -->
+		<path class="route" d="M970,1180l-30,10l-45,45c-50-30-50-35-70-37q-20-18-60-5q-40,5-68,20q-40,27-90,27q-25,2-102,30"/>
+	</g>
+
+	<g class="local rushhour-6-per-hour midday-6-per-hour">
+		<!-- Route 11 -->
+		<path class="route" d="M1000,1128l-14-14l54-46l51-50l50-52q40-45,100-66q20-0,40-20q20-13,40-11l35,2q25,3,48-8q40-25,54-50L1460,810c15-50,20-130,50-160q28-30,28-35"/>
+	</g>
+
+	<g class="local rushhour-4-per-hour midday-3-per-hour">
+		<!-- Route 15 -->
+		<path class="route" d="M1000,1128l-10,10l99,99l5-5l50,60c27,35,45,40,48,50l45,15l-7,15l15,3l2,20l-53,10q0,20,17,47t45,45"/>
+	</g>
+
+	<g class="local rushhour-4-per-hour midday-4-per-hour">
+		<!-- Route 16 -->
+		<path class="route" d="M1000,1128l-14-14l-50,50l-30,35q-40,18-65,34q-7,33-23,49l-29-29l-10,20l20,37l-31,49l-77,120q-35,48-98,87"/>
+	</g>
+
+	<g class="local rushhour-4-per-hour midday-3-per-hour">
+		<!-- Route 27 -->
+		<path class="route" d="M1000,1128l58,57q12-10,24-16q50,42,85,80q6,0,37,43q40,0,70,25q25,22,50,40q15,15,50,18l110,58q70,40,53,100q-5,15,13,54l45,90q15,22,19,59l27,33c25,100,80,140,80,168q5,28,39,52l15-20"/>
+	</g>
+
+	<g class="local rushhour-3-per-hour midday-3-per-hour">
+		<!-- Route 56 -->
+		<path class="route" d="M771,1815q-27-3-55,6l-41,12q1,30-4,50q-15,0-29-38q-7,5-34-10l-154-91q-7-10-40-5l-15,15q5,10,42,10q-35,30-68,70q-30,80-40,92q-20,15-100,60q-19,13-40,18t-36,16q-53,42-105,70"/>
+	</g>
+
+	<g class="local rushhour-6-per-hour midday-6-per-hour">
+		<!-- Routes 5 + 7 -->
+		<path class="route" d="M1000,1128l-60-60q-25-25-35-23"/>
+	</g>
+
+	<g class="express rushhour-6-per-hour midday-6-per-hour">
+		<!-- Routes 5 + 7 + 77x -->
+		<path class="route" d="M977,1105l-37-37"/>
+	</g>
+
+	<g class="local rushhour-5-per-hour midday-5-per-hour">
+		<!-- Routes 24 + 56 -->
+		<path class="route" d="M771,1815q-27-3-55,6l-41,12"/>
+	</g>
+
+	<g class="local rushhour-5-per-hour midday-4-per-hour">
+		<!-- Routes 12 + 19 + 43 -->
+		<path class="route" d="M739,1953c45,36,63,10,74,13"/>
+	</g>
+
+	<g class="local rushhour-6-per-hour midday-6-per-hour">
+		<!-- Routes 12 + 16 -->
+		<path class="route" d="M758,1374l-47,75"/>
+	</g>
+
+	<g class="local rushhour-3-per-hour midday-3-per-hour">
+		<!-- Routes 16 + 60 -->
+		<path class="route" d="M763,1598q-14-3-32,5q-35,20-50,14q-26-8-50,0q-33,8-33-25q0-12-5-24"/>
+	</g>
+
+	<g class="local rushhour-6-per-hour midday-4-per-hour">
+		<!-- Routes 3 + 23 -->
+		<path class="route" d="M1000,1128l19,19l110-95c40-25,75-90,105-96l50,49l13-15"/>
+	</g>
+
+	<g class="local rushhour-6-per-hour midday-6-per-hour">
+		<!-- Routes 16 + 19 -->
+		<path class="route" d="M1000,1128l-14-14l-50,50"/>
+	</g>
+
+	<g class="local rushhour-4-per-hour midday-4-per-hour">
+		<!-- Routes 4 + 17 -->
+		<path class="route" d="M1000,1128l19,19l22-18l18,20"/>
+	</g>
+
+	<g class="local rushhour-4-per-hour midday-4-per-hour">
+		<!-- Routes 21 + 26 -->
+		<path class="route" d="M1000,1128l-39-39q55-49,63-60"/>
+	</g>
+
+	<g class="local rushhour-5-per-hour midday-5-per-hour">
+		<!-- Routes 10 + 25 -->
+		<path class="route" d="M895,1235c-50-30-50-35-70-37q-20-13-32-10"/>
+	</g>
+
+	<g class="local rushhour-5-per-hour midday-3-per-hour">
+		<!-- Routes 19 + 25 -->
+		<path class="route" d="M905,1245l35,35"/>
+	</g>
+
+	<g class="local rushhour-6-per-hour midday-5-per-hour">
+		<!-- Routes 14 + 15 + 20 -->
+		<path class="route" d="M1000,1128l-10,10l99,99"/>
+	</g>
+
+	<g class="gold streetcar rushhour-4-per-hour">
+		<path class="route" d="M1000,1128l99,98q40-30,42-53M1000,1128l-60-60q-25-25-35-23q-25-3-20-30c5-25,13-40,13-53"/>
+	</g>
+
+	<g class="stations">
+
+		<!-- Blue Line Stations -->
+		<g transform="translate(1020, 1111)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,20)" filter="url(#bg-white)">7th St</text>
+		</g>
+		<g transform="translate(1000, 1128)" class="light-rail ctc">
+			<circle cx="0" cy="0" class="blue"/>
+			<circle cx="0" cy="0" class="gold"/>
+			<text transform="translate(15,20)" filter="url(#bg-white)">CTC/Arena</text>
+		</g>
+		<g transform="translate(983, 1142)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,25)" filter="url(#bg-white)">3rd St / Convention Center</text>
+		</g>
+		<g transform="translate(962, 1160)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,20)" filter="url(#bg-white)">Stonewall</text>
+		</g>
+		<g transform="translate(940, 1179)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,20)" filter="url(#bg-white)">Carson</text>
+		</g>
+		<g transform="translate(917, 1198)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,20)" filter="url(#bg-white)">Bland St</text>
+		</g>
+		<g transform="translate(886, 1235)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">East/West Blvd</text>
+		</g>
+		<g transform="translate(815, 1340)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">New Bern</text>
+		</g>
+		<g transform="translate(781, 1404)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Scaleybark</text>
+		</g>
+		<g transform="translate(758, 1515)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Woodlawn</text>
+		</g>
+		<g transform="translate(768, 1617)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Tyvola</text>
+		</g>
+		<g transform="translate(767.5, 1700)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Archdale</text>
+		</g>
+		<g transform="translate(775, 1829)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Arrowood</text>
+		</g>
+		<g transform="translate(739, 1953)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Sharon Rd W</text>
+		</g>
+		<g transform="translate(734, 2053)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">I-485</text>
+		</g>
+
+		<!-- Blue Line Extension Stations -->
+		<g transform="translate(1040, 1094)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">9th St</text>
+		</g>
+		<g transform="translate(1112, 1040)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Parkwood</text>
+		</g>
+		<g transform="translate(1160, 999)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">25th St</text>
+		</g>
+		<g transform="translate(1221, 949)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">36th St</text>
+		</g>
+		<g transform="translate(1313, 924)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Sugar Creek Rd</text>
+		</g>
+		<g transform="translate(1446, 850)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Old Concord Rd</text>
+		</g>
+		<g transform="translate(1480, 720)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">Tom Hunter</text>
+		</g>
+		<g transform="translate(1505, 655)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">University City</text>
+		</g>
+		<g transform="translate(1562, 540)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)"></text>
+		</g>
+		<g transform="translate(1609, 467)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)"></text>
+		</g>
+		<g transform="translate(1700, 456)" class="light-rail">
+			<circle cx="0" cy="0" class="blue"/>
+			<text transform="translate(10,10)" filter="url(#bg-white)">UNCC</text>
+		</g>
+
+		<!-- Community Transit Centers -->
+		<g transform="translate(1559, 1265)" class="ctc">
+			<circle cx="0" cy="0" class="local"/>
+			<text transform="translate(15,5)" filter="url(#bg-white)">Eastland CTC</text>
+		</g>
+		<g transform="translate(912, 755)" class="ctc">
+			<circle cx="0" cy="0" class="local"/>
+			<text transform="translate(15,5)" filter="url(#bg-white)">Rosa Parks Pl CTC</text>
+		</g>
+		<g transform="translate(1060, 1692)" class="ctc">
+			<circle cx="0" cy="0" class="local"/>
+			<text transform="translate(15,5)" filter="url(#bg-white)">SouthPark CTC</text>
+		</g>
+	</g>
+</svg>
+</body>
+</html>
