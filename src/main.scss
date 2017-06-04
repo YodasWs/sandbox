@@ -6,9 +6,8 @@
 	font-size: 12pt;
 }
 html,
-body,
-main {
-	margin: 0;
+body {
+	margin: 0 auto;
 	padding: 0;
 	width: 100%;
 	height: 100%;
@@ -18,15 +17,30 @@ body {
 	max-width: 97%;
 	border: solid black;
 	border-width: 0 1px;
-	margin: 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+
+	~ * {
+		display: none;
+	}
 }
 
 main {
+	margin: 0;
+	padding: 0;
+	flex-grow: 1;
+
 	> * {
 		$padding: 1rem;
 		padding-right: $padding;
 		padding-left: $padding;
 	}
+}
+
+body > footer ~ * {
+	display: none;
 }
 
 h1 {
@@ -36,7 +50,6 @@ h1 {
 
 a:link,
 a:visited {
-	text-decoration: none;
 	color: blue;
 }
 a:link:active,

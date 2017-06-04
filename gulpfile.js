@@ -163,7 +163,6 @@ gulp.task('compile', gulp.parallel('compile:html', 'compile:js', 'compile:sass',
 
 //gulp.task('watch', () => {
 	//gulp.watch('./src/**/*.{sa,sc,c}ss', gulp.series('compile:sass'))
-	//gulp.watch('./src/**/*.html', gulp.series('compile:html'))
 	//gulp.watch('./src/**/*.js', gulp.series('compile:js'))
 //})
 

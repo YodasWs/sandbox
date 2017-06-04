@@ -3,8 +3,24 @@ nav {
 	flex-flow: row nowrap;
 	justify-content: space-around;
 	list-style: none;
+	margin: 0 1rem;
 
-	nav > * {
+	> * {
 		flex-grow: 1;
+	}
+
+	> li {
+
+		> span {
+			cursor: pointer;
+		}
+
+		> ul {
+			display: none;
+		}
+
+		&:hover > ul {
+			display: block;
+		}
 	}
 }

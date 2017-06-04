@@ -1,0 +1,2 @@
+[object Object]'use strict';
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImNvbXBvbmVudHMvbmF2L25hdi5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiZUFBQSIsImZpbGUiOiJtaW4uanMiLCJzb3VyY2VzQ29udGVudCI6WyIndXNlIHN0cmljdCc7XG4iXX0=
