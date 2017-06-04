@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <title>Charlotte Rail Network</title>
+<!--<base href="http://yodasws.github.io/sandbox/"/>-->
+<base href="http://sandbox.local/"/>
+<link rel="stylesheet" href="min.css"/>
 <script src="https://d3js.org/d3.v4.min.js" async></script>
 <script src="https://d3js.org/d3-collection.v1.min.js" async></script>
 <script src="https://d3js.org/d3-dispatch.v1.min.js" async></script>
@@ -20,11 +23,10 @@ window.onReady = function(cb){
 	else if(Element.prototype.attachEvent)document.attachEvent('onreadystatechange',a)
 };
 </script>
-<link rel="stylesheet" href="d3.css"/>
 </head>
 <body>
 <h1>Charlotte Rail Network</h1>
-<svg class="web" xmlns="http://www.w3.org/2000/svg">
+<svg class="d3 web" xmlns="http://www.w3.org/2000/svg">
 	<defs>
 		<filter x="0" y="0" width="1" height="1" id="bg-white">
 			<feFlood flood-color="white"/>

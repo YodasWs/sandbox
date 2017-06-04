@@ -74,7 +74,7 @@ const options = {
 
 function runTasks ( stream, tasks, fileType='static' ) {
 	stream = stream.pipe(plugins.sourcemaps.init())
-	for (let i=0, k=tasks.length; i<k; i++) {
+	if (tasks.length) for (let i=0, k=tasks.length; i<k; i++) {
 		let option = options[tasks[i]] || {}
 		if (option[fileType]) option = option[fileType]
 		stream = stream.pipe(plugins[tasks[i]](option))
@@ -131,13 +131,23 @@ function runTasks ( stream, tasks, fileType='static' ) {
 		],
 		fileType: 'html'
 	},
+	{
+		name: 'transfer-files',
+		src: [
+			'./src/**/*.jp{,e}g',
+			'./src/**/*.gif',
+			'./src/**/*.png',
+			'./src/**/*.ttf'
+		],
+		tasks: []
+	}
 ].forEach((task) => {
 	gulp.task(task.name, () => {
 		return runTasks(gulp.src(task.src), task.tasks, task.fileType)
 	})
 })
 
-gulp.task('compile', gulp.parallel('compile:html', 'compile:js', 'compile:sass'))
+gulp.task('compile', gulp.parallel('compile:html', 'compile:js', 'compile:sass', 'transfer-files'))
 
 //gulp.task('watch', () => {
 	//gulp.watch('./src/**/*.{sa,sc,c}ss', gulp.series('compile:sass'))
