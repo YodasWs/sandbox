@@ -30,6 +30,18 @@ const options = {
 	compileSass:{
 		outputStyle: 'compressed'
 	},
+	lintES:{
+		env: {
+			browser: true,
+			es6: true
+		},
+		rules: {
+			strict: [
+				'error',
+				'global'
+			]
+		}
+	},
 	prefixCSS:{
 		// more options at https://github.com/postcss/autoprefixer#options
 		browsers: [
