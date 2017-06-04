@@ -1,44 +1,30 @@
 'use strict';
 
 const gulp = require('gulp');
-const filterUpdatedFiles = require('gulp-changed');
-const prefixCSS = require('gulp-autoprefixer');
-const rmLines = require('gulp-delete-lines');
-const compileSass = require('gulp-sass');
-const minifyJS = require('gulp-babel');
-const concat = require('gulp-concat');
-const header = require('gulp-header');
-const ignore = require('gulp-ignore');
-const string = require('gulp-change');
-const mv = require('gulp-rename');
-const git = require('gulp-git');
-const ssi = require('gulp-ssi');
+
+const plugins = {
+	prefixCSS: require('gulp-autoprefixer'),
+	sourcemaps: require('gulp-sourcemaps'),
+	rmLines: require('gulp-delete-lines'),
+	compileSass: require('gulp-sass'),
+	addHeader: require('gulp-header'),
+	compileJS: require('gulp-babel'),
+	concat: require('gulp-concat'),
+	lintES: require('gulp-eslint'),
+	git: require('gulp-git'),
+	ssi: require('gulp-ssi'),
+}
 
 const options = {
-	filterUpdatedFiles:{
-		cwd: __dirname
-	},
-	ignore:{
-		html:'**/components/**/*.html',
-		css:{
-			merge:[
-				'**/*.min.css',
-				'**/min.css'
-			],
-			dist:[
-				'**/components/**/*.css',
-				'**/main.css'
-			]
-		},
-		js:'{**/*.min.js}'
-	},
-	minifyJS:{
+	compileJS:{
 		comments:false,
-		presets: [
-			'babili'
-		],
 		plugins: [
+			'transform-exponentiation-operator',
 			'transform-remove-console'
+		],
+		presets: [
+			'react',
+			'es2015'
 		]
 	},
 	compileSass:{
@@ -48,20 +34,16 @@ const options = {
 		// more options at https://github.com/postcss/autoprefixer#options
 		browsers: [
 			// browser strings detailed at https://github.com/ai/browserslist#queries
-			'last 2 versions',
-			'not ie_mob < 11',
-			'not ie < 11',
-			'Safari >= 8'
+			'last 2 Firefox versions',
+			'last 2 Chrome versions',
+			'Safari >= 10',
+			'ie_mob >= 11',
+			'ie >= 11'
 		],
 		cascade: false
 	},
-	dest:{
-		// Save in build directory
-		build:'build/',
-		// Save in dist(rubutable) directory
-		dist:'docs/'
-	},
-	header:{
+	dest: 'docs/',
+	addHeader:{
 		css:(function(){
 			// properties found at https://github.com/gulpjs/vinyl
 			return '/* <%= file.relative %> */\n'
@@ -70,68 +52,100 @@ const options = {
 			return ''
 		})()
 	},
+	rmLines:{
+		filters:[
+			'^\s*$',
+		]
+	},
+	concat: {
+		css: {
+			path: 'min.css'
+		},
+		js: {
+			path: 'min.js'
+		}
+	},
+	ssi:{
+		root: 'src'
+	},
 	git:{
 	}
 }
 
-gulp.task('sass', () => {
-	// Compile and Minify CSS Files
-	return gulp.src('src/**/*.{,s}css')
-		// Compile only updated files
-		.pipe(filterUpdatedFiles(options.dest.build), options.filterUpdatedFiles)
-		// Compile Sass into CSS
-		.pipe(compileSass(options.compileSass))
-		// Save in build directory
-		.pipe(gulp.dest(options.dest.build))
-});
+function runTasks ( stream, tasks, fileType='static' ) {
+	stream = stream.pipe(plugins.sourcemaps.init())
+	for (let i=0, k=tasks.length; i<k; i++) {
+		let option = options[tasks[i]] || {}
+		if (option[fileType]) option = option[fileType]
+		stream = stream.pipe(plugins[tasks[i]](option))
+	}
+	if (tasks.indexOf('lintES') != -1) {
+		stream = stream.pipe(plugins.lintES.format())
+	}
+	return stream.pipe(plugins.sourcemaps.write())
+		.pipe(gulp.dest(options.dest))
+}
 
-gulp.task('css:dist', () => {
-	return gulp.src('build/**/*.css')
-		// Ignore Component Files
-		.pipe(ignore.exclude(options.ignore.css.dist))
-		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest.dist))
-});
+;[
+	{
+		name: 'compile:sass',
+		src: [
+			'src/main.{sa,sc,c}ss',
+			'src/**/*.{sa,sc,c}ss',
+			'!**/*.min.css',
+			'!**/min.css'
+		],
+		tasks: [
+			'compileSass',
+			'prefixCSS',
+			'addHeader',
+			'concat',
+			'rmLines',
+		],
+		fileType: 'css'
+	},
+	{
+		name: 'compile:js',
+		src: [
+			'src/**/*.js',
+			'!**/*.min.js',
+			'!**/min.js'
+		],
+		tasks: [
+			'lintES',
+			'compileJS',
+			'addHeader',
+			'concat',
+			'rmLines',
+		],
+		fileType: 'js'
+	},
+	{
+		name: 'compile:html',
+		src: [
+			'./src/**/*.html',
+			'!**/components/**/*.html'
+		],
+		tasks: [
+			'ssi',
+		],
+		fileType: 'html'
+	},
+].forEach((task) => {
+	gulp.task(task.name, () => {
+		return runTasks(gulp.src(task.src), task.tasks, task.fileType)
+	})
+})
 
-gulp.task('css:merge', () => {
-	return gulp.src(['build/main.css','build/**/*.css'])
-		// Ignore minified files
-		.pipe(ignore.exclude(options.ignore.css.merge))
-		// Add File Headers
-		.pipe(header(options.header.css))
-		// Autoprefix CSS for Backwards Compatibility
-		.pipe(prefixCSS(options.prefixCSS))
-		// Combine into one File
-		.pipe(concat('min.css'))
-		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest.dist))
-});
+gulp.task('compile', gulp.parallel('compile:html', 'compile:js', 'compile:sass'))
 
-gulp.task('css', gulp.series('sass', gulp.parallel('css:merge', 'css:dist')));
+//gulp.task('watch', () => {
+	//gulp.watch('./src/**/*.{sa,sc,c}ss', gulp.series('compile:sass'))
+	//gulp.watch('./src/**/*.html', gulp.series('compile:html'))
+	//gulp.watch('./src/**/*.js', gulp.series('compile:js'))
+//})
 
-gulp.task('js', () => {
-	// Minify JavaScript Files
-	return gulp.src('src/**/*.js')
-		// Ignore minified files
-		.pipe(ignore.exclude(options.ignore.js))
-		// Minify only updated files
-		.pipe(filterUpdatedFiles(options.dest.dist), options.filterUpdatedFiles)
-		// Minify!
-		.pipe(minifyJS(options.minifyJS))
-		// Add Project and License Header
-		.pipe(header(options.header.js))
-		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest.dist))
-});
-
-gulp.task('html', () => {
-	return gulp.src('src/**/*.html')
-		// Ignore include files
-		.pipe(ignore.exclude(options.ignore.html))
-		// Include include files
-		.pipe(ssi({root:'src'}))
-		// Save in dist(rubutable) directory
-		.pipe(gulp.dest(options.dest.dist))
-});
-
-gulp.task('default', gulp.parallel('html', 'js', 'css'));
+gulp.task('default', gulp.series(
+	'compile'
+//	'watch'
+))
