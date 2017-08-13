@@ -1,6 +1,6 @@
 {
   "name": "sandbox",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Fun side projects exploring what is possible with HTML5, JavaScript, CSS3, ECMAScript2016, CSS4, D3.js, Node.js, and others.",
   "main": "gulpfile.js",
   "private": true,
@@ -8,24 +8,41 @@
     "type": "git",
     "url": "git+https://github.com/YodasWs/sandbox.git"
   },
-  "author": "Samuel B Grundman",
+  "author": "Sam Grundman",
   "bugs": {
     "url": "https://github.com/YodasWs/sandbox/issues"
   },
   "homepage": "https://github.com/YodasWs/sandbox#readme",
   "devDependencies": {
+    "@mightyplow/sass-dedup-importer": "^1.1.1",
+    "angular": "^1.6.4",
+    "angular-route": "^1.6.4",
+    "babel-plugin-transform-exponentiation-operator": "^6.24.1",
+    "babel-plugin-transform-remove-console": "^6.8.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "file-exists": "^4.0.0",
+    "font-awesome": "^4.7.0",
     "gulp": "github:gulpjs/gulp#4.0",
-    "gulp-autoprefixer": "^3.1.1",
+    "gulp-autoprefixer": "^4.0.0",
     "gulp-babel": "^6.1.2",
-    "gulp-change": "^1.0.0",
-    "gulp-changed": "^1.3.2",
     "gulp-concat": "^2.6.1",
-    "gulp-delete-lines": "0.0.7",
+    "gulp-eslint": "^3.0.1",
+    "gulp-file": "^0.3.0",
     "gulp-git": "^1.12.0",
-    "gulp-header": "^1.8.8",
-    "gulp-ignore": "^2.0.2",
-    "gulp-rename": "^1.2.2",
+    "gulp-html-lint": "^0.0.1",
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-order": "^1.1.1",
+    "gulp-rm-lines": "^0.0.9",
+    "gulp-run-command": "^0.0.7",
     "gulp-sass": "^3.1.0",
-    "gulp-ssi": "^0.1.2"
+    "gulp-sass-lint": "^1.3.2",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-ssi": "^0.1.3",
+    "gulp-strip-css-comments": "^1.2.0",
+    "gulp-webserver": "^0.9.1",
+    "jquery": "^3.2.1",
+    "yargs": "^8.0.2"
   }
 }
