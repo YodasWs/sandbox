@@ -1,13 +1,13 @@
+@import 'mixins';
+
 * { box-sizing: border-box; }
 
 :root {
 	font-family: 'Trebuchet MS', 'Helvetica Neue', sans-serif;
-	font-size: 12pt;
 }
 
 html,
-body,
-main {
+body {
 	margin: 0;
 	padding: 0;
 	width: 100%;
@@ -20,6 +20,9 @@ body {
 	border: solid black;
 	border-width: 0 1px;
 	margin: 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
 
 	@media (max-width: 1200px) {
 		border: 0 none;
@@ -27,6 +30,8 @@ body {
 }
 
 main {
+	flex-grow: 1;
+
 	> * {
 		$padding: 1rem;
 		padding-right: $padding;
@@ -36,7 +41,15 @@ main {
 
 h1 {
 	text-align: center;
-	margin-top: 0;
+	margin: 0;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
 }
 
 a:link,

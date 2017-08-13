@@ -3,8 +3,16 @@ nav {
 	flex-flow: row nowrap;
 	justify-content: space-around;
 	list-style: none;
+	background: lightgreen;
 
-	nav > * {
+	> * {
+		@include hover {
+			background: green;
+			color: white;
+		}
+
+		text-align: center;
+		padding: 2px 5px;
 		flex-grow: 1;
 	}
 }
