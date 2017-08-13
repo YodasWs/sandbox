@@ -1,5 +1,10 @@
 'use strict';
 
+const gulpfileVersion = '1.0.0'
+
+const fs = require('fs')
+const packageJson = JSON.parse(fs.readFileSync('./package.json'))
+
 function camelCase(name) {
 	name = name.split('-')
 	if (name.length > 1) {
@@ -40,6 +45,11 @@ const argv = require('yargs')
 			describe: 'Name for your new page',
 			required: true,
 			alias: 'n',
+		},
+		section: {
+			describe: 'Section under which to add page',
+			default: '',
+			alias: 's',
 		},
 	})
 	.command('lint', 'Lint all JavaScript and Sass/SCSS files')
@@ -302,7 +312,7 @@ options = {
 		}
 	},
 	webserver:{
-		path: '/sandbox/',
+		path: `/${packageJson.name}/`,
 		directoryListing: false,
 		defaultFile: 'index.html',
 		fallback: 'index.html',
@@ -417,7 +427,6 @@ function runTasks(task) {
 	{
 		name: 'transfer:assets',
 		src: [
-			'./node_modules/font-awesome/fonts/fontawesome-webfont.*',
 			'./src/**/*.jp{,e}g',
 			'./src/**/*.json',
 			'./src/**/*.gif',
@@ -465,13 +474,18 @@ gulp.task('lint:js', () => {
 
 gulp.task('lint', gulp.parallel('lint:sass', 'lint:js', 'lint:html'))
 
-gulp.task('transfer:res', () => {
-	return gulp.src([
+gulp.task('transfer:res', (done) => {
+	gulp.src([
 		'./node_modules/angular/angular.min.js{,.map}',
 		'./node_modules/angular-route/angular-route.min.js{,.map}',
 		'./node_modules/jquery/dist/jquery.min.{js,map}',
 	])
 		.pipe(gulp.dest(path.join(options.dest, 'res')))
+	gulp.src([
+		'./node_modules/font-awesome/fonts/fontawesome-webfont.*',
+	])
+		.pipe(gulp.dest(path.join(options.dest, 'fonts')))
+	done()
 })
 
 gulp.task('transfer-files', gulp.parallel('transfer:assets', 'transfer:res'))
@@ -490,28 +504,35 @@ gulp.task('serve', () => {
 })
 
 gulp.task('generate:page', gulp.series(
+	() => {
+		if (argv.section) {
+			argv.section += '/'
+		}
+	},
 	plugins.cli([
-		`mkdir -pv ./src/pages/${argv.name}`,
-		`touch -a ./src/pages/${argv.name}/${argv.name}.html`,
-		`touch -a ./src/pages/${argv.name}/${argv.name}.scss`,
+		`mkdir -pv ./src/pages/${argv.section}${argv.name}`,
+		`touch -a ./src/pages/${argv.section}${argv.name}/${argv.name}.html`,
+		`touch -a ./src/pages/${argv.section}${argv.name}/${argv.name}.scss`,
 	]),
 	() => {
 		const str = `'use strict';\n\nangular.module('${camelCase('page-'+argv.name)}', [\n\t'ngRoute',\n])\n`
 		return plugins.newFile('module.js', str, { src: true })
-			.pipe(gulp.dest(`./src/pages/${argv.name}`))
+			.pipe(gulp.dest(`./src/pages/${argv.section}${argv.name}`))
 	},
 	() => {
 		const str = `'use strict';\n
 angular.module('${camelCase('page-'+argv.name)}')
 .config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
-	$routeProvider.when('/${argv.name}/', {
-		templateUrl: 'pages/${argv.name}/${argv.name}.html',
-	})
+\t$routeProvider.when('/${argv.name}/', {
+\t\ttemplateUrl: 'pages/${argv.section}${argv.name}/${argv.name}.html',
+\t\tcontrollerAs: '$ctrl',
+\t\tcontroller() {\n\t\t},
+\t})
 }])\n`
 		return plugins.newFile(`routes.js`, str, { src: true })
-			.pipe(gulp.dest(`./src/pages/${argv.name}`))
+			.pipe(gulp.dest(`./src/pages/${argv.section}${argv.name}`))
 	},
-	// TODO: Add to app.module.js
+	// TODO: Add to app.js
 	plugins.cli([
 		`git status`,
 	])
@@ -533,13 +554,13 @@ gulp.task('generate:component', gulp.series(
 angular.module('${camelCase('comp-'+argv.name)}')
 .component('${camelCase(argv.name)}', {
 \ttemplateUrl: 'components/${argv.name}/${argv.name}.html',
-\tcontroller() {
-\t}
+\tcontrollerAs: '$ctrl',
+\tcontroller() {\n\t}
 })\n`
 		return plugins.newFile(`${argv.name}.js`, str, { src: true })
 			.pipe(gulp.dest(`./src/components/${argv.name}`))
 	},
-	// TODO: Add to app.module.js
+	// TODO: Add to app.js
 	plugins.cli([
 		`git status`,
 	])
@@ -640,7 +661,7 @@ body > nav {\n\tdisplay: flex;\n\tflex-flow: row wrap;\n\tjustify-content: space
 		}
 		const str = `<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<base href="/sandbox/"/>
+<base href="/${packageJson.name}/"/>
 <link rel="stylesheet" href="min.css"/>
 <script src="res/jquery.min.js"></script>
 <script src="res/angular.min.js"></script>
