@@ -15,11 +15,15 @@ main {
 }
 
 body {
-	width: 1200px;
-	max-width: 97%;
+	width: 100%;
+	max-width: 1200px;
 	border: solid black;
 	border-width: 0 1px;
 	margin: 0 auto;
+
+	@media (max-width: 1200px) {
+		border: 0 none;
+	}
 }
 
 main {
