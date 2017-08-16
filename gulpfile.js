@@ -1,6 +1,9 @@
+/**
+ * Sam Grundman's Super Awesome Gulp Web Development Toolset
+ *
+ * @version 1.0.0
+ */
 'use strict';
-
-const gulpfileVersion = '1.0.0'
 
 const fs = require('fs')
 const packageJson = JSON.parse(fs.readFileSync('./package.json'))
