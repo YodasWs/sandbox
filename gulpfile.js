@@ -1,7 +1,7 @@
 /**
  * Sam Grundman's Super Awesome Gulp Web Development Toolset
  *
- * @version 1.0.0
+ * @version 1.0.1
  */
 'use strict';
 
@@ -507,16 +507,21 @@ gulp.task('serve', () => {
 })
 
 gulp.task('generate:page', gulp.series(
-	() => {
+	(done) => {
 		if (argv.section) {
 			argv.section += '/'
 		}
+		done()
 	},
 	plugins.cli([
-		`mkdir -pv ./src/pages/${argv.section}${argv.name}`,
-		`touch -a ./src/pages/${argv.section}${argv.name}/${argv.name}.html`,
-		`touch -a ./src/pages/${argv.section}${argv.name}/${argv.name}.scss`,
+		`mkdir -pv ./src/pages/${argv.section}/${argv.name}`,
+		`touch -a ./src/pages/${argv.section}/${argv.name}/${argv.name}.scss`,
 	]),
+	() => {
+		const str = `<h2>${argv.name}</h2>\n`
+		return plugins.newFile(`${argv.name}.html`, str, { src: true })
+			.pipe(gulp.dest(`./src/pages/${argv.section}${argv.name}`))
+	},
 	() => {
 		const str = `'use strict';\n\nangular.module('${camelCase('page-'+argv.name)}', [\n\t'ngRoute',\n])\n`
 		return plugins.newFile('module.js', str, { src: true })
