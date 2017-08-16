@@ -1,7 +1,7 @@
 /**
  * Sam Grundman's Super Awesome Gulp Web Development Toolset
  *
- * @version 1.0.2
+ * @version 1.0.3
  */
 'use strict';
 
@@ -173,7 +173,7 @@ options = {
 	]}
 ],
 'no-empty-rulesets': 1,
-'no-extends': 1,
+'no-extends': 0,
 'no-ids': 1,
 'no-important': 1,
 'no-invalid-hex': 1,
