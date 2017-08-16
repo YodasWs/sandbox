@@ -1,4 +1,0 @@
-<IfModule include_module>
-	Options +Includes
-	AddOutputFilter INCLUDES .html
-</IfModule>
