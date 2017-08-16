@@ -1,7 +1,7 @@
 /**
  * Sam Grundman's Super Awesome Gulp Web Development Toolset
  *
- * @version 1.0.1
+ * @version 1.0.2
  */
 'use strict';
 
@@ -531,7 +531,7 @@ gulp.task('generate:page', gulp.series(
 		const str = `'use strict';\n
 angular.module('${camelCase('page-'+argv.name)}')
 .config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
-\t$routeProvider.when('/${argv.name}/', {
+\t$routeProvider.when('/${argv.section}${argv.name}/', {
 \t\ttemplateUrl: 'pages/${argv.section}${argv.name}/${argv.name}.html',
 \t\tcontrollerAs: '$ctrl',
 \t\tcontroller() {\n\t\t},
