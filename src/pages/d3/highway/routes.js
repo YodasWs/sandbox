@@ -28,10 +28,18 @@ angular.module('pageHighway')
 		this.addCar({
 			id: 'center',
 			x: 2000 / 2,
-			y: roadway.lanes[1],
-			movingTo: 1,
 			lane: 1,
+			cruiseControl: 0,
 		})
+
+		let forces = []
+
+		// Add Collision Force
+		forces.push(carCollision(CAR))
+
+		for (let i=0, f=forces.length; i<f; i++) {
+			this.sim.force(i, forces.pop())
+		}
 
 		// Set onTick
 		this.sim.on('tick', () => {
@@ -53,6 +61,19 @@ angular.module('pageHighway')
 	}
 
 	this.addCar = (car) => {
+		// Add missing data
+		if (typeof car.lane === 'number' && car.lane >= 0 && car.lane < roadway.lanes.length) {
+			if (!car.y) {
+				car.y = roadway.lanes[car.lane]
+			}
+			if (typeof car.movingTo === 'undefined') car.movingTo = car.lane
+		}
+		if (!car.id) {
+			car.id = `car${this.cars.length}`
+		}
+		car.x = car.x || 2000 + CAR.w
+		car.vy = 0
+		// Add to Simulation
 		this.cars.push(car)
 		this.sim.nodes(this.cars)
 		let cars = this.d3.selectAll('g.car')
@@ -101,12 +122,7 @@ angular.module('pageHighway')
 
 	// Add Traffic
 	this.addCar({
-		id: 'car2',
-		x: 2000 + CAR.w,
-		y: roadway.lanes[0],
-		movingTo: 0,
-		lane: 0,
-		vx: -5,
-		vy: 0,
+		lane: 1,
+		cruiseControl: -5,
 	})
 })

@@ -1,7 +1,7 @@
 /**
  * Sam Grundman's Super Awesome Gulp Web Development Toolset
  *
- * @version 1.0.3
+ * @version 1.0.4
  */
 'use strict';
 
@@ -142,6 +142,7 @@ options = {
 'no-console': 0,
 'no-undef': 0,
 'no-tabs': 0,
+'no-var': 2,
 'semi': 0,
 
 		}
@@ -409,8 +410,8 @@ function runTasks(task) {
 			'lintES',
 			'sort',
 			'concat',
-			'rmLines',
 			'compileJS',
+			'rmLines',
 		],
 		fileType: 'js'
 	},
