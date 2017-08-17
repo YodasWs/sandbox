@@ -1,0 +1,36 @@
+main[ng-view='pageHighway'] > svg {
+	g.car {
+		rect {
+			stroke: none;
+			fill: lightgreen;
+		}
+	}
+
+	g.roadway {
+		> rect {
+			stroke: none;
+			fill: black;
+		}
+
+		> line {
+			stroke: white;
+			stroke-width: 5px;
+			stroke-dasharray: 50, 75;
+			stroke-dashoffset: 0;
+		}
+
+		&.animated > line {
+			animation: 1s linear infinite lanes;
+		}
+	}
+}
+
+@keyframes lanes {
+	from {
+		stroke-dashoffset: 0;
+	}
+
+	to {
+		stroke-dashoffset: 125;
+	}
+}
