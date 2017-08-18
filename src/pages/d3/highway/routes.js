@@ -8,7 +8,7 @@ angular.module('pageHighway')
 		controller: 'ctrlHighway',
 	})
 }])
-.controller('ctrlHighway', function() {
+.controller('ctrlHighway', ['$scope', function($scope) {
 	// Use page stylesheet
 	angular.element('[ng-view]').attr('ng-view', 'pageHighway')
 	// Initialize our variables
@@ -22,6 +22,7 @@ angular.module('pageHighway')
 		this.sim = d3.forceSimulation().stop().alphaMin(0.01)
 		this.sim.alphaDecay(0).velocityDecay(0)
 	}
+	$scope.btnPause = 'Resume'
 
 	this.buildSim = () => {
 		// Add Center Car
@@ -58,6 +59,23 @@ angular.module('pageHighway')
 			})
 		})
 		this.sim.on('tick')()
+	}
+
+	$scope.toggleSim = () => {
+		if ($scope.btnPause === 'Pause') this.pauseSim()
+		else this.resumeSim()
+	}
+
+	this.pauseSim = () => {
+		this.d3.selectAll('g.roadway').classed('animated', false)
+		this.sim.stop()
+		$scope.btnPause = 'Resume'
+	}
+
+	this.resumeSim = () => {
+		this.d3.selectAll('g.roadway').classed('animated', true)
+		this.sim.restart()
+		$scope.btnPause = 'Pause'
 	}
 
 	this.addCar = (car) => {
@@ -101,7 +119,6 @@ angular.module('pageHighway')
 
 	// Build Roadway
 	this.d3.append('g').classed('roadway', true)
-		.classed('animated', true)
 	this.d3.selectAll('g.roadway').append('rect')
 		.attr('height', roadway.numLanes * roadway.laneWidth)
 		.attr('y', 1000 - roadway.numLanes * roadway.laneWidth / 2)
@@ -118,7 +135,7 @@ angular.module('pageHighway')
 	// Initialize Sim
 	this.clearSim()
 	this.buildSim()
-	this.sim.restart()
+	this.resumeSim()
 
 	// Add Traffic
 	this.addCar({
