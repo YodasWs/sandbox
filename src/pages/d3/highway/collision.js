@@ -58,9 +58,12 @@ const carCollision = function(dimensions) {
 
 		for (let k = 0; k < iterations; ++k) {
 			tree = d3.quadtree(nodes, x, y).visitAfter(prepare);
+			// Release brakes
 			for (i = 0; i < n; ++i) {
-				nodes[i].applyBrakes = false
+				nodes[i].distanceBehind = false
+				nodes[i].distanceToStop = false
 			}
+			// Check if we need to apply brakes
 			for (i = 0; i < n; ++i) {
 				node = nodes[i];
 				rx = radii[node.index].w;
@@ -70,11 +73,22 @@ const carCollision = function(dimensions) {
 				yi = node.y + node.vy;
 				tree.visit(apply);
 			}
+			// Adjust speed
 			for (i = 0; i < n; ++i) {
-				if (node.applyBrakes) {
-					node.vx -= Math.sign(node.vx) * strengths[node.index] / 4
-				} else if (Math.abs(node.vx - node.cruiseControl) >= 1e-5) {
+				let node = nodes[i];
+
+				if (node.distanceToStop === false && Math.abs(node.vx - node.cruiseControl) >= strengths[node.index] / 5) {
+					// Adjust towards Cruise Control
 					node.vx += Math.sign(node.cruiseControl) * strengths[node.index] / 5
+				} else if (node.distanceToStop && node.distanceBehind <= node.separation) {
+					node.vx = 0
+				} else if (node.distanceToStop) {
+					// Desired Acceleration to stop Car
+					let speed = Math.max(Math.abs(node.vx), Math.abs(node.cruiseControl))
+					let acceleration = speed * speed / 2 / node.distanceToStop
+					let delta = Math.sign(node.vx) * acceleration
+					node.vx -= delta
+					if (Math.abs(node.vx) < Math.abs(delta)) node.vx = 0
 				}
 			}
 		}
@@ -91,11 +105,11 @@ const carCollision = function(dimensions) {
 					if (Math.abs(y) > ry / 2 + radii[data.index].h / 2 + 5) return
 					if (l >= r * r) return
 
-					if (data.x > node.x) {
-						data.applyBrakes = true
-					} else {
-						node.applyBrakes = true
-					}
+					const carWidth = rx / 2 + radii[data.index].w / 2
+
+					let car = node.x < data.x ? data : node
+					car.distanceBehind = Math.sqrt(l) - carWidth - car.separation
+					car.distanceToStop = r - carWidth - car.separation
 				}
 				return;
 			}

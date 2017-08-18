@@ -47,6 +47,8 @@ angular.module('pageHighway')
 			this.nodes.selectAll('rect').attr('x', (d) => {
 				if (d.x < 0 - CAR.w) {
 					d.x = 2000 + CAR.w
+					d.movingTo = 1
+					d.lane = d.movingTo
 				}
 				return d.x - CAR.w / 2
 			}).attr('y', (d) => {
@@ -90,6 +92,7 @@ angular.module('pageHighway')
 			car.id = `car${this.cars.length}`
 		}
 		car.x = car.x || 2000 + CAR.w
+		car.separation = car.separation || CAR.w / 10
 		car.vy = 0
 		// Add to Simulation
 		this.cars.push(car)
@@ -108,7 +111,7 @@ angular.module('pageHighway')
 	}
 	let roadway = {
 		laneWidth: 70,
-		numLanes: 4,
+		numLanes: 2,
 		lanes: [],
 	}
 
@@ -140,6 +143,14 @@ angular.module('pageHighway')
 	// Add Traffic
 	this.addCar({
 		lane: 1,
+		x: 2000 - CAR.w * 5,
 		cruiseControl: -5,
 	})
-})
+	/*
+	this.addCar({
+		lane: 1,
+		x: 2000 + CAR.w * 10,
+		cruiseControl: -10,
+	})
+	/**/
+}])
