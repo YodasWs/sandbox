@@ -55,7 +55,11 @@ angular.module('pageHighway')
 				if (d.lane === d.movingTo) {
 					d.y = roadway.lanes[d.lane]
 					d.vy = 0
+				} else if (Math.abs(roadway.lanes[d.movingTo] - d.y) <= roadway.laneWidth / 20) {
+					d.lane = d.movingTo
 				} else {
+					let sign = Math.sign(roadway.lanes[d.movingTo] - d.y)
+					d.vy = sign * roadway.laneWidth / 20
 				}
 				return d.y - CAR.h / 2
 			})
@@ -80,6 +84,10 @@ angular.module('pageHighway')
 		$scope.btnPause = 'Pause'
 	}
 
+	function changeLanes() {
+		this.movingTo = this.lane === roadway.lanes.length - 1 ? this.lane - 1 : this.lane + 1
+	}
+
 	this.addCar = (car) => {
 		// Add missing data
 		if (typeof car.lane === 'number' && car.lane >= 0 && car.lane < roadway.lanes.length) {
@@ -94,6 +102,7 @@ angular.module('pageHighway')
 		car.x = car.x || 2000 + CAR.w
 		car.separation = car.separation || CAR.w / 10
 		car.vy = 0
+		car.changeLanes = changeLanes.bind(car)
 		// Add to Simulation
 		this.cars.push(car)
 		this.sim.nodes(this.cars)
@@ -146,11 +155,9 @@ angular.module('pageHighway')
 		x: 2000 - CAR.w * 5,
 		cruiseControl: -5,
 	})
-	/*
 	this.addCar({
 		lane: 1,
 		x: 2000 + CAR.w * 10,
 		cruiseControl: -10,
 	})
-	/**/
 }])

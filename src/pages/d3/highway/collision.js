@@ -108,8 +108,13 @@ const carCollision = function(dimensions) {
 					const carWidth = rx / 2 + radii[data.index].w / 2
 
 					let car = node.x < data.x ? data : node
+					let other = node.x < data.x ? node : data
 					car.distanceBehind = Math.sqrt(l) - carWidth - car.separation
 					car.distanceToStop = r - carWidth - car.separation
+					// If we're going faster, change lanes
+					if (Math.abs(car.cruiseControl) > Math.abs(other.vx)) {
+						car.changeLanes()
+					}
 				}
 				return;
 			}
