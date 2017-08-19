@@ -66,7 +66,7 @@ const carCollision = function(dimensions) {
 			// Check if we need to apply brakes
 			for (i = 0; i < n; ++i) {
 				node = nodes[i];
-				rx = radii[node.index].w;
+				rx = radii[node.index].w * 2;
 				ry = radii[node.index].h;
 				ri2 = rx * rx;
 				xi = node.x + node.vx;
@@ -89,6 +89,7 @@ const carCollision = function(dimensions) {
 					let delta = Math.sign(node.vx) * acceleration
 					node.vx -= delta
 					if (Math.abs(node.vx) < Math.abs(delta)) node.vx = 0
+					if (Math.sign(node.vx) !== Math.sign(node.cruiseControl)) node.vx = 0
 				}
 			}
 		}
@@ -102,7 +103,7 @@ const carCollision = function(dimensions) {
 						l = x * x + y * y;
 
 					// Are they going to hit?
-					if (Math.abs(y) > ry / 2 + radii[data.index].h / 2 + 5) return
+					if (Math.abs(y) > (ry / 2 + radii[data.index].h / 2 + 5) / 2) return
 					if (l >= r * r) return
 
 					const carWidth = rx / 2 + radii[data.index].w / 2
