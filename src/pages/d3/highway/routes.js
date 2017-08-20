@@ -46,15 +46,23 @@ angular.module('pageHighway')
 					d.movingTo = Math.floor(Math.random() * roadways[d.roadway].lanes.length)
 					d.lane = d.movingTo
 					roadways[d.roadway].carsPassed++
+					d.y = roadways[d.roadway].lanes[d.lane]
 				}
 				return d.x - CAR.w / 2
 			}).attr('y', (d) => {
+				/*
 				if (d.lane === d.movingTo) {
-					d.y = roadways[d.roadway].lanes[d.lane]
-					d.vy = 0
-				} else if (Math.abs(roadways[d.roadway].lanes[d.movingTo] - d.y) <= roadways[d.roadway].laneWidth / 30) {
+					// d.y = roadways[d.roadway].lanes[d.lane]
+					// d.vy = 0
+				} else
+				/**/
+				if (d.occupiedLanes.indexOf(d.movingTo) !== -1) d.movingTo = d.lane // Uh, nope, car there
+				if (Math.abs(roadways[d.roadway].lanes[d.movingTo] - d.y) <= roadways[d.roadway].laneWidth / 30) {
+					// We've taken the lane!
 					d.lane = d.movingTo
+					d.vy = 0
 				} else {
+					// Still moving over
 					d.vy = Math.sign(roadways[d.roadway].lanes[d.movingTo] - d.y) * roadways[d.roadway].laneWidth / 30
 				}
 				return d.y - CAR.h / 2
@@ -121,16 +129,23 @@ angular.module('pageHighway')
 		{
 			carsPassed: 0,
 			laneWidth: 70,
-			numLanes: 2,
+			numLanes: 3,
 			lanes: [],
 		},
 		{
 			carsPassed: 0,
 			laneWidth: 70,
-			numLanes: 2,
+			numLanes: 3,
+			lanes: [],
+		},
+		{
+			carsPassed: 0,
+			laneWidth: 70,
+			numLanes: 3,
 			lanes: [],
 		},
 	]
+	this.roadways = roadways
 	roadways.forEach((roadway, i) => {
 		roadway.y = 2000 / (roadways.length + 1) * (i + 1)
 		roadway.i = i
@@ -187,6 +202,18 @@ angular.module('pageHighway')
 		id: 'center',
 		x: 2000 / 2,
 		lane: 0,
+		cruiseControl: 0,
+	})
+	this.addCar(2, {
+		id: 'center',
+		x: 2000 / 2,
+		lane: 0,
+		cruiseControl: 0,
+	})
+	this.addCar(2, {
+		id: 'center2',
+		x: 2000 / 2,
+		lane: 2,
 		cruiseControl: 0,
 	})
 

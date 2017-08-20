@@ -60,8 +60,11 @@ const carCollision = function(dimensions) {
 			tree = d3.quadtree(nodes, x, y).visitAfter(prepare);
 			// Release brakes
 			for (i = 0; i < n; ++i) {
-				nodes[i].distanceBehind = false
-				nodes[i].distanceToStop = false
+				let node = nodes[i]
+				node.distanceBehind = false
+				node.distanceToStop = false
+				node.occupiedLanes = []
+				node.willChangeLanes = false
 			}
 			// Check if we need to apply brakes
 			for (i = 0; i < n; ++i) {
@@ -88,8 +91,11 @@ const carCollision = function(dimensions) {
 					let acceleration = speed * speed / 2 / node.distanceToStop
 					let delta = Math.sign(node.vx) * acceleration
 					node.vx -= delta
-					if (Math.abs(node.vx) < Math.abs(delta)) node.vx = 0
-					if (Math.sign(node.vx) !== Math.sign(node.cruiseControl)) node.vx = 0
+					// if (Math.abs(node.vx) < Math.abs(delta)) node.vx = 0
+					// if (Math.sign(node.vx) !== Math.sign(node.cruiseControl)) node.vx = 0
+				}
+				if (node.willChangeLanes) {
+					node.changeLanes()
 				}
 			}
 		}
@@ -102,19 +108,35 @@ const carCollision = function(dimensions) {
 						y = yi - data.y - data.vy,
 						l = x * x + y * y;
 
-					// Are they going to hit?
-					if (Math.abs(y) > (ry / 2 + radii[data.index].h / 2 + 5) / 2) return
 					if (l >= r * r) return
 
-					const carWidth = rx / 2 + radii[data.index].w / 2
+					// Are they going to hit?
+					if (Math.abs(y) <= (ry / 2 + radii[data.index].h / 2 + 5) / 2) {
 
-					let car = node.x < data.x ? data : node
-					let other = node.x < data.x ? node : data
-					car.distanceBehind = Math.sqrt(l) - carWidth - car.separation
-					car.distanceToStop = r - carWidth - car.separation
-					// If we're going faster, change lanes
-					if (Math.abs(car.cruiseControl) > Math.abs(other.vx)) {
-						car.changeLanes()
+						const carWidth = rx / 2 + radii[data.index].w / 2
+
+						let car = node.x < data.x ? data : node
+						let other = node.x < data.x ? node : data
+						car.distanceBehind = Math.sqrt(l) - carWidth - car.separation
+						car.distanceToStop = r - carWidth - car.separation
+						// If we're going faster, change lanes
+						if (Math.abs(car.cruiseControl) > Math.abs(other.vx)) {
+							car.willChangeLanes = true
+						}
+					}
+
+					// Are they next to each other?
+					if (Math.abs(data.lane - node.lane) === 1) {
+						data.occupiedLanes.push(node.lane)
+						node.occupiedLanes.push(data.lane)
+					}
+
+					// Are they next to each other?
+					if (Math.abs(y) <= ry / 2 + radii[data.index].h / 2 + 5) {
+						// Let faster car pass first
+						let car = node.vx < data.vx ? node : data
+						let other = node.vx < data.vx ? data : node
+						car.occupiedLanes.push(other.movingTo)
 					}
 				}
 				return;
