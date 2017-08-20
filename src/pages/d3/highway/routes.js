@@ -50,12 +50,6 @@ angular.module('pageHighway')
 				}
 				return d.x - CAR.w / 2
 			}).attr('y', (d) => {
-				/*
-				if (d.lane === d.movingTo) {
-					// d.y = roadways[d.roadway].lanes[d.lane]
-					// d.vy = 0
-				} else
-				/**/
 				if (d.occupiedLanes.indexOf(d.movingTo) !== -1) d.movingTo = d.lane // Uh, nope, car there
 				if (Math.abs(roadways[d.roadway].lanes[d.movingTo] - d.y) <= roadways[d.roadway].laneWidth / 30) {
 					// We've taken the lane!

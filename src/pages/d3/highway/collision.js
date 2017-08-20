@@ -80,19 +80,17 @@ const carCollision = function(dimensions) {
 			for (i = 0; i < n; ++i) {
 				let node = nodes[i];
 
-				if (node.distanceToStop === false && Math.abs(node.vx - node.cruiseControl) >= strengths[node.index] / 5) {
+				if (node.distanceToStop === false && Math.abs(node.cruiseControl - node.vx) >= strengths[node.index] / 5) {
 					// Adjust towards Cruise Control
-					node.vx += Math.sign(node.cruiseControl) * strengths[node.index] / 5
-				} else if (node.distanceToStop && node.distanceBehind <= node.separation) {
-					node.vx = 0
+					node.vx += Math.sign(node.cruiseControl - node.vx) * strengths[node.index] / 5
+				} else if (node.distanceToStop && node.distanceBehind <= radii[node.index].w + node.separation) {
+					// Keep car behind the other
+					let speed = Math.max(Math.abs(node.vx), Math.abs(node.cruiseControl))
+					node.vx += speed * speed / 2 / (radii[node.index].w - node.distanceBehind + node.separation)
 				} else if (node.distanceToStop) {
 					// Desired Acceleration to stop Car
 					let speed = Math.max(Math.abs(node.vx), Math.abs(node.cruiseControl))
-					let acceleration = speed * speed / 2 / node.distanceToStop
-					let delta = Math.sign(node.vx) * acceleration
-					node.vx -= delta
-					// if (Math.abs(node.vx) < Math.abs(delta)) node.vx = 0
-					// if (Math.sign(node.vx) !== Math.sign(node.cruiseControl)) node.vx = 0
+					node.vx -= Math.sign(node.vx) * speed * speed / 2 / node.distanceToStop
 				}
 				if (node.willChangeLanes) {
 					node.changeLanes()
@@ -117,7 +115,7 @@ const carCollision = function(dimensions) {
 
 						let car = node.x < data.x ? data : node
 						let other = node.x < data.x ? node : data
-						car.distanceBehind = Math.sqrt(l) - carWidth - car.separation
+						car.distanceBehind = car.x - other.x
 						car.distanceToStop = r - carWidth - car.separation
 						// If we're going faster, change lanes
 						if (Math.abs(car.cruiseControl) > Math.abs(other.vx)) {
@@ -142,6 +140,7 @@ const carCollision = function(dimensions) {
 							other = node.vx < data.vx ? data : node
 						}
 						car.occupiedLanes.push(other.movingTo)
+						car.occupiedLanes.push(other.lane)
 					}
 				}
 				return;
