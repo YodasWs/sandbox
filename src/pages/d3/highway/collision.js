@@ -133,9 +133,14 @@ const carCollision = function(dimensions) {
 
 					// Are they next to each other?
 					if (Math.abs(y) <= ry / 2 + radii[data.index].h / 2 + 5) {
-						// Let faster car pass first
-						let car = node.vx < data.vx ? node : data
-						let other = node.vx < data.vx ? data : node
+						// Let first car through
+						let car = node.x < data.x ? data : node
+						let other = node.x < data.x ? node : data
+						if (car.letFasterCarPass) {
+							// Let faster car pass first
+							car = node.vx < data.vx ? node : data
+							other = node.vx < data.vx ? data : node
+						}
 						car.occupiedLanes.push(other.movingTo)
 					}
 				}
