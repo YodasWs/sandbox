@@ -25,14 +25,6 @@ angular.module('pageHighway')
 	$scope.btnPause = 'Resume'
 
 	this.buildSim = () => {
-		// Add Center Car
-		this.addCar(0, {
-			id: 'center',
-			x: 2000 / 2,
-			lane: 1,
-			cruiseControl: 0,
-		})
-
 		let forces = []
 
 		// Add Collision Force
@@ -44,26 +36,30 @@ angular.module('pageHighway')
 
 		// Set onTick
 		this.sim.on('tick', () => {
+			this.d3.selectAll('g.roadway').selectAll('text')
+				.text((d) => {
+					return d.carsPassed
+				})
 			this.nodes.selectAll('rect').attr('x', (d) => {
 				if (d.x < 0 - CAR.w) {
 					d.x = 2000 + CAR.w
-					d.movingTo = 1 // Math.floor(Math.random() * roadways[0].lanes.length)
+					d.movingTo = Math.floor(Math.random() * roadways[d.roadway].lanes.length)
 					d.lane = d.movingTo
+					roadways[d.roadway].carsPassed++
 				}
 				return d.x - CAR.w / 2
 			}).attr('y', (d) => {
 				if (d.lane === d.movingTo) {
-					d.y = roadways[0].lanes[d.lane]
+					d.y = roadways[d.roadway].lanes[d.lane]
 					d.vy = 0
-				} else if (Math.abs(roadways[0].lanes[d.movingTo] - d.y) <= roadways[0].laneWidth / 30) {
+				} else if (Math.abs(roadways[d.roadway].lanes[d.movingTo] - d.y) <= roadways[d.roadway].laneWidth / 30) {
 					d.lane = d.movingTo
 				} else {
-					d.vy = Math.sign(roadways[0].lanes[d.movingTo] - d.y) * roadways[0].laneWidth / 30
+					d.vy = Math.sign(roadways[d.roadway].lanes[d.movingTo] - d.y) * roadways[d.roadway].laneWidth / 30
 				}
 				return d.y - CAR.h / 2
 			})
 		})
-		this.sim.on('tick')()
 	}
 
 	$scope.toggleSim = () => {
@@ -84,10 +80,13 @@ angular.module('pageHighway')
 	}
 
 	function changeLanes() {
-		this.movingTo = this.lane === roadways[0].lanes.length - 1 ? this.lane - 1 : this.lane + 1
+		this.movingTo = this.lane === roadways[this.roadway].lanes.length - 1 ? this.lane - 1 : this.lane + 1
 	}
 
 	this.addCar = (i, car) => {
+		if (typeof i !== 'number') return
+		if (i < 0 || i >= roadways.length) return
+		if (!roadways[i]) return
 		// Add missing data
 		if (typeof car.lane === 'number' && car.lane >= 0 && car.lane < roadways[i].lanes.length) {
 			if (!car.y) {
@@ -100,6 +99,7 @@ angular.module('pageHighway')
 		}
 		car.x = car.x || 2000 + CAR.w
 		car.separation = car.separation || CAR.w / 10
+		car.roadway = i
 		car.vy = 0
 		car.changeLanes = changeLanes.bind(car)
 		// Add to Simulation
@@ -119,25 +119,49 @@ angular.module('pageHighway')
 	}
 	let roadways = [
 		{
+			carsPassed: 0,
+			laneWidth: 70,
+			numLanes: 2,
+			lanes: [],
+		},
+		{
+			carsPassed: 0,
 			laneWidth: 70,
 			numLanes: 2,
 			lanes: [],
 		},
 	]
+	roadways.forEach((roadway, i) => {
+		roadway.y = 2000 / (roadways.length + 1) * (i + 1)
+		roadway.i = i
+	})
 
 	// Calculate Center of Lanes
-	for (let i=0; i<roadways[0].numLanes; i++) {
-		roadways[0].lanes.push(i * roadways[0].laneWidth + 1000 - roadways[0].numLanes * roadways[0].laneWidth / 2 + roadways[0].laneWidth / 2)
-	}
+	roadways.forEach((roadway, j) => {
+		for (let i=0; i<roadway.numLanes; i++) {
+			roadway.lanes.push(i * roadway.laneWidth + 2000 / (roadways.length + 1) * (j + 1) - roadway.numLanes * roadway.laneWidth / 2 + roadway.laneWidth / 2)
+		}
+	})
 
 	// Build roadways
+	let d3roadways = this.d3.selectAll('g.roadway').data(roadways)
+	d3roadways = d3roadways.enter().append('g').classed('roadway', true).merge(d3roadways)
+	d3roadways.append('rect')
+		.attr('x', 0).attr('width', 2000)
+		.attr('height', (d) => {
+			return d.numLanes * d.laneWidth
+		})
+		.attr('y', (d) => {
+			return d.y - d.numLanes * d.laneWidth / 2
+		})
+	d3roadways.append('text')
+		.attr('x', 20).attr('y', (d) => {
+			return d.y - d.numLanes * d.laneWidth / 2 - 10
+		})
+
+	// Add Lanes
 	roadways.forEach((roadway, i) => {
 		const ry = 2000 / (roadways.length + 1) * (i + 1)
-		this.d3.append('g').classed('roadway', true)
-		this.d3.selectAll('g.roadway').append('rect')
-			.attr('height', roadway.numLanes * roadway.laneWidth)
-			.attr('y', ry - roadway.numLanes * roadway.laneWidth / 2)
-			.attr('x', 0).attr('width', 2000)
 		for (let i=1; i<roadway.numLanes; i++) {
 			let line = this.d3.selectAll('g.roadway').append('line')
 			const y = i * roadway.laneWidth + ry - roadway.numLanes * roadway.laneWidth / 2
@@ -151,17 +175,45 @@ angular.module('pageHighway')
 	// Initialize Sim
 	this.clearSim()
 	this.buildSim()
-	this.resumeSim()
+
+	// Add Center Car
+	this.addCar(0, {
+		id: 'center',
+		x: 2000 / 2,
+		lane: 1,
+		cruiseControl: 0,
+	})
+	this.addCar(1, {
+		id: 'center',
+		x: 2000 / 2,
+		lane: 0,
+		cruiseControl: 0,
+	})
 
 	// Add Traffic
-	this.addCar(0, {
-		lane: 1,
-		x: 2000 - CAR.w * 5,
-		cruiseControl: -5,
+	roadways.forEach((roadway, i) => {
+		this.addCar(i, {
+			lane: 1,
+			x: 2000 - CAR.w * 5,
+			cruiseControl: -5,
+		})
+		this.addCar(i, {
+			lane: 1,
+			x: 2000 + CAR.w * 10,
+			cruiseControl: -10,
+		})
+		this.addCar(i, {
+			lane: 1,
+			x: 2000 - CAR.w * 15,
+			cruiseControl: -15,
+		})
+		this.addCar(i, {
+			lane: 1,
+			x: 2000 + CAR.w * 20,
+			cruiseControl: -20,
+		})
 	})
-	this.addCar(0, {
-		lane: 1,
-		x: 2000 + CAR.w * 10,
-		cruiseControl: -10,
-	})
+
+	// Start Sim
+	this.resumeSim()
 }])

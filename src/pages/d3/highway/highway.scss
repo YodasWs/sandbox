@@ -23,6 +23,10 @@ main[ng-view='pageHighway'] > svg {
 			animation: 1s linear infinite lanes;
 		}
 	}
+
+	text {
+		font-size: 50px;
+	}
 }
 
 @keyframes lanes {
