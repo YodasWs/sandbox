@@ -19,8 +19,13 @@ angular.module('sandbox', [
 	return {
 		restrict: 'A',
 		link(scope, element, attrs) {
-			element.bind('click', () => {
+			element.on('click', () => {
 				element.toggleClass('expand')
+			}).on('keypress', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault()
+					element.toggleClass('expand')
+				}
 			})
 		},
 	}
