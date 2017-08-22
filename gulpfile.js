@@ -1,7 +1,7 @@
 /**
  * Sam Grundman's Super Awesome Gulp Web Development Toolset
  *
- * @version 1.0.1
+ * @version 1.0.4
  */
 'use strict';
 
@@ -142,6 +142,7 @@ options = {
 'no-console': 0,
 'no-undef': 0,
 'no-tabs': 0,
+'no-var': 2,
 'semi': 0,
 
 		}
@@ -173,7 +174,7 @@ options = {
 	]}
 ],
 'no-empty-rulesets': 1,
-'no-extends': 1,
+'no-extends': 0,
 'no-ids': 1,
 'no-important': 1,
 'no-invalid-hex': 1,
@@ -409,8 +410,8 @@ function runTasks(task) {
 			'lintES',
 			'sort',
 			'concat',
-			'rmLines',
 			'compileJS',
+			'rmLines',
 		],
 		fileType: 'js'
 	},
@@ -531,7 +532,7 @@ gulp.task('generate:page', gulp.series(
 		const str = `'use strict';\n
 angular.module('${camelCase('page-'+argv.name)}')
 .config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
-\t$routeProvider.when('/${argv.name}/', {
+\t$routeProvider.when('/${argv.section}${argv.name}/', {
 \t\ttemplateUrl: 'pages/${argv.section}${argv.name}/${argv.name}.html',
 \t\tcontrollerAs: '$ctrl',
 \t\tcontroller() {\n\t\t},

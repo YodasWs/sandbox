@@ -6,8 +6,7 @@
 	font-family: 'Trebuchet MS', 'Helvetica Neue', sans-serif;
 }
 
-html,
-body {
+html {
 	margin: 0;
 	padding: 0;
 	width: 100%;
@@ -15,8 +14,11 @@ body {
 }
 
 body {
+	margin: 0;
+	padding: 0;
 	width: 100%;
 	max-width: 1200px;
+	min-height: 100%;
 	border: solid black;
 	border-width: 0 1px;
 	margin: 0 auto;
@@ -26,6 +28,10 @@ body {
 
 	@media (max-width: 1200px) {
 		border: 0 none;
+	}
+
+	> * {
+		flex-shrink: 0;
 	}
 }
 
@@ -62,4 +68,8 @@ a:link:active,
 a:link:focus,
 a:link:hover {
 	text-decoration: underline;
+}
+
+body > footer {
+	padding: 0.5rem 1rem;
 }
