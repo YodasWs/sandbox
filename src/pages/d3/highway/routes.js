@@ -47,6 +47,11 @@ angular.module('pageHighway')
 					d.lane = d.movingTo
 					roadways[d.roadway].carsPassed++
 					d.y = roadways[d.roadway].lanes[d.lane]
+					d.vx = d.cruiseControl
+				}
+				if (d.x > 2000 + CAR.w && d.vx > 0) {
+					d.vx = d.cruiseControl
+					d.x = 2000 + CAR.w
 				}
 				return d.x - CAR.w / 2
 			}).attr('y', (d) => {
