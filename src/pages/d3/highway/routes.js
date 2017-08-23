@@ -90,25 +90,45 @@ angular.module('pageHighway')
 		this.movingTo = this.lane === roadways[this.roadway].lanes.length - 1 ? this.lane - 1 : this.lane + 1
 	}
 
-	this.addCar = (i, car) => {
-		if (typeof i !== 'number') return
-		if (i < 0 || i >= roadways.length) return
-		if (!roadways[i]) return
+	function Car(roadway, options = {}) {
+		if (typeof roadway !== 'number') return
+		if (roadway < 0 || roadway >= roadways.length) return
+		if (!roadways[roadway]) return
+
+		Object.assign(this, options)
+		this.roadway = roadway
+
 		// Add missing data
-		if (typeof car.lane === 'number' && car.lane >= 0 && car.lane < roadways[i].lanes.length) {
-			if (!car.y) {
-				car.y = roadways[i].lanes[car.lane]
-			}
-			if (typeof car.movingTo === 'undefined') car.movingTo = car.lane
+		if (typeof this.lane !== 'number' || !roadways[roadway].lanes[this.lane]) {
+			this.lane = Math.floor(Math.random() * roadways[roadway].lanes.length)
 		}
+		if (typeof this.movingTo !== 'number') this.movingTo = this.lane
+		this.y = roadways[roadway].lanes[this.lane]
+		this.x = this.x || 2000 + CAR.w
+		this.vx = 0
+		this.vy = 0
+
+		// Set Driving Style
+		this.will = Object.assign({
+			preferedLane: roadways[roadway].lanes.length > 2 ? 1 : 0,
+			passRight: false,
+		}, this.will || {})
+		this.separation = this.separation || CAR.w / 10
+		this.v = Object.assign({
+			angle: 180,
+			speed: 5,
+		}, this.v || {})
+	}
+
+	Car.prototype.changeLanes = changeLanes
+
+	this.addCar = (i, car) => {
+		car = new Car(i, car)
+		if (!car) return
+		// Add missing data
 		if (!car.id) {
 			car.id = `car${this.cars.length}`
 		}
-		car.x = car.x || 2000 + CAR.w
-		car.separation = car.separation || CAR.w / 10
-		car.roadway = i
-		car.vy = 0
-		car.changeLanes = changeLanes.bind(car)
 		// Add to Simulation
 		this.cars.push(car)
 		this.sim.nodes(this.cars)
