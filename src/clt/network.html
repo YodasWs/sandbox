@@ -269,7 +269,8 @@ var json = {
 			"id":"Ayrsley"
 		},
 		{
-			"id":"S Cedar St"
+			"id":"S Cedar St",
+			"borough":"City Center",
 		},
 		{
 			"id":"S Clarkson St"
@@ -1020,6 +1021,28 @@ map.classifyLinks = (links) => {
 	})
 }
 
+map.classifyNodes = (nodes) => {
+  // Gather List of Neighborhoods and Boroughs
+  let neighborhoods = []
+  json.nodes.forEach((n) => {
+    if (n.neighborhood && neighborhoods.indexOf(n.neighborhood) === -1) {
+      neighborhoods.push(n.neighborhood)
+    }
+    if (n.borough && neighborhoods.indexOf(n.borough) === -1) {
+      neighborhoods.push(n.borough)
+    }
+  })
+  // Now Add Neighborhood Classes to Nodes
+  nodes.classed('neighborhood', (d) => {
+    return !!d.neighborhood || !!d.borough
+  })
+  neighborhoods.forEach((n) => {
+    nodes.classed(n, (d) => {
+      return d.neighborhood == n || d.borough == n
+    })
+  })
+}
+
 map.initSim = () => {
 	// Draw Routes
 	map.links = map.d3.selectAll('g.line')
@@ -1039,10 +1062,17 @@ map.initSim = () => {
 		.data(map.sim.nodes())
 		.enter().append('g')
 		.classed('node', true)
+	map.classifyNodes(node)
 	node.append('circle').attr('r', (d) => {
 		return d.size || 5
 	})
-	node.append("text")
+	node.append((d) => {
+		let txtNode = document.createElementNS(svgNS, 'text')
+			if (!!d.neighborhood || !!d.borough) {
+				txtNode.setAttribute('filter', 'url(#bg-white)')
+			}
+			return txtNode
+		})
 		.attr("dx", (d) => {
 			return 4 + d.size || 5
 		})
