@@ -47,12 +47,15 @@ angular.module('pageHighway')
 					d.lane = d.movingTo
 					roadways[d.roadway].carsPassed++
 					d.y = roadways[d.roadway].lanes[d.lane]
-					d.vx = d.cruiseControl
+					d.v.angle = 90 + Math.sign(d.cruiseControl) * 90
+					d.v.speed = d.cruiseControl
 				}
 				if (d.x > 2000 + CAR.w && d.vx > 0) {
-					d.vx = d.cruiseControl
+					d.v.angle = 90 + Math.sign(d.cruiseControl) * 90
+					d.v.speed = d.cruiseControl
 					d.x = 2000 + CAR.w
 				}
+				d.vx = Math.cos(d.v.angle * Math.PI / 180) * d.v.speed
 				return d.x - CAR.w / 2
 			}).attr('y', (d) => {
 				if (d.occupiedLanes.indexOf(d.movingTo) !== -1) d.movingTo = d.lane // Uh, nope, car there
@@ -64,6 +67,7 @@ angular.module('pageHighway')
 					// Still moving over
 					d.vy = Math.sign(roadways[d.roadway].lanes[d.movingTo] - d.y) * roadways[d.roadway].laneWidth / 30
 				}
+				d.vy = Math.sin(d.v.angle * Math.PI / 180) * d.v.speed
 				return d.y - CAR.h / 2
 			})
 		})
@@ -148,21 +152,21 @@ angular.module('pageHighway')
 		{
 			carsPassed: 0,
 			laneWidth: 70,
-			numLanes: 3,
-			lanes: [],
+			numLanes: 2,
 		},
+		/*
 		{
 			carsPassed: 0,
 			laneWidth: 70,
 			numLanes: 3,
-			lanes: [],
 		},
+		/*
 		{
 			carsPassed: 0,
 			laneWidth: 70,
 			numLanes: 3,
-			lanes: [],
 		},
+		/**/
 	]
 	this.roadways = roadways
 	roadways.forEach((roadway, i) => {
@@ -172,6 +176,7 @@ angular.module('pageHighway')
 
 	// Calculate Center of Lanes
 	roadways.forEach((roadway, j) => {
+		roadway.lanes = []
 		for (let i=0; i<roadway.numLanes; i++) {
 			roadway.lanes.push(i * roadway.laneWidth + 2000 / (roadways.length + 1) * (j + 1) - roadway.numLanes * roadway.laneWidth / 2 + roadway.laneWidth / 2)
 		}
@@ -210,54 +215,36 @@ angular.module('pageHighway')
 	this.clearSim()
 	this.buildSim()
 
-	// Add Center Car
-	this.addCar(0, {
-		id: 'center',
-		x: 2000 / 2,
-		lane: 1,
-		cruiseControl: 0,
-	})
-	this.addCar(1, {
-		id: 'center',
-		x: 2000 / 2,
-		lane: 0,
-		cruiseControl: 0,
-	})
-	this.addCar(2, {
-		id: 'center',
-		x: 2000 / 2,
-		lane: 0,
-		cruiseControl: 0,
-	})
-	this.addCar(2, {
-		id: 'center2',
-		x: 2000 / 2,
-		lane: 2,
-		cruiseControl: 0,
-	})
-
 	// Add Traffic
 	roadways.forEach((roadway, i) => {
 		this.addCar(i, {
-			lane: 1,
-			x: 2000 - CAR.w * 5,
-			cruiseControl: -5,
+			id: 'center',
+			x: 2000 / 2,
+			lane: i,
+			cruiseControl: 0,
 		})
 		this.addCar(i, {
 			lane: 1,
+			x: 2000 - CAR.w * 5,
+			cruiseControl: 5,
+		})
+		/*
+		this.addCar(i, {
+			lane: 0,
 			x: 2000 + CAR.w * 10,
-			cruiseControl: -10,
+			cruiseControl: 1,
 		})
 		this.addCar(i, {
 			lane: 1,
 			x: 2000 - CAR.w * 15,
-			cruiseControl: -15,
+			cruiseControl: 10,
 		})
 		this.addCar(i, {
 			lane: 1,
 			x: 2000 + CAR.w * 20,
-			cruiseControl: -20,
+			cruiseControl: 10,
 		})
+		/**/
 	})
 
 	// Start Sim
