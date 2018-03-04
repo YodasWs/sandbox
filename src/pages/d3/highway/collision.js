@@ -3,8 +3,6 @@
  *
  * Forked from https://github.com/d3/d3-force/blob/dfc521aa8edd2ea51576acdc336bc6babc375535/src/collide.js
  */
-'use strict';
-
 const carCollision = function(dimensions) {
 
 	// https://github.com/d3/d3-force/blob/master/src/constant.js

@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('pageHighway')
 .config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
 	$routeProvider.when('/d3/highway/', {
