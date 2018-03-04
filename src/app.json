@@ -1,14 +1,1 @@
-{
-	"name": "sandbox",
-	"sections":[
-	],
-	"modules":[
-		"ngRoute"
-	],
-	"pages":[
-		{
-			"path":"d3/highway",
-			"module":"pageHighway"
-		}
-	]
-}
+{"name":"sandbox","sections":[],"modules":["ngRoute"],"pages":[{"path":"d3/highway","module":"pageHighway"},{"path":"d3/almanac","module":"pageD3Almanac"}]}
