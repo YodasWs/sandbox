@@ -14,11 +14,23 @@
 		fill: forestgreen;
 	}
 
-	.path {
+	path {
 		fill: none;
 		stroke: black;
 		stroke-width: 5px;
 		stroke-dasharray: 10, 10;
 		transform: rotateY(80deg);
+
+		&.lat {
+			stroke-width: 1px;
+			stroke-dasharray: none;
+		}
+
+		&.moon {
+			transform: rotateZ(5.14deg) rotateY(80deg);
+		}
+	}
+
+	g.paths {
 	}
 }
