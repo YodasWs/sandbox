@@ -37,24 +37,38 @@ angular.module('pageD3Almanac')
 			earth.green.setAttribute('id', 'terra')
 			$svg.append(earth.green)
 
-			// Add Orbiting Objects
+			// Add Equator
+			let lat = document.createElementNS(ns, 'path')
+			lat.classList.add('lat')
+			lat.setAttribute('d',
+				`M ${center.x},${center.y} m 0-${earth.radius} a ${earth.radius},${earth.radius} 0,0,1 ${earth.radius},${earth.radius}`
+			)
+			lat.style.transform = `rotateY(80deg)`
+			earth.lat.push(lat)
+			$svg.append(lat)
+
+			// Add Orbiting Objects's Paths
 			;[sun,moon].forEach((orb) => {
-				// Add Rise Path
-				orb.rise = document.createElementNS(ns, 'path')
-				if (orb.class) orb.rise.classList.add(orb.class)
-				orb.rise.setAttribute('d',
-					`M ${center.x},${center.y} m -${orb.radius},0 a ${orb.radius},${orb.radius} 0,0,1 ${orb.radius}-${orb.radius}`
-				)
-				$svg.prepend(orb.rise)
+				;[orb.radius, earth.radius].forEach((radius) => {
+					// Add Rise Path
+					orb.rise = document.createElementNS(ns, 'path')
+					if (orb.class) orb.rise.classList.add(orb.class)
+					if (radius === earth.radius) orb.rise.classList.add('surface-path')
+					orb.rise.setAttribute('d',
+						`M ${center.x},${center.y} m -${radius},0 a ${radius},${radius} 0,0,1 ${radius}-${radius}`
+					)
+					$svg.prepend(orb.rise)
 
-				// Add Set Path
-				orb.set = document.createElementNS(ns, 'path')
-				if (orb.class) orb.set.classList.add(orb.class)
-				orb.set.setAttribute('d',
-					`M ${center.x},${center.y} m 0-${orb.radius} a ${orb.radius},${orb.radius} 0,0,1 ${orb.radius},${orb.radius}`
-				)
-				$svg.append(orb.set)
+					// Add Set Path
+					orb.set = document.createElementNS(ns, 'path')
+					if (orb.class) orb.set.classList.add(orb.class)
+					if (radius === earth.radius) orb.set.classList.add('surface-path')
+					orb.set.setAttribute('d',
+						`M ${center.x},${center.y} m 0-${radius} a ${radius},${radius} 0,0,1 ${radius},${radius}`
+					)
+					$svg.append(orb.set)
 
+				})
 			})
 		},
 	})

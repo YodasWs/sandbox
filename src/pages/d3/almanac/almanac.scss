@@ -26,6 +26,12 @@
 			stroke-dasharray: none;
 		}
 
+		&.surface-path {
+			stroke: darkgreen;
+			stroke-width: 2px;
+			stroke-dasharray: 10, 20;
+		}
+
 		&.moon {
 			transform: rotateZ(5.14deg) rotateY(80deg);
 		}
