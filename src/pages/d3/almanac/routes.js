@@ -47,7 +47,7 @@ angular.module('pageD3Almanac')
 			earth.lat.push(lat)
 			$svg.append(lat)
 
-			// Add Orbiting Objects's Paths
+			// Add Orbiting Objects' Paths
 			;[sun,moon].forEach((orb) => {
 				;[orb.radius, earth.radius].forEach((radius) => {
 					// Add Rise Path
