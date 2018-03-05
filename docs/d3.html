@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8"/>
+<title>Charlotte Transit Network</title>
+<script src="https://d3js.org/d3.v4.min.js" async></script>
+<script src="https://d3js.org/d3-collection.v1.min.js" async></script>
+<script src="https://d3js.org/d3-dispatch.v1.min.js" async></script>
+<script src="https://d3js.org/d3-quadtree.v1.min.js" async></script>
+<script src="https://d3js.org/d3-timer.v1.min.js" async></script>
+<script src="https://d3js.org/d3-force.v1.min.js" async></script>
+<script src="https://d3js.org/d3-selection.v1.min.js" async></script>
+<script src="https://d3js.org/d3-drag.v1.min.js" async></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script>
+// For anything requiring a loaded dependency
+window.onReady = function(cb){
+	var c=0,a=function(){if(!c){if(document.readyState=='complete'){cb();c=true}}}
+	if(Element.prototype.addEventListener)document.addEventListener('readystatechange',a)
+	else if(Element.prototype.attachEvent)document.attachEvent('onreadystatechange',a)
+};
+</script>
+<link rel="stylesheet" href="d3.css"/>
+</head>
+<body>
+<h1>Charlotte Transit Network</h1>
+<svg class="web" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<filter x="0" y="0" width="1" height="1" id="bg-white">
+			<feFlood flood-color="white"/>
+			<feComposite in="SourceGraphic"/>
+		</filter>
+	</defs>
+</svg>
+<script>
+var map = {
+	sim:null,
+	polarX: (d) => d.y * Math.sin(d.x) + map.svg.width() / 2,
+	polarY: (d) => -1 * d.y * Math.cos(d.x) + map.svg.height() / 2
+}
+var json = {
+	"nodes":[
+		{
+			"id":"Uptown",
+			"size":20
+		},
+		{
+			"id":"University Research Park",
+			"size":5
+		},
+		{
+			"id":"UNCC",
+			"size":5
+		},
+		{
+			"id":"South End",
+			"size":5
+		},
+		{
+			"id":"Dilworth",
+			"size":3
+		},
+		{
+			"id":"Northlake",
+			"size":5
+		},
+		{
+			"id":"Huntersville",
+			"size":10
+		},
+		{
+			"id":"Birkdale",
+			"size":5
+		},
+		{
+			"id":"Northcross",
+			"size":2
+		},
+		{
+			"id":"Eastland",
+			"size":2
+		},
+		{
+			"id":"Commonwealth",
+			"size":5
+		},
+		{
+			"id":"Gastonia",
+			"size":5
+		},
+		{
+			"id":"Matthews",
+			"size":10
+		},
+		{
+			"id":"Cornelius",
+			"size":10
+		},
+		{
+			"id":"Davidson",
+			"size":5
+		},
+		{
+			"id":"Pineville",
+			"also":"Carolina Place Mall",
+			"size":5
+		},
+		{
+			"id":"Cotswold",
+			"size":3
+		},
+		{
+			"id":"Rock Hill",
+			"size":5
+		},
+		{
+			"id":"Concord",
+			"size":10
+		},
+		{
+			"id":"Rosa Parks",
+			"size":3
+		},
+		{
+			"id":"Monroe",
+			"size":10
+		},
+		{
+			"id":"Hembstead",
+			"size":3
+		},
+		{
+			"id":"Home",
+			"also":"Quail Corners Shopping Center",
+			"size":2
+		},
+		{
+			"id":"Park Rd Park",
+			"size":2
+		},
+		{
+			"id":"Archdale Station",
+			"size":5
+		},
+		{
+			"id":"Sharon Rd West Station",
+			"size":5
+		},
+		{
+			"id":"Midtown",
+			"size":3
+		},
+		{
+			"id":"Elizabeth",
+			"size":5
+		},
+		{
+			"id":"Briar Creek",
+			"size":5
+		},
+		{
+			"id":"Southpark",
+			"size":5
+		},
+		{
+			"id":"Oakhurst",
+			"size":3
+		},
+		{
+			"id":"Airport",
+			"size":5
+		}
+	],
+	"routes":[
+		{
+			"name":"48X",
+			"class":"express",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Huntersville"
+		},
+		{
+			"name":"80X",
+			"class":"regional",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Concord"
+		},
+		{
+			"name":"11",
+			"class":"local",
+			"tree":true,
+			"source":"Uptown",
+			"target":"UNCC"
+		},
+		{
+			"name":"9",
+			"class":"local",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Commonwealth"
+		},
+		{
+			"name":"20",
+			"class":"local",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Elizabeth"
+		},
+		{
+			"name":"6",
+			"class":"local",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Midtown"
+		},
+		{
+			"name":"74X",
+			"class":"regional",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Monroe"
+		},
+		{
+			"name":"19",
+			"class":"local",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Dilworth"
+		},
+		{
+			"name":"Blue Line",
+			"class":"blue",
+			"tree":true,
+			"source":"Uptown",
+			"target":"South End"
+		},
+		{
+			"name":"82X",
+			"class":"regional",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Rock Hill"
+		},
+		{
+			"name":"Sprinter",
+			"class":"local",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Airport"
+		},
+		{
+			"name":"85X",
+			"class":"regional",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Gastonia"
+		},
+		{
+			"name":"53X",
+			"class":"express",
+			"source":"Uptown",
+			"target":"Northlake"
+		},
+		{
+			"name":"7",
+			"class":"local",
+			"tree":true,
+			"source":"Uptown",
+			"target":"Rosa Parks"
+		},
+		{
+			"name":"9",
+			"class":"local",
+			"tree":true,
+			"source":"Commonwealth",
+			"target":"Briar Creek"
+		},
+		{
+			"name":"9",
+			"class":"local",
+			"tree":true,
+			"source":"Briar Creek",
+			"target":"Eastland"
+		},
+		{
+			"name":"7",
+			"class":"local",
+			"tree":true,
+			"source":"Rosa Parks",
+			"target":"Northlake"
+		},
+		{
+			"name":"99",
+			"class":"local",
+			"source":"Northlake",
+			"target":"Huntersville"
+		},
+		{
+			"name":"65X",
+			"class":"express",
+			"source":"Uptown",
+			"target":"Matthews"
+		},
+		{
+			"name":"77X",
+			"class":"express",
+			"source":"Uptown",
+			"target":"Northcross"
+		},
+		{
+			"name":"19",
+			"class":"local",
+			"tree":true,
+			"source":"Dilworth",
+			"target":"Park Rd Park"
+		},
+		{
+			"name":"97",
+			"class":"local",
+			"tree":true,
+			"source":"Northcross",
+			"target":"Birkdale"
+		},
+		{
+			"name":"77X",
+			"class":"express",
+			"tree":true,
+			"source":"Northcross",
+			"target":"Cornelius"
+		},
+		{
+			"name":"77X",
+			"class":"express",
+			"tree":true,
+			"source":"Cornelius",
+			"target":"Davidson"
+		},
+		{
+			"name":"48X",
+			"class":"express",
+			"tree":true,
+			"source":"Huntersville",
+			"target":"Northcross"
+		},
+		{
+			"name":"97",
+			"class":"local",
+			"source":"Huntersville",
+			"target":"Northcross"
+		},
+		{
+			"name":"97",
+			"class":"local",
+			"source":"Birkdale",
+			"target":"Cornelius"
+		},
+		{
+			"name":"97",
+			"class":"local",
+			"source":"Cornelius",
+			"target":"Davidson"
+		},
+		{
+			"name":"57",
+			"class":"local",
+			"source":"Park Rd Park",
+			"target":"Southpark"
+		},
+		{
+			"name":"19",
+			"class":"local",
+			"source":"Sharon Rd West Station",
+			"target":"Home"
+		},
+		{
+			"name":"19",
+			"class":"local",
+			"tree":true,
+			"source":"Home",
+			"target":"Park Rd Park"
+		},
+		{
+			"name":"57",
+			"class":"local",
+			"source":"Archdale Station",
+			"target":"Park Rd Park"
+		},
+		{
+			"name":"20",
+			"class":"local",
+			"tree":true,
+			"source":"Pineville",
+			"target":"Home"
+		},
+		{
+			"name":"20",
+			"class":"local",
+			"source":"Home",
+			"target":"Southpark"
+		},
+		{
+			"name":"25",
+			"class":"local",
+			"source":"South End",
+			"target":"Dilworth"
+		},
+		{
+			"name":"25",
+			"class":"local",
+			"source":"Dilworth",
+			"target":"Midtown"
+		},
+		{
+			"name":"25",
+			"class":"local",
+			"source":"Midtown",
+			"target":"Elizabeth"
+		},
+		{
+			"name":"27",
+			"class":"local",
+			"source":"Uptown",
+			"target":"Elizabeth"
+		},
+		{
+			"name":"29",
+			"class":"local",
+			"source":"Southpark",
+			"target":"Cotswold"
+		},
+		{
+			"name":"29",
+			"class":"local",
+			"source":"Cotswold",
+			"target":"Oakhurst"
+		},
+		{
+			"name":"29",
+			"class":"local",
+			"source":"Oakhurst",
+			"target":"Eastland"
+		},
+		{
+			"name":"29",
+			"class":"local",
+			"source":"Eastland",
+			"target":"UNCC"
+		},
+		{
+			"name":"27",
+			"class":"local",
+			"tree":true,
+			"source":"Elizabeth",
+			"target":"Oakhurst"
+		},
+		{
+			"name":"15",
+			"class":"local",
+			"tree":true,
+			"source":"Elizabeth",
+			"target":"Cotswold"
+		},
+		{
+			"name":"20",
+			"class":"local",
+			"tree":true,
+			"source":"Southpark",
+			"target":"Elizabeth"
+		},
+		{
+			"name":"14",
+			"class":"local",
+			"tree":true,
+			"source":"Cotswold",
+			"target":"Hembstead"
+		},
+		{
+			"name":"27",
+			"class":"local",
+			"source":"Oakhurst",
+			"target":"Matthews"
+		},
+		{
+			"name":"51",
+			"class":"local",
+			"source":"Pineville",
+			"target":"Hembstead"
+		},
+		{
+			"name":"51",
+			"class":"local",
+			"tree":true,
+			"source":"Hembstead",
+			"target":"Matthews"
+		},
+		{
+			"name":"Blue Line",
+			"class":"blue",
+			"tree":true,
+			"source":"South End",
+			"target":"Archdale Station"
+		},
+		{
+			"name":"Blue Line",
+			"class":"blue",
+			"tree":true,
+			"source":"Archdale Station",
+			"target":"Sharon Rd West Station"
+		},
+		{
+			"name":"591",
+			"class":"express",
+			"source":"Airport",
+			"target":"Archdale Station"
+		},
+		{
+			"name":"590",
+			"class":"express",
+			"source":"Airport",
+			"target":"Northlake"
+		}
+	],
+	'currentLocation':'Uptown'
+}
+
+window.onReady(()=>{
+	map.d3 = d3.select('svg')
+	map.svg = $('svg')
+
+let link, forces = []
+
+json.routes = json.routes.filter((r) => {
+	return 1
+	return r.class == 'local'
+})
+// Filter Out Unconnected Map Locations
+json.nodes = json.nodes.filter((node) => {
+	let r = json.routes.filter((r) => {
+		return r.source == node.id || r.target == node.id
+	})
+	return r.length > 0
+})
+
+const svgNS = 'http://www.w3.org/2000/svg';
+
+map.clearSim = () => {
+	// Initialize Simulation
+	if (map.sim && map.sim.stop) map.sim.stop()
+	map.sim = d3.forceSimulation().stop().alphaMin(0.01)
+	map.d3.selectAll("path.link").remove()
+	map.d3.selectAll('g.point').remove()
+	map.d3.selectAll('g.node').remove()
+	map.d3.selectAll("line").remove()
+	map.svg.children(':not(defs)').remove()
+}
+
+map.buildSim = () => {
+
+	map.clearSim()
+
+	if (!map.sim.removeFixedPoints) {
+		map.sim.removeFixedPoints = (function() {
+			this.nodes().forEach((node) => {
+				if (node == map.center) return
+				delete node.fx
+				delete node.fy
+			})
+		}).bind(map.sim)
+	}
+
+	// Build Forces
+	forces.push(
+		d3.forceLink()
+			.id((d) => {
+				return d.id
+			})
+			.distance((d) => {
+				if (d.class == 'regional') return Math.min(map.svg.width(), map.svg.height()) * 0.45
+				const x = d.source.x - d.target.x
+				const y = d.source.y - d.target.y
+				const dist = Math.sqrt(x * x + y * y)
+				console.log('distance: ' + dist)
+				return dist
+			})
+			.links(json.routes)
+	)
+	forces.push(
+		d3.forceCollide((d) => {
+			return (d.size || 5) * 2
+		})
+	)
+
+	// Add to Simulation
+	map.sim.nodes(json.nodes)
+	for (let i=0, l=forces.length; i<l; i++) {
+		map.sim.force(i, forces.pop())
+	}
+
+	// Fix Center
+	map.center = map.sim.nodes().filter((node) => {
+		return node.id == json.currentLocation
+	})[0]
+	map.center.fx = map.svg.width() / 2
+	map.center.fy = map.svg.height() / 2
+
+	// Release Center
+	map.sim.on('end.fixedpoint', () => {
+		console.log('ended!')
+		map.sim.removeFixedPoints()
+		map.sim.on('end.fixedpoint', null)
+	})
+}
+
+map.classifyLinks = (links) => {
+	;['shuttle','local','express','regional','blue','gold'].forEach((routeType) => {
+		links.classed(routeType, function(d) {
+			return d.class == routeType
+		})
+	})
+	links.append((d) => {
+		let txtNode = document.createElementNS(svgNS, 'text')
+		txtNode.setAttribute('filter', 'url(#bg-white)')
+		return txtNode
+	}).text((d) => {
+		return d.name
+	})
+}
+
+map.initSim = () => {
+	// Draw Routes
+	map.links = map.d3.selectAll('g.line')
+		.data(json.routes)
+		.enter().append('g')
+		.classed('line', true)
+//		.style("opacity", function(d) { return Math.atan(d.weight * 100) / 2 / Math.PI })
+
+	map.classifyLinks(map.links)
+
+	map.links.append('line').lower()
+	map.links.append('path').lower()
+
+
+	// Draw Nodes
+	let node = map.d3.selectAll('g.node')
+		.data(map.sim.nodes())
+		.enter().append('g')
+		.classed('node', true)
+	node.append('circle').attr('r', (d) => {
+		return d.size || 5
+	})
+	node.append("text")
+		.attr("dx", (d) => {
+			return 4 + d.size
+		})
+		.attr("dy", ".35em")
+		.text(function(d) {
+			return d.also || d.id
+		})
+
+	// Make Nodes Draggable
+	map.d3.call(d3.drag()
+		.container(map.svg[0])
+		.subject(() => {
+			return map.sim.find(d3.event.x, d3.event.y)
+		})
+		.on("start", () => {
+			if (!d3.event.active) map.sim.alphaTarget(0.3).restart()
+			map.sim.removeFixedPoints()
+			d3.event.subject.fx = d3.event.subject.x
+			d3.event.subject.fy = d3.event.subject.y
+		})
+		.on("drag", () => {
+			d3.event.subject.fx = d3.event.x
+			d3.event.subject.fy = d3.event.y
+		})
+		.on("end", () => {
+			if (!d3.event.active) map.sim.alphaTarget(0)
+			let p = { x: d3.event.subject.fx, y: d3.event.subject.fy }
+			map.sim.removeFixedPoints()
+//			d3.event.subject.fx = p.x
+//			d3.event.subject.fy = p.y
+		})
+	)
+
+	// Update Map
+	map.sim.on("tick", function() {
+		// Draw Lines
+		map.links.select('line').attr("x1", (d) => {
+			return d.source.x
+		}).attr("y1", (d) => {
+			return d.source.y
+		}).attr("x2", (d) => {
+			return d.target.x
+		}).attr("y2", (d) => {
+			return d.target.y
+		})
+		map.links.select('path').attr("d", (d) => {
+			let points = []
+			switch (d.class) {
+			case 'local':
+			case 'blue':
+				points.push([d.source.x, d.source.y])
+				points.push([d.target.x, d.target.y])
+				break;
+			default:
+				let angle = Math.atan((d.target.y - d.source.y) / (d.target.x - d.source.x))
+				angle += Math.PI / 2
+				const distance = d.class == 'local' ? 5 : 20
+				points.push([d.source.x + Math.cos(angle) * distance, d.source.y + Math.sin(angle) * distance])
+				points.push([d.source.x - Math.cos(angle) * distance, d.source.y - Math.sin(angle) * distance])
+				points.push([d.target.x - Math.cos(angle) * distance, d.target.y - Math.sin(angle) * distance])
+				points.push([d.target.x + Math.cos(angle) * distance, d.target.y + Math.sin(angle) * distance])
+			}
+			return 'M' + points.map((p) => {
+				return p.join(',')
+			}).join('L') + 'Z'
+		})
+		// Update Text Location on Lines
+		map.links.select('text').attr("x", (d) => {
+			return (d.source.x + d.target.x) / 2
+		}).attr("y", (d) => {
+			return (d.source.y + d.target.y) / 2
+		})
+		// Move Node Circles
+		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
+	})
+	map.sim.on('tick')()
+}
+map.startSim = () => {
+	map.sim.restart()
+}
+
+// Build Map as a Tree Chart
+map.buildTree = function() {
+	let tree = {
+		name:json.currentLocation,
+		children:[]
+	}
+	let inTree = [tree.name]
+	let i = 0
+	let findChildren = (tree) => {
+		if (i++ > 100) return false
+		json.routes.forEach((r) => {
+			if (i > 100) return false
+			if (!r.tree) return true
+			let child = false
+			;['source','target'].forEach((prop) => {
+				let val = r[prop]
+				let other = prop == 'source' ? 'target' : 'source'
+				if (typeof val !== 'string' && val.id) val = val.id
+				if (val === tree.name) child = r[other]
+				if (typeof child !== 'string' && child.id) child = child.id
+			})
+			if (!child) return
+			if (inTree.indexOf(child) > -1) return
+			inTree.push(child)
+			let node = {
+				name:child,
+				children:[]
+			}
+			tree.children.push(node)
+		})
+		if (!tree.children.length) delete tree.children
+	}
+	let nodes = [tree]
+	do {
+		let node = nodes.shift()
+		findChildren(node)
+		if (node.children && node.children.length) {
+			node.children.forEach((node) => { nodes.push(node) })
+		}
+	} while (nodes.length)
+	$('<pre>').text(JSON.stringify(tree, null, 2)).appendTo('body')
+	return tree
+}
+map.layoutTree = function() {
+
+	map.clearSim()
+
+	let root = d3.hierarchy(map.buildTree())
+	let tree = d3.tree().size([2 * Math.PI, Math.min(map.svg.width(), map.svg.height()) / 2 - 10])(root)
+
+	// Draw Radial Tree
+	map.d3.selectAll("path.link")
+		.data(tree.descendants().slice(1))
+		.enter().append("path")
+		.classed('link', true)
+		.attr("d", function(d) {
+//			console.log('d', d)
+			let nodes = [
+				{ x: map.polarX(d), y: map.polarY(d) },
+				{ x: map.polarX(d.parent), y: map.polarY(d.parent) }
+			],
+			points = []
+			points.push("M" + nodes[0].x + "," + nodes[0].y)
+			if (Math.abs(nodes[1].x - nodes[0].x) > Math.abs(nodes[1].y - nodes[0].y)) {
+				points.push("C" + (nodes[0].x + nodes[1].x) / 2 + "," + nodes[0].y)
+				points.push((nodes[0].x + nodes[1].x) / 2 + "," + nodes[1].y)
+			} else {
+				points.push("C" + nodes[0].x + ',' + (nodes[0].y + nodes[1].y) / 2)
+				points.push(nodes[1].x + ',' + (nodes[0].y + nodes[1].y) / 2)
+			}
+			points.push(nodes[1].x + "," + nodes[1].y)
+			return points.join(' ')
+		})
+
+	// Draw Nodes
+	let node = map.d3.selectAll('g.point')
+		.data(root.descendants())
+		.enter().append("g")
+		.classed('point', true)
+		.classed('leaf', function(d) { return !d.children })
+		.attr("transform", function(d) {
+			return "translate(" + map.polarX(d) + "," + map.polarY(d) + ")"
+		})
+	node.append('circle').attr('r', 5)
+	node.append('text')
+		.attr("dx", (d) => {
+			return 4 + d.size || 5
+		})
+		.attr("dy", ".35em")
+		.text((d) => d.data.name)
+
+	if (map.sim && typeof map.sim.on === 'function') {
+		let on = map.sim.on('tick')
+		if (typeof on === 'function') on()
+	}
+
+	return root.descendants()
+}
+
+map.tree = map.layoutTree()
+
+map.simTree = () => {
+
+	if (!map.getCoords) {
+		map.getCoords = (name) => {
+			let coords = {}
+			map.tree.forEach((node) => {
+				if (node.data.name == name) {
+					coords.x = node.x
+					coords.y = node.y
+				}
+			})
+			return coords
+		}
+	}
+
+	map.sim.nodes().forEach((node) => {
+		let c = map.getCoords(node.id)
+//		delete node.fx
+//		delete node.fy
+		node.x = map.polarX(c)
+		node.y = map.polarY(c)
+	})
+
+	map.buildSim()
+
+	map.initSim()
+}
+map.simTree()
+map.simTree()
+});
+$(document).ready(()=>{
+	// Build Stop/Restart Menu
+	let menu = $('<div class="menu">')
+	$('<input type="button" value="Static Tree Layout"/>').appendTo(menu).on('click', () => {
+		map.layoutTree()
+	})
+	$('<input type="button" value="Sim Tree Layout"/>').appendTo(menu).on('click', () => {
+		map.simTree()
+	})
+	$('<input type="button" value="Run Sim"/>').appendTo(menu).on('click', () => {
+		map.startSim()
+	})
+	$('body').append(menu)
+});
+</script>
+</body>
+</html>
