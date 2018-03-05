@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Hidden City Map!</title>
+<link rel="stylesheet" href="overstreet-mall.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="upgrdr.js" async></script>
+<script>
+var svg = {
+	g: function() {
+		return document.createElementNS("http://www.w3.org/2000/svg", "g")
+	},
+	text: function() {
+		return document.createElementNS("http://www.w3.org/2000/svg", "text")
+	},
+	path: function() {
+		return document.createElementNS("http://www.w3.org/2000/svg", "path")
+	},
+	tspan: function() {
+		return document.createElementNS("http://www.w3.org/2000/svg", "tspan")
+	},
+	ele: function(ele, x, y) {
+		var e = document.createElementNS("http://www.w3.org/2000/svg", ele)
+		if (x) e.setAttribute("x", x)
+		if (y) e.setAttribute("y", y)
+		return e
+	},
+	rect: function(w, h) {
+		var e = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+		e.setAttribute("x", 0)
+		e.setAttribute("y", 0)
+		e.setAttribute("width", w)
+		e.setAttribute("height", h)
+		return e
+	}
+},
+map = {
+	name: ''
+}
+$(document).ready(function(){
+	svg.root = document.getElementsByTagNameNS("http://www.w3.org/2000/svg", 'svg')[0]
+	$.ajax({
+		url:'overstreet.json',
+		dataType:'json',
+		success:function(data) {
+			if (data.name) {
+				document.title = map.name = data.name
+				$('body > h1').text(data.name)
+			}
+			var numCols = 1
+			data.links.forEach(function(l) {
+				var p = new svg.path()
+				p.setAttribute('id', 'path' + l.id)
+				svg.root.prependChild(p)
+				$('<div>').addClass('linkLabel').attr('id', 'lbl' + l.id).text(l.name).appendTo('body')
+			})
+			data.blocks.forEach(function(b) {
+				var a = [], col = 1, row = 1, num = 0, div = $('<div class="building">').attr('id', b.id), ul
+
+				// State Block Name
+				div.append('<span>' + b.name)
+
+				// List Stores
+				if (b.stores && b.stores.length) {
+					ul = $('<ul>')
+					b.stores.forEach(function(s, i) {
+						var $s = $('<li>').text(s.name).appendTo(ul), d, id = map.getStoreUrl(s.name)
+						// Build Store Details Modal
+						if (!s.type) s.type = "LocalBusiness"
+						if ($('article.store#' + id).length) {
+							id = map.getStoreUrl(b.name) + '_' + id
+						}
+						$s = $('<article class="store" itemscope itemtype="http://schema.org/' + s.type + '" id="' + id + '">')
+							.append('<h1 itemprop="name">' + s.name)
+							.append('<a rel="up">&#x2715;</a>')
+							.appendTo($s)
+						d = $('<div>').text(map.camelCaseToDisplayCase(s.type))
+						if (s.cuisine) d.append('<small itemprop="servesCuisine">' + s.cuisine.join(', '))
+						if (s.additionalTypes && s.additionalTypes.length) s.additionalTypes.forEach(function(t){
+							d.append(', ' + map.camelCaseToDisplayCase(t))
+							d.append('<meta itemprop="additionalType" content="http://schema.org/' + t + '"/>')
+						})
+						$s.append(d)
+						if (s.loc && s.loc != 'Unknown') $s.append('<div itemprop="location">' + b.name + ', ' + s.loc)
+						if (s.url) $s.append('<a href="' + s.url + '" itemprop="url" target="_blank">' + s.url)
+						if (s.phone) $s.append('<a href="tel:' + s.phone + '" itemprop="telephone">' + s.phone)
+					})
+					div.append(ul)
+				}
+
+				// Calculate Grid Location
+				a = b.address.street.split(' ')
+				num = Number.parseInt(a[0], 10)
+				row = Math.floor(num / 100)
+				switch (a[2]) {
+					case 'Tryon':
+						col = 1
+						break
+					case 'College':
+						col = 2
+						break
+					case 'Trade':
+						col = Math.floor(num / 100) + 1
+						row = 2
+						break
+				}
+				// Adjust for side of the street
+				switch (a[1][0]) {
+					case 'N':
+						if (num % 2 == 0) col++
+						row *= -1
+						row += 3
+						break
+					case 'S':
+						if (num % 2) col++
+						if (a[2] == 'Tryon' && Math.floor(num / 100) == 2) col--
+						row += 2
+						break
+					case 'E':
+						if (num % 2 == 0) row++
+						break
+					case 'W':
+						if (num % 2) row++
+						break
+				}
+				numCols = Math.max(numCols, col)
+
+				// Create new row
+				if (!$('#grid > #row' + row).length) {
+					var r = $('<div id="row' + row + '" style="order:' + row + '">').appendTo('#grid')
+				}
+				// Create new column
+				if (!$('#grid > #row' + row + ' > .col' + col).length) {
+					$('#grid > [id^="row"]').each(function(j, r) {
+						for(var i=1; i<=numCols; i++) {
+							if (!$(r).children('.col' + i).length) $(r).append('<div class="col col' + i + '">')
+						}
+					})
+				}
+
+				// Add Block to Grid
+				$('#grid > #row' + row + ' > .col' + col).append(div)
+
+				// Tie Block Links
+				if (b.links && b.links.length) b.links.forEach(function(l) {
+					var p = $('#path'+l.id).data('endpoint') || []
+					p.push(b.id)
+					$('#path'+l.id).data('endpoint', p)
+				})
+			})
+			map.updateLinks()
+
+			$('div.linkLabel').on('mouseenter', function(){
+				map.getBlocksOnLink($(this)).addClass('highlight')
+			}).on('mouseleave', function(){
+				if (!$(this).is('.active')) {
+					map.getBlocksOnLink($(this)).removeClass('highlight')
+				}
+			}).on('click', function(){
+				var $t = $(this)
+				if (!$t.is('.active')) {
+					$('div.linkLabel').removeClass('active')
+					$('#grid .building').removeClass('highlight')
+					$t.addClass('active')
+					map.getBlocksOnLink($t).addClass('highlight')
+				} else {
+					$t.removeClass('active')
+					map.getBlocksOnLink($t).removeClass('highlight')
+				}
+			})
+
+			// Expand/Hide List of Stores
+			$('#grid .building').on('mouseenter', function() {
+				map.closeBlocks()
+				map.openBlock($(this))
+			}).on('mouseleave', function() {
+				if (!$(this).is('.open')) map.closeBlocks()
+			}).children('span').on('click', function() {
+				var $t = $(this).parents('.building')
+				if (!$t.is('.open') && $t.find('ul').is(':visible')) {
+					$t.addClass('open')
+				} else if ($t.is('.open') || $t.find('ul').is(':visible')) {
+					$t.removeClass('open')
+					map.closeBlocks()
+				} else {
+					map.closeBlocks()
+					map.openBlock($t.addClass('open'))
+				}
+			})
+
+			// Show/Hide Store Details
+			$('#grid .building > ul > li').on('click', function() {
+				map.openStore($(this).children('article.store').attr('id'))
+			})
+			$('article.store').on('click', function() {
+				return false
+			})
+			$('article.store a[rel="up"]').on('click', map.closeStores)
+		},
+		error:function(xhr) {
+			console.log(xhr)
+		}
+	})
+})
+map.camelCaseToDisplayCase = function(txt) {
+	return txt.replace(/(?=.)([A-Z])/g, ' $&')
+}
+map.getBlocksOnLink = function(id) {
+	if (typeof id == 'object' && id instanceof $) {
+		id = id.attr('id')
+	}
+	if (id.indexOf('path') === 0) id = id.substr(4)
+	if (id.indexOf('lbl') === 0) id = id.substr(3)
+	var b = $('#path'+id).data('endpoint') || []
+	return (b.length ? $('#' + b.join(',#')) : $())
+}
+map.closeBlocks = function() {
+	$(svg.root).attr('class','blur')
+	$('div.linkLabel').addClass('blur')
+	$('#grid .building > ul:visible').filter(function() {
+		return !$(this).parent('div').is('.open') && !$(this).find('article.store:visible').length
+	}).stop(true,false).slideUp(500, function(){
+		map.updateLinks()
+	})
+}
+map.normalizeSVGDimension = function(x, f) {
+	return x / $('body')[f]() * svg.root.getBoundingClientRect()[f]
+}
+map.updateLinks = function() {
+	$('div.linkLabel').removeClass('blur')
+	$(svg.root).attr('class','').children('path').each(function(){
+		var $p = $(this), e = $p.data('endpoint'), p = [], name = $p.attr('id').substr(4)
+		e.forEach(function(b){
+			b = $('#'+b)
+			p.push({
+				x:b.offset().left,
+				y:b.offset().top,
+				h:b.outerHeight(),
+				w:b.outerWidth()
+			})
+		})
+		if (p.length != 2) {
+			$p.remove()
+			return
+		}
+		// Place Link Endpoints on Blocks' Centers
+		p.sort(function(a,b) {
+			if (a.x != b.x) return a.x - b.x
+			return a.y - b.y
+		})
+		s = {
+			b1:{x:0,y:0},
+			b2:{x:0,y:0},
+			txt:{x:0,y:0}
+		}
+		;['x','y'].forEach(function(a){
+			var d = a == 'x' ? 'w' : 'h', m
+				pts = [
+					{n:'b1l',x:p[0][a]},
+					{n:'b1r',x:p[0][a] + p[0][d]},
+					{n:'b2l',x:p[1][a]},
+					{n:'b2r',x:p[1][a] + p[1][d]}
+				]
+			// Calculate Link Endpoint Locations
+			s.b1[a] = (pts[0].x + pts[1].x) / 2
+			s.b2[a] = (pts[2].x + pts[3].x) / 2
+			// Calculate Link Text Location
+			s.txt[a] = (Math.max(pts[0].x, pts[2].x) + Math.min(pts[1].x, pts[3].x)) / 2
+		})
+
+		if (Math.abs(s.b1.y - s.b2.y) < 50) s.txt.x -= 100
+
+		// Move Text
+		$('#lbl' + name).css({
+			top:(s.txt.y - 5) + 'px',
+			left:(s.txt.x - 10) + 'px'
+		})
+		// Move Path
+		$p.attr('d',
+			'M ' + map.normalizeSVGDimension(Math.floor(s.b1.x) - .5, 'width') + ' ' + map.normalizeSVGDimension(Math.floor(s.b1.y) - .5, 'width') + ' ' +
+			'L ' + map.normalizeSVGDimension(Math.floor(s.b2.x) + .5, 'height') + ' ' + map.normalizeSVGDimension(Math.floor(s.b2.y) + .5, 'height')
+		)
+	})
+}
+map.adjX = function(el, x) {
+	var $e = $(el)
+	$e.css('left', Number.parseFloat($e.css('left')) + x)
+}
+map.openBlock = function($b, cb) {
+	$(svg.root).attr('class','blur')
+	$('div.linkLabel').addClass('blur')
+	$b.children('ul').stop(true,false).slideDown(500, function() {
+		map.updateLinks()
+		if (typeof cb === 'function') cb()
+	})
+}
+map.closeStores = function() {
+	history.pushState({}, map.name, '/sam/map.html')
+	$(window).trigger('popstate')
+}
+map.openStore = function(id) {
+	id = map.getStoreUrl(id)
+	var $s = $('article.store#' + id),
+		name = map.getStoreUrl($s.find('[itemprop="name"]').text())
+	history.pushState({store: id}, name + ' | ' + map.name, '/sam/map.html/' + id)
+	$(window).trigger('popstate')
+//	map.displayStore($s)
+}
+map.getStoreUrl = function(name) {
+	return encodeUri(name.replace(/\s+/g, '_')).replace(/%[0-9a-f]{2}/gi, '-')
+}
+$(window).on('popstate', function() {
+	var s = history.state || {}, p = window.location.pathname, id
+	$('li.highlight').removeClass('highlight')
+	$('.building').css('z-index','')
+	s.store = s.store || false
+	if (p.indexOf('/map.html/') > -1) {
+		s.store = p.substr(p.lastIndexOf('/') + 1)
+	}
+	id = s.store ? map.getStoreUrl(s.store) : false
+	if (s.store && $('article.store#' + id).length) {
+		var $s = $('article.store#' + id)
+		map.openBlock($s.parents('ul').parent(), function(){
+			map.displayStore($s)
+		})
+	} else {
+		map.closeBlocks()
+		$('article.store:visible').stop(true,false).fadeOut(200)
+//		$('#greybg').stop(true,false).fadeOut(200)
+	}
+})
+map.displayStore = function($s) {
+	var bg = $('#greybg'), t = 0, l = 0
+	$('li.highlight').removeClass('highlight')
+	$s.parent('li').addClass('highlight')
+	$('.building').css('z-index','')
+	$s.parents('.building').css('z-index',2)
+	if ($s.is(':hidden')) {
+		$s.show()
+		l = ($(window).width() - $s.outerWidth()) / 2
+		t = ($(window).height() - $s.outerHeight()) / 2
+		$s.css({ top: t, left: l }).hide()
+	}
+	var delay = 0
+	if ($('article.store:visible').not($s).length) {
+		delay = 200
+		$('article.store:visible').not($s).stop(true,false).fadeOut(delay)
+	}
+//	if ($s.is(':visible')) bg.stop(true,false).fadeOut(500)
+//	else if (bg.is(':hidden')) bg.stop(true,false).fadeIn(500)
+	$s.stop(true,false).delay(delay).fadeToggle(500)
+	setTimeout(map.closeBlocks, delay * 2 + 1)
+}
+$(document).keyup(function(e) {
+	if (!e.key) switch (e.which) {
+		case 27:
+			e.key = "Escape"
+			break
+	}
+	switch (e.key) {
+		case "Escape":
+		case "Esc":
+			map.closeStores()
+			break
+	}
+})
+</script>
+</head>
+<body>
+<h1>Mall Layout</h1>
+<div id="grid"></div>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" preserveAspectRatio="xMaxYMin meet">
+	<defs>
+		<filter id="blur">
+			<feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+		</filter>
+	</defs>
+</svg>
+<div id="greybg"></div>
+</body>
+</html>

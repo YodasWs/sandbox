@@ -1,0 +1,842 @@
+{
+"name":"Overstreet Mall",
+"blocks":[
+	{
+		"id":"STrynSqr",
+		"name":"South Tryon Square",
+		"address":{
+			"street":"201 S Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"url":[
+			"http://www.spectrum-properties.com/buildings/detail/south-tryon-square"
+		],
+		"stores":[
+			{
+				"type":"Restaurant",
+				"name":"Dean and Deluca",
+				"loc":"1st Floor"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Vapiano's",
+				"loc":"1st Floor"
+			},
+			{
+				"type":"Store",
+				"name":"FedEx Office",
+				"loc":"1st Floor"
+			}
+		],
+		"links":[
+			{
+				"id":"NBbtPrk",
+				"loc":"3rd Floor"
+			}
+		]
+	},
+	{
+		"id":"CrtYrd",
+		"name":"237 S Tryon St",
+		"address":{
+			"street":"237 S Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"stores":[
+			{
+				"type":"Hotel",
+				"name":"Courtyard Marriott",
+				"loc":"1st Floor"
+			}
+		],
+		"links":[
+			{
+				"id":"SBbtPrk",
+				"loc":"3rd Floor"
+			}
+		]
+	},
+	{
+		"id":"BBTCen",
+		"name":"BB&T Center",
+		"address":{
+			"street":"200 S College St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"stores":[
+			{
+				"type":"FastFoodRestaurant",
+				"name":"McDonald's",
+				"loc":"3rd Floor"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["coffee","sandwiches"],
+				"name":"Brad's",
+				"loc":"3rd Floor"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"cuisine":["donuts"],
+				"name":"Dunkin Donuts",
+				"loc":"3rd Floor"
+			}
+		],
+		"links":[
+			{
+				"id":"E4th",
+				"loc":"3rd Floor"
+			},
+			{
+				"id":"E3rd",
+				"loc":"3rd Floor"
+			},
+			{
+				"id":"NBbtPrk",
+				"loc":"3rd Floor"
+			},
+			{
+				"id":"Col2",
+				"loc":"3rd Floor"
+			},
+			{
+				"id":"SBbtPrk",
+				"loc":"3rd Floor"
+			}
+		]
+	},
+	{
+		"id":"Wfc1",
+		"name":"One Wells Fargo Center",
+		"address":{
+			"street":"301 S College St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"url":[
+			"http://onewellsfargocenter.info/"
+		],
+		"stores":[
+			{
+				"type":"DryCleaningOrLaundry",
+				"name":"2001 Cleaners",
+				"loc":"Suite 205",
+				"phone":"704-332-2360"
+			},
+			{
+				"type":"LocalBusiness",
+				"products":["Photograph"],
+				"name":"Deb Young Portrait Studios",
+				"loc":"Suite 225",
+				"url":"http://www.deborahyoungstudio.com/",
+				"phone":"704-896-3422"
+			},
+			{
+				"type":"HairSalon",
+				"name":"Gene's Master Cuts",
+				"loc":"Suite 130",
+				"url":"http://www.yelp.com/biz/genes-master-cuts-charlotte",
+				"phone":"704-372-0846"
+			},
+			{
+				"type":"AutoRental",
+				"name":"Avis Rent-A-Car",
+				"loc":"Suite 120",
+				"phone":"704-331-9007",
+				"url":"http://www.avis.com/car-rental/location/CAU/US/NC/Charlotte"
+			},
+			{
+				"type":"Hotel",
+				"name":"Hilton Hotel",
+				"loc":"Suite 100",
+				"phone":"704-377-1500"
+			},
+			{
+				"type":"DryCleaningOrLaundry",
+				"name":"Mint Condition",
+				"loc":"Garage, Level H",
+				"phone":"704-375-7252"
+			},
+			{
+				"type":"Place",
+				"name":"UPS Drop Box",
+				"loc":"Mail Room",
+				"phone":"704-342-8965"
+			},
+			{
+				"type":"ExerciseClub",
+				"name":"YMCA",
+				"loc":"Suite 200",
+				"phone":"704-716-6400",
+				"url":"http://www.ymcacharlotte.org/branches/childressklein/ck.aspx"
+			},
+			{
+				"type":"FoodEstablishment",
+				"name":"YMCA Fitness Bar",
+				"loc":"Suite 200",
+				"phone":"704-716-6400",
+				"url":"http://www.ymcacharlotte.org/branches/childressklein/ck.aspx"
+			},
+			{
+				"type":"CafeOrCoffeeShop",
+				"name":"Charlotte Coffee Station",
+				"loc":"Suite 275",
+				"phone":"704-338-1505"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["chinese","sushi"],
+				"name":"Fujo Bistro Fine Chinese & Sushi Bar",
+				"loc":"Suite 100",
+				"phone":"704-954-0087",
+				"url":"http://www.fujobistro.com/"
+			},
+			{
+				"type":"FoodEstablishment",
+				"cuisine":["smoothies"],
+				"name":"Smoothie King",
+				"loc":"Suite 265",
+				"phone":"704-374-0200",
+				"url":"http://smoothieking.com/location/view?store=167"
+			}
+		],
+		"links":[
+			{
+				"id":"Col3",
+				"loc":"2nd Floor"
+			}
+		]
+	},
+	{
+		"id":"Wfc2",
+		"name":"Two Wells Fargo Center",
+		"address":{
+			"street":"301 S Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"stores":[
+			{
+				"type":"CafeOrCoffeeShop",
+				"name":"Jackson's Java",
+				"loc":"Suite 100",
+				"phone":"704-332-3313"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Just Fresh",
+				"loc":"Atrium",
+				"phone":"704-376-2202",
+				"url":"http://www.justfresh.com/Default.aspx"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Mimosa Grill",
+				"loc":"Atrium",
+				"phone":"704-343-0700",
+				"url":"http://www.harpersgroup.com/mimosa.asp"
+			}
+		],
+		"links":[
+			{
+				"id":"E3rd",
+				"loc":"Atrium, 2nd Floor, North"
+			},
+			{
+				"id":"Col3",
+				"loc":"Atrium, 2nd Floor, East"
+			},
+			{
+				"id":"EMlk",
+				"loc":"Atrium, 1st Floor, South"
+			},
+			{
+				"id":"Wfc2Esc",
+				"loc":"Atrium, 1st Floor, Northeast Corner"
+			}
+		]
+	},
+	{
+		"id":"ColShps",
+		"name":"College Street Shoppes",
+		"address":{
+			"street":"301 S Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"stores":[
+			{
+				"type":"HairSalon",
+				"name":"Tower Hairstyling",
+				"loc":"Suite 10",
+				"phone":"704-372-7412"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Halfpenny's",
+				"loc":"Suite 30",
+				"phone":"704-342-9697"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"name":"Johnny Burrito",
+				"loc":"Suite 55",
+				"phone":"704-371-4448",
+				"url":"http://www.johnnyburrito.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Subway",
+				"cuisine":["sandwiches"],
+				"loc":"Suite 60",
+				"phone":"704-344-9866",
+				"url":"http://www.subway.com/subwayroot/default.aspx"
+			}
+		],
+		"links":[
+			{
+				"id":"Wfc2Esc",
+				"loc":"Basement"
+			}
+		]
+	},
+	{
+		"id":"Wfc3",
+		"name":"Three Wells Fargo Center",
+		"address":{
+			"street":"401 S Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"stores":[
+			{
+				"type":"Museum",
+				"name":"Wells Fargo Museum",
+				"loc":"1st Floor"
+			},
+			{
+				"type":"CafeOrCoffeeShop",
+				"name":"Nirvana II",
+				"phone":"704-919-0502",
+				"url":"http://www.cafenirvana.net/"
+			}
+		],
+		"links":[
+			{
+				"id":"EMlk",
+				"loc":"Parking Elevators, Bridge Level"
+			},
+			{
+				"id":"Wfc3Wlk",
+				"loc":"1st Floor, Center"
+			}
+		]
+	},
+	{
+		"id":"FndrHll",
+		"name":"Founders Hall",
+		"address":{
+			"street":"100 N Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28255"
+		},
+		"stores":[
+			{
+				"type":"Restaurant",
+				"name":"Aria Tucson Grill",
+				"loc":"1st Floor"
+			}
+		],
+		"links":[
+			{
+				"id":"ETrd",
+				"loc":"2nd Floor"
+			},
+			{
+				"id":"E5th",
+				"loc":"2nd Floor"
+			}
+		]
+	},
+	{
+		"id":"BoaPlz",
+		"name":"Bank of America Plaza",
+		"address":{
+			"street":"101 S Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28280"
+		},
+		"stores":[
+			{
+				"type":"Pharmacy",
+				"additionalTypes":["ConvenienceStore"],
+				"name":"Walgreens",
+				"loc":"Retail Floor"
+			},
+			{
+				"type":"Restaurant",
+				"name":"McAlister's Deli",
+				"cuisine":["sandwiches","baked potatoes"],
+				"loc":"Retail Floor"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"name":"Chick-fil-A",
+				"cuisine":["chicken"],
+				"loc":"Retail Floor"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"name":"Salsarita's Fresh Cantina",
+				"cuisine":["mexican"],
+				"loc":"Retail Floor"
+			},
+			{
+				"type":"CafeOrCoffeeShop",
+				"name":"Starbucks",
+				"loc":"Retail Floor"
+			},
+			{
+				"type":"Hotel",
+				"name":"Omni Hotel",
+				"loc":"Retail Floor"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Which Wich",
+				"cuisine":["sandwiches"],
+				"loc":"Retail Floor"
+			}
+		],
+		"links":[
+			{
+				"id":"E4th",
+				"loc":"2nd Floor"
+			},
+			{
+				"id":"Col1",
+				"loc":"2nd Floor"
+			},
+			{
+				"id":"ETrd",
+				"loc":"3rd Floor"
+			}
+		]
+	},
+	{
+		"id":"CltPlz",
+		"name":"Charlotte Plaza",
+		"address":{
+			"street":"201 S College St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"url":[
+			"http://www.hines.com/property/detail.aspx?id=2045"
+		],
+		"stores":[
+			{
+				"type":"Restaurant",
+				"name":"Carolina Ale House",
+				"loc":"1st Floor"
+			},
+			{
+				"type":"CafeOrCoffeeShop",
+				"name":"Starbucks",
+				"loc":"2nd Floor"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Showmars",
+				"loc":"2nd Floor",
+				"url":"http://showmars.com/"
+			}
+		],
+		"links":[
+			{
+				"id":"Col2",
+				"loc":"2nd Floor"
+			}
+		]
+	},
+	{
+		"id":"HrstTwr",
+		"name":"Hearst Tower",
+		"address":{
+			"street":"214 N Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"url":[
+			"http://www.hearsttower.info/"
+		],
+		"stores":[
+			{
+				"type":"Restaurant",
+				"cuisine":["pizza"],
+				"name":"Fuel Pizza"
+			},
+			{
+				"type":"Restaurant",
+				"name":"SoHo Bistro",
+				"url":"http://www.sohobistro2go.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Blue Restaurant & Bar",
+				"url":"http://www.bluerestaurantandbar.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Malabar",
+				"url":"http://conterestaurantgroup.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Luce"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Pita Pit",
+				"url":"http://www.pitapit.com/"
+			},
+			{
+				"type":"CafeOrCoffeeShop",
+				"name":"Port City Java",
+				"url":"http://www.portcityjava.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Ri-Ra Sandwich Bar",
+				"url":"http://www.rira.com/locations/charlotte/index.php"
+			},
+			{
+				"type":"Bakery",
+				"cuisine":["cupcakes"],
+				"name":"Jewell Treats",
+				"url":"http://www.jewelltreats.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Showmars",
+				"url":"http://showmars.com/"
+			},
+			{
+				"type":"HairSalon",
+				"additionalTypes":["DaySpa"],
+				"name":"Modern Salon & Spa",
+				"url":"http://www.modernsalonandspa.com/"
+			},
+			{
+				"type":"Store",
+				"products":["Periodical","Newspaper","PublicationIssue"],
+				"name":"Hearst Tower Newstand"
+			},
+			{
+				"type":"ArtGallery",
+				"name":"SOZO Gallery",
+				"url":"http://www.sozogallery.net/"
+			}
+		],
+		"links":[
+			{
+				"id":"E5th",
+				"loc":"2nd Floor"
+			}
+		]
+	},
+	{
+		"id":"Epicnt",
+		"name":"EpiCentre",
+		"address":{
+			"street":"210 E Trade St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"url":"http://epicentrenc.com/",
+		"stores":[
+			{
+				"type":"FastFoodRestaurant",
+				"cuisine":["burgers"],
+				"name":"Five Guys",
+				"url":"http://www.fiveguys.com/",
+				"loc":"2nd Floor"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"cuisine":["sandwiches"],
+				"name":"Firehouse Subs",
+				"url":"http://www.firehousesubs.com/",
+				"loc":"2nd Floor"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["sandwiches"],
+				"name":"Jason's Deli",
+				"url":"http://www.jasonsdeli.com/",
+				"loc":"2nd Floor"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"cuisine":["japanese"],
+				"name":"Fuji Hibachi + Teriyaki Grill",
+				"loc":"2nd Floor"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["steak","wine"],
+				"name":"Fleming's",
+				"phone":"704-333-4266",
+				"url":"http://flemingssteakhouse.com/locations/nc/charlotte"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["japanese"],
+				"name":"Enso Asian Bistro",
+				"loc":"Suite A-108",
+				"phone":"704-716-3676",
+				"url":"http://www.ensocharlotte.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Tin Roof"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["mexican"],
+				"name":"vida"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["greek"],
+				"name":"Ios Greek Kitchen"
+			},
+			{
+				"type":"BarOrPub",
+				"additionalTypes":["CafeOrCoffeeShop"],
+				"name":"Mortimer's"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Bubble",
+				"phone":"704-733-9427",
+				"url":"http://bubblecharlotte.com/",
+				"loc":"Suite A-200"
+			},
+			{
+				"type":"BarOrPub",
+				"name":"Whisky River"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["bagels"],
+				"name":"Bruegger's Bagel"
+			},
+			{
+				"type":"BarOrPub",
+				"name":"Wild Wing Cafe",
+				"loc":"2nd Floor"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["mexican"],
+				"name":"Vida Vida!"
+			},
+			{
+				"type":"BarOrPub",
+				"name":"Blackfinn Ameripub"
+			},
+			{
+				"type":"FoodEstablishment",
+				"cuisine":["smoothies"],
+				"name":"Smoothie King",
+				"loc":"2nd Floor",
+				"phone":"704-979-6911",
+				"url":"http://smoothieking.com/location/view?store=851"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"cuisine":["mexican"],
+				"name":"Moe's Southwest Grill",
+				"url":"http://www.charlotte.moes.com/"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"name":"Studio Movie Grill",
+				"url":"https://www.studiomoviegrill.com/"
+			},
+			{
+				"type":"Hotel",
+				"name":"Aloft Hotel",
+				"loc":"5th Floor",
+				"url":"http://www.aloftcharlotteuptown.com/"
+			},
+			{
+				"type":"BowlingAlley",
+				"additionalTypes":["FastFoodRestaurant"],
+				"name":"Strike City",
+				"loc":"Suite D-164",
+				"phone":"704-716-9300",
+				"url":"http://www.strikecitycharlotte.com/"
+			},
+			{
+				"type":"IceCreamShop",
+				"cuisine":["frozen yoghurt","dessert"],
+				"name":"Yoforia",
+				"url":"http://www.yoforia.com/"
+			},
+			{
+				"type":"ConvenienceStore",
+				"name":"Sundries EpiCentre",
+				"loc":"E Trade St"
+			},
+			{
+				"type":"MobilePhoneStore",
+				"name":"AT&T",
+				"loc":"2nd Floor"
+			},
+			{
+				"type":"Pharmacy",
+				"additionalTypes":["ConvenienceStore"],
+				"name":"CVS",
+				"loc":"1st Floor"
+			},
+			{
+				"type":"Restaurant",
+				"cuisine":["pizza"],
+				"name":"Libretto's Pizzeria",
+				"loc":"1st Floor",
+				"url":"http://www.librettospizzeria.com/"
+			}
+		],
+		"links":[
+			{
+				"id":"Col1",
+				"loc":"2nd Floor"
+			}
+		]
+	},
+	{
+		"id":"Ratclf",
+		"name":"The Ratcliffe",
+		"address":{
+			"street":"435 S Tryon St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"stores":[
+			{
+				"type":"Restaurant",
+				"cat":["fine dining"],
+				"name":"Bernardin's",
+				"loc":"Suite 100",
+				"phone":"704-332-3188",
+				"url":"http://www.bernardinsfinedining.com/"
+			},
+			{
+				"type":"Restaurant",
+				"name":"Matt's Chicago Dogs",
+				"loc":"Suite 140",
+				"phone":"704-333-3650"
+			},
+			{
+				"type":"Restaurant",
+				"name":"The Sandwich Club",
+				"loc":"Suite 130",
+				"phone":"704-344-1975",
+				"url":"http://www.sandwichclub2go.com/ordereze/default.aspx"
+			}
+		],
+		"links":[
+			{
+				"id":"Wfc3Wlk",
+				"loc":"Lobby off The Green"
+			}
+		]
+	},
+	{
+		"id":"LnxCtc",
+		"name":"Charlotte Transportation Center",
+		"address":{
+			"street":"310 E Trade St",
+			"city":"Charlotte, NC",
+			"zip":"28202"
+		},
+		"stores":[
+			{
+				"type":"TrainStation",
+				"name":"LYNX Blue Line CTC/Arena Station",
+				"url":"http://charmeck.org/city/charlotte/cats/lynx/Pages/default.aspx"
+			},
+			{
+				"type":"BusStation",
+				"name":"CATS Bus Terminal",
+				"url":"http://charmeck.org/city/charlotte/cats/Bus/Pages/default.aspx"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"name":"Bojangles'"
+			},
+			{
+				"type":"FastFoodRestaurant",
+				"name":"Burger King",
+				"loc":"Bus Bay U, Trade & Brevard"
+			}
+		],
+		"links":[
+		]
+	}
+],"links":[
+	{
+		"id":"E5th",
+		"name":"E 5th St"
+	},
+	{
+		"id":"ETrd",
+		"name":"E Trade St",
+		"caution":"&#x267f;&#x20e0;"
+	},
+	{
+		"id":"E4th",
+		"name":"E 4th St"
+	},
+	{
+		"id":"E3rd",
+		"name":"E 3rd St"
+	},
+	{
+		"id":"EMlk",
+		"name":"E MLKJr Blvd"
+	},
+	{
+		"id":"Col1",
+		"name":"1xx S College St"
+	},
+	{
+		"id":"Col2",
+		"name":"2xx S College St"
+	},
+	{
+		"id":"Col3",
+		"name":"3xx S College St"
+	},
+	{
+		"id":"NBbtPrk",
+		"name":"BB&T Center Parking Deck, North End"
+	},
+	{
+		"id":"SBbtPrk",
+		"name":"BB&T Center Parking Deck, South End"
+	},
+	{
+		"id":"Wfc2Esc",
+		"name":"Wells Fargo Escalators"
+	},
+	{
+		"id":"Wfc3Wlk",
+		"name":"Wells Fargo Walkway"
+	}
+]}
