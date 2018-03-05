@@ -1,20 +1,6 @@
 [
 	{
 		"name":"Sam Grundman",
-		"z-id":"pzchsh",
-		"email":"Samuel.Grundman@ally.com",
-		"role":"WPA"
-	},
-	{
-		"name":"Josh Bowes",
-		"z-id":"",
-		"email":"Joshua.Bowes@ally.com",
-		"role":"TDM"
-	},
-	{
-		"name":"John Easton",
-		"z-id":"",
-		"email":"John.Easton@ally.com",
-		"role":"Manager"
+		"email":"sam-kanban@yodas.ws"
 	}
 ]
