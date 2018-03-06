@@ -54,46 +54,68 @@ angular.module('pageD3Almanac')
 
 			// Add Orbiting Objects' Paths
 			;[sun,moon].forEach((orb) => {
-				;[earth.radius, orb.radius].forEach((radius) => {
-					if (radius !== earth.radius) {
-						// Add Rise Path
-						orb.rise = document.createElementNS(ns, 'path')
-						if (orb.class) orb.rise.classList.add(orb.class)
-						if (radius === earth.radius) orb.rise.classList.add('surface-path')
-						orb.rise.setAttribute('d',
-							`M ${center.x},${center.y} m 0,${radius} a ${radius},${radius} 0,0,1 0-${radius*2}`
-						)
-						$svg.prepend(orb.rise)
-					}
-
-					// Add Set Path
-					orb.set = document.createElementNS(ns, 'path')
-					if (orb.class) orb.set.classList.add(orb.class)
-					if (radius === earth.radius) orb.set.classList.add('surface-path')
-					orb.set.setAttribute('d',
-						`M ${center.x},${center.y} m 0,${radius} a ${radius},${radius} 0,0,0 0-${radius*2}`
+				;[
+					{
+						class: 'surface-path',
+						radius: earth.radius,
+						path: 'path',
+						fn: 'append',
+						sweep: 0,
+					},
+					{
+						radius: orb.radius,
+						path: 'rise',
+						fn: 'prepend',
+						sweep: 1,
+					},
+					{
+						radius: orb.radius,
+						path: 'set',
+						fn: 'append',
+						sweep: 0,
+					},
+				].forEach((d) => {
+					// Add Rise Path
+					orb[d.path] = document.createElementNS(ns, 'path')
+					if (orb.class) orb[d.path].classList.add(orb.class)
+					if (d.class) orb[d.path].classList.add(d.class)
+					orb[d.path].setAttribute('d',
+						`M ${center.x},${center.y} m 0,${d.radius} a ${d.radius},${d.radius} 0,0,${d.sweep} 0-${d.radius*2}`
 					)
-					$svg.append(orb.set)
-
+					$svg[d.fn](orb[d.path])
 				})
 			})
 
 			setInterval(() => {
 				moon.x += 36
 				if (moon.x >= 360) moon.x -= 360
-				let x = moon.radius * Math.sin(moon.x * Math.PI / 180)
-				let y = moon.radius * Math.cos(moon.x * Math.PI / 180)
-				let dx = moon.radius * Math.sin((moon.x + 180) * Math.PI / 180) - x
-				let dy = moon.radius * Math.cos((moon.x + 180) * Math.PI / 180) - y
-				moon.rise.setAttribute('d',
-					`M ${center.x},${center.y} m ${x},${y} a ${moon.radius},${moon.radius} 0,0,1 ${dx},${dy}`
-				)
-				moon.set.setAttribute('d',
-					`M ${center.x},${center.y} m ${x},${y} a ${moon.radius},${moon.radius} 0,0,0 ${dx},${dy}`
-				)
-				moon.rise.style.transform= `rotateZ(5.14deg) rotateX(${moon.x}deg) rotateY(80deg)`
-				moon.set.style.transform= `rotateZ(5.14deg) rotateX(${moon.x}deg) rotateY(80deg)`
-			}, 100)
+				;[
+					{
+						radius: earth.radius,
+						path: 'path',
+						sweep: 0,
+					},
+					{
+						radius: moon.radius,
+						path: 'rise',
+						sweep: 1,
+					},
+					{
+						radius: moon.radius,
+						path: 'set',
+						sweep: 0,
+					},
+				].forEach((d) => {
+					let x = d.radius * Math.sin(moon.x * Math.PI / 180)
+					let y = d.radius * Math.cos(moon.x * Math.PI / 180)
+					let dx = d.radius * Math.sin((moon.x + 180) * Math.PI / 180) - x
+					let dy = d.radius * Math.cos((moon.x + 180) * Math.PI / 180) - y
+					moon[d.path].setAttribute('d',
+						`M ${center.x},${center.y} m ${x},${y} a ${d.radius},${d.radius} 0,0,${d.sweep} ${dx},${dy}`
+					)
+					moon[d.path].style.transform= `rotateZ(5.14deg) rotateX(${moon.x}deg) rotateY(80deg)`
+				})
+			}, 300)
 		},
 	})
 }])
