@@ -29,12 +29,27 @@
 		&.surface-path {
 			stroke: darkgreen;
 			stroke-width: 2px;
-			stroke-dasharray: 10, 20;
+			stroke-dasharray: 20, 30;
 		}
 
 		&.moon {
-			transform: rotateZ(5.14deg) rotateY(80deg);
+			transform: rotateX(5.14deg) rotateY(80deg);
+			// animation-name: moon;
+			animation-duration: 10s;
+			animation-iteration-count: infinite;
+			animation-timing-function: linear;
 		}
+
+		@keyframes moon {
+			from {
+				transform: rotateZ(5.14deg) rotateX(0deg) rotateY(80deg);
+			}
+
+			to {
+				transform: rotateZ(5.14deg) rotateX(360deg) rotateY(80deg);
+			}
+		}
+
 	}
 
 	g.paths {
