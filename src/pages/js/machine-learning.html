@@ -228,16 +228,6 @@ mons.forEach((m) => {
 });
 plot(graphs);
 
-function f(x) {
-  return tf.tidy(() => {
-    let y = tf.clone(C[0]);
-    for (let i=1; i<C.length; i++) {
-      y = y.add(C[i].mul(x.pow(tf.scalar(i))))
-    }
-    return y.maximum(min).minimum(max)
-  });
-}
-
 function loss(pred, label) {
   return tf.tidy(() => label.sub(pred).abs().mean());
   return tf.tidy(() => tf.losses.absoluteDifference(label, pred));
