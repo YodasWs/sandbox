@@ -177,6 +177,19 @@ async function plot() {
     showCurrentTime: true,
     moveable: false,
     zoomable: false,
+    autoResize: false,
+    hiddenDates: ((d) => {
+      // Hide Weekends
+      d = new Date(d);
+      d.setDate(d.getDate() + 6 - d.getDay());
+      const e = new Date(d.toString());
+      e.setDate(e.getDate() + 2);
+      return {
+        start: `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`,
+        end: `${e.getFullYear()}-${e.getMonth()+1}-${e.getDate()}`,
+        repeat: 'weekly',
+      };
+    })(data.points[0].x),
     legend: {
       enabled: true,
       left: { position: 'top-right' },
