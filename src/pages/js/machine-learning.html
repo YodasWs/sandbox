@@ -11,6 +11,12 @@
 :root { font-family: 'Trebuchet MS', sans-serif; }
 h1 { margin-top: 0; }
 
+.vis-timeline .vis-graph-group4.vis-point {
+  stroke-width: 1px;
+  stroke: black;
+  fill: red;
+}
+
 </style>
 </head>
 <body>
@@ -24,9 +30,9 @@ const priceData = [ // {{{1
 ]; // }}}1
 
 const config = {
-  iterations: 100,
-  learnRate: 5e-1,
-  degree: 3,
+  iterations: 150,
+  learnRate: 1,
+  degree: 6,
 }
 
 Array.prototype.mean = function mean() {
@@ -60,26 +66,55 @@ function TimeSeries(data, startDate, endDate, degree=config.degree, group=2) {
   data = data.filter((day) => {
     return startDate <= new Date(day.date) && new Date(day.date) <= endDate;
   });
-  // Parse Data into Tensors and Plot Points
-  const xs = [];
-  const ys = [];
+
+  // Parse Daily Data into Tensors and Plot Points
+  const ip = {
+    step: 2 / (data.length + 1),
+    dayChangeYs: [],
+    meanYs: [],
+    xs: [],
+  };
   this.dates = [];
   data.forEach((day, j) => {
-    const y = [];
+    const y4 = [];
+    const yOC = [];
     ['close', 'open', 'low', 'hi'].forEach((i) => {
-      y.push(day[i]);
+      y4.push(day[i]);
     });
-    ys.push(y);
-    xs.push(j / (data.length / 2) - 1);
+    ['open', 'close'].forEach((i) => {
+      yOC.push(day[i]);
+    });
+    ip.meanYs.push(y4);
+    ip.dayChangeYs.push(yOC);
+    ip.xs.push(j * ip.step - 1); // Normalize to range [-1, 1]
     this.dates.push(day.date);
   });
-  this.xs = tf.tensor(xs);
-  this.ys = tf.tensor(ys).mean(1);
+
+  this.dayChange = {
+    xs: tf.tensor(ip.xs).expandDims(1),
+    ys: tf.tensor(ip.dayChangeYs),
+    group: group + 2,
+  };
+  this.dailyMean = {
+    ys: tf.tensor(ip.meanYs).mean(1),
+    xs: tf.tensor(ip.xs),
+    group,
+  };
+
   // Initialize Coefficients
-  this.C = [];
-  for (let i=0; i<=degree; i++) {
-    this.C.push(tf.variable(i === 0 ? this.ys.mean() : tf.scalar(0)));
-  }
+  [
+    [this.dayChange, 'dayChangeYs'],
+    [this.dailyMean, 'meanYs'],
+  ].forEach((d) => {
+    d[0].C = [];
+    tf.tidy(() => {
+      for (let i=0; i<=degree; i++) {
+        d[0].C.push(tf.variable(i === 0 ? tf.tensor(ip[d[1]]).mean() : tf.scalar(0)));
+      }
+    });
+  });
+
+  // this.dayChange.ys.print(true);
   return Object.defineProperties(this, {
     group: {
       value: group,
@@ -87,17 +122,28 @@ function TimeSeries(data, startDate, endDate, degree=config.degree, group=2) {
   });
 }
 
-TimeSeries.prototype.f = function f() {
+TimeSeries.prototype.predictMean = function predictMean() {
   return tf.tidy(() => {
-    let y = tf.clone(this.C[0]);
-    for (let i=1; i<this.C.length; i++) {
-      y = y.add(this.C[i].mul(this.xs.pow(tf.scalar(i))))
+    let y = tf.clone(this.dailyMean.C[0]);
+    for (let i=1; i<this.dailyMean.C.length; i++) {
+      y = y.add(this.dailyMean.C[i].mul(this.dailyMean.xs.pow(tf.scalar(i))))
+    }
+    return y.maximum(min).minimum(max)
+  });
+}
+
+TimeSeries.prototype.predictDayChange = function predictDayChange() {
+  return tf.tidy(() => {
+    let y = tf.clone(this.dayChange.C[0]);
+    for (let i=1; i<this.dayChange.C.length; i++) {
+      y = y.add(this.dayChange.C[i].mul(this.dayChange.xs.pow(tf.scalar(i))))
     }
     return y.maximum(min).minimum(max)
   });
 }
 
 data.allTime = new TimeSeries(priceData, '2018-01-01', '2018-05-31', 6, 3);
+// Segment Data by Month
 data.jan = new TimeSeries(priceData, '2018-01-01', '2018-02-01');
 data.feb = new TimeSeries(priceData, '2018-02-01', '2018-03-01');
 data.mar = new TimeSeries(priceData, '2018-03-01', '2018-04-01');
@@ -139,16 +185,16 @@ groups.add({
   },
 });
 groups.add({
-  id: 3,
-  content: 'Matched Curve',
+  id: 2,
+  content: 'Curve Month',
   options: {
     drawPoints: false,
     style: 'line',
   },
 });
 groups.add({
-  id: 2,
-  content: 'Matched Curve',
+  id: 3,
+  content: 'Curve YTD',
   options: {
     drawPoints: false,
     style: 'line',
@@ -161,12 +207,14 @@ async function plot() {
   const graphs = [];
   const arr = arguments.length === 1 && Array.isArray(arguments[0]) ? arguments[0] : Array.from(arguments);
   for (let i=0; i<arr.length; i++) {
-    graphs.push(arr[i].f());
+    graphs.push(arr[i].predictMean());
+    // graphs.push(arr[i].predictDayChange());
   }
   for (let i=0; i<graphs.length; i++) {
     const val = await graphs[i].data();
     for (let j in val) {
-      points.push({ x: arr[i].dates[j], y: val[j], group: arr[i].group });
+      points.push({ x: arr[i].dates[j], y: val[j], group: arr[i].dailyMean.group });
+      // points.push({ x: arr[i].dates[j], y: val[j], group: arr[i].dayChange.group });
     }
   }
 
@@ -179,9 +227,8 @@ async function plot() {
     zoomable: false,
     autoResize: false,
     hiddenDates: ((d) => {
-      // Hide Weekends
       d = new Date(d);
-      d.setDate(d.getDate() + 6 - d.getDay());
+      d.setDate(d.getDate() - d.getDay() + 6); // Saturday this week
       const e = new Date(d.toString());
       e.setDate(e.getDate() + 2);
       return {
@@ -192,7 +239,7 @@ async function plot() {
     })(data.points[0].x),
     legend: {
       enabled: true,
-      left: { position: 'top-right' },
+      left: { position: 'bottom-left' },
     },
     format: {
       minorLabels: {
@@ -238,12 +285,15 @@ function loss(pred, label) {
 
 function train(data, num) {
   const optimizer = tf.train.adagrad(config.learnRate);
+  const optDayChg = tf.train.adagrad(config.learnRate);
   for (let i=0; i<num; i++) {
-    optimizer.minimize(() => loss(data.f(), data.ys), true);
+    optimizer.minimize(() => loss(data.predictMean(), data.dailyMean.ys), true);
+    optDayChg.minimize(() => loss(data.predictDayChange(), data.dayChange.ys), true);
   }
 }
 
 </script>
+
 </body>
 </html>
 <!--
