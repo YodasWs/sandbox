@@ -9,13 +9,13 @@
 
 :root { font-family: 'Trebuchet MS', sans-serif; }
 html, body {
-  padding: 0;
-  margin: 0;
+	padding: 0;
+	margin: 0;
 }
 h1 {
-  margin: 0;
-  line-height: 4rem;
-  text-align: center;
+	margin: 0;
+	line-height: 4rem;
+	text-align: center;
 }
 
 svg {
@@ -26,15 +26,15 @@ svg {
 }
 
 rect {
-  stroke: black;
-  stroke-width: 1px;
-  fill: none;
+	stroke: black;
+	stroke-width: 1px;
+	fill: none;
 }
 
 circle.creature {
-  stroke: none;
-  fill: black;
-  r: 5px;
+	stroke: none;
+	fill: black;
+	r: 5px;
 }
 
 </style>
@@ -78,9 +78,11 @@ Vector.prototype = {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	},
 	normalize: function() {
-		var mag = this.mag();
-		mag && this.div(mag);
-		return this;
+		const mag = this.mag();
+		const copy = this.copy();
+		mag && copy.div(mag).add({x:1,y:1}).div(2);
+		console.log('Normalized:', copy);
+		return copy;
 	},
 	angle: function() {
 		return Math.atan2(this.y, this.x);
@@ -129,7 +131,7 @@ Vector.prototype = {
 		this.set(1,1);
 		this.setAngle(Math.random() * Math.PI * 2);
 		return this;
-	}
+	},
 }
 // End Vector 1}}}
 
@@ -137,79 +139,89 @@ const $svg = $('svg');
 $svg.x = $svg.width();
 $svg.y = $svg.height();
 
+const game = {
+	biteSize: 0.05,
+};
+
 function fade(color, fade) {
-  color = color.replace(/^#/, '');
-  const r = color.substr(0, 2);
-  const g = color.substr(2, 2);
-  const b = color.substr(4, 2);
-  return '#' + [ r, g, b ].map((c) => Math.ceil(Number.parseInt('ff', 16) * (1 - fade) + Number.parseInt(c, 16) * fade).toString(16).padStart(2, '0')).join('');
+	color = color.replace(/^#/, '');
+	const r = color.substr(0, 2);
+	const g = color.substr(2, 2);
+	const b = color.substr(4, 2);
+	return '#' + [ r, g, b ].map((c) => Math.ceil(Number.parseInt('ff', 16) * (1 - fade) + Number.parseInt(c, 16) * fade).toString(16).padStart(2, '0')).join('');
 }
 
 function Tile(number, x, y, numR, numC, $svg) {
-  const ns = 'http://www.w3.org/2000/svg';
-  this.food = 0.5;
+	const ns = 'http://www.w3.org/2000/svg';
+	this.food = 0.5;
 
-  Object.defineProperties(this, {
-    number: {
-      get() {
-        return number / numTiles;
-      },
-    },
-    row: {
-      value: x,
-    },
-    col: {
-      value: y,
-    },
-    x: {
-      value: x / numC * $svg.width(),
-    },
-    y: {
-      value: y / numR * $svg.height(),
-    },
-    height: {
-      value: 1 / numR * $svg.height(),
-    },
-    width: {
-      value: 1 / numC * $svg.width(),
-    },
-    rect: {
-      value: document.createElementNS(ns, 'rect'),
-    },
-  });
+	Object.defineProperties(this, {
+		number: {
+			get() {
+				return number / numTiles;
+			},
+		},
+		row: {
+			value: x,
+		},
+		col: {
+			value: y,
+		},
+		x: {
+			value: x / numC * $svg.x,
+		},
+		y: {
+			value: y / numR * $svg.y,
+		},
+		height: {
+			value: 1 / numR * $svg.y,
+		},
+		width: {
+			value: 1 / numC * $svg.x,
+		},
+		rect: {
+			value: document.createElementNS(ns, 'rect'),
+		},
+	});
 
-  this.rect.setAttribute('x', this.x);
-  this.rect.setAttribute('y', this.y);
-  this.rect.setAttribute('width', this.width);
-  this.rect.setAttribute('height', this.height);
+	Object.defineProperties(this, {
+		center: {
+			value: new Vector((this.x + this.width) / 2, (this.y + this.height) / 2),
+		},
+	});
 
-  $svg.append(this.rect);
+	this.rect.setAttribute('x', this.x);
+	this.rect.setAttribute('y', this.y);
+	this.rect.setAttribute('width', this.width);
+	this.rect.setAttribute('height', this.height);
+
+	$svg.append(this.rect);
 }
 
 Tile.prototype = {
-  color() {
-    this.rect.style.fill = fade('#228b22', this.food);
-  },
-  takeFood(biteSize) {
-    const food = Math.min(this.food, 0.05 * biteSize);
-    this.food -= food;
-    if (this.food <= 0) {
-      this.food = 0;
-      return 0;
-    }
-    return food;
-  },
-  tick() {
-    this.food += 0.01;
-    this.food = Math.max(0, Math.min(this.food, 1));
-  },
+	color() {
+		this.rect.style.fill = fade('#228b22', this.food);
+	},
+	takeFood(biteSize) {
+		const food = Math.min(this.food, game.biteSize * biteSize);
+		this.food -= food;
+		if (this.food <= 0) {
+			this.food = 0;
+			return 0;
+		}
+		return food;
+	},
+	tick() {
+		this.food += 0.01;
+		this.food = Math.max(0, Math.min(this.food, 1));
+	},
 };
 
 Object.defineProperties(Tile.prototype, {
 });
 
 function Field(number, x, y, numR, numC, $svg) {
-  Tile.call(this, number, x, y, numR, numC, $svg);
+	Tile.call(this, number, x, y, numR, numC, $svg);
 }
 
 Field.prototype = Object.assign(Tile.prototype, {
@@ -220,179 +232,208 @@ Object.defineProperties(Field.prototype, {
 });
 
 function Creature(x, y) {
-  console.log('adding at %d, %d', x, y);
-  const ns = 'http://www.w3.org/2000/svg';
-  this.brain = new synaptic.Architect.Perceptron(3, 3, 2);
-  this.health = 0.5;
-  this.hunger = 0.5;
-  this.v = new Vector(0, 0);
-  this.p = new Vector(x, y);
+	console.log('adding at %d, %d', x, y);
+	const ns = 'http://www.w3.org/2000/svg';
+	this.brain = new synaptic.Architect.Perceptron(6, 6, 2);
+	this.health = 0.5;
+	this.hunger = 0.5;
+	this.v = new Vector(0, 0);
+	this.p = new Vector(x, y);
 
-  Object.defineProperties(this, {
-    sight: {
-      value: Math.min($svg.width(), $svg.height()) / 3,
-    },
-    spot: {
-      value: document.createElementNS(ns, 'circle'),
-    },
-    biteSize: {
-      value: 1,
-    },
-  });
+	Object.defineProperties(this, {
+		sight: {
+			value: Math.min($svg.width(), $svg.height()) / 3,
+		},
+		spot: {
+			value: document.createElementNS(ns, 'circle'),
+		},
+		biteSize: {
+			value: 1,
+		},
+		learningRate: {
+			value: 0.3,
+		},
+	});
 
-  this.spot.classList.add('creature');
-  this.spot.setAttribute('cx', this.p.x);
-  this.spot.setAttribute('cy', this.p.y);
+	this.spot.classList.add('creature');
+	this.spot.setAttribute('cx', this.p.x);
+	this.spot.setAttribute('cy', this.p.y);
 
-  $svg.append(this.spot);
+	$svg.append(this.spot);
 }
 
 Creature.prototype = {
-  eat() {
-    console.log('Tile:', this.tile);
-    let food = 0;
-    if (this.hunger > 0) {
-      food = this.tile.takeFood(this.biteSize);
-    }
-    if (food) {
-      this.hunger -= food;
-    } else {
-      this.hunger += 0.05;
-    }
-    if (this.hunger > 0.2) {
-      this.health -= 0.05;
-    }
-  },
-  seeFood() {
-    for (let row=this.tile.row-1; row<this.tile.row+1; row++) {
-      for (let col=this.tile.col-1; col<this.tile.col+1; col++) {
-        if (!world[row] || !world[row][col]) continue;
-        if (world[row][col].food > 0.05 * this.biteSize) console.log('There\'s food at %d,%d', row, col);
-      }
-    }
-  },
-  move() {
-    const maxA = Math.min($svg.x, $svg.y) / 10;
+	eat() {
+		console.log('Tile:', this.tile);
+		let food = 0;
+		if (this.hunger > 0) {
+			food = this.tile.takeFood(this.biteSize);
+		}
+		if (food) {
+			this.hunger -= food;
+		} else {
+			this.hunger += game.biteSize;
+		}
+		if (this.hunger > 0.2) {
+			this.health -= 0.05;
+		}
+	},
+	seeFood() {
+		const tiles = [];
+		for (let row=this.tile.row-1; row<this.tile.row+1; row++) {
+			for (let col=this.tile.col-1; col<this.tile.col+1; col++) {
+				if (!world[row] || !world[row][col]) continue;
+				if (row === this.tile.row && col === this.tile.col) continue;
+				const tile = world[row][col];
+				if (tile.food > game.biteSize * this.biteSize) {
+					tiles.push([ tile.number, tile.food ]);
+				}
+			}
+		}
+		if (tiles.length) return tiles[Math.floor(Math.random() * tiles.length)];
+		return [ 0, 0 ];
+	},
+	meanFood() {
+		const vector = new Vector(0, 0);
+		for (let row=this.tile.row-1; row<this.tile.row+1; row++) {
+			for (let col=this.tile.col-1; col<this.tile.col+1; col++) {
+				if (!world[row] || !world[row][col]) continue;
+				if (world[row][col].food > game.biteSize * this.biteSize) {
+					// Point towards mean of different nearby food sources
+					const tile = world[row][col];
+					vector.add(tile.center.copy().sub(this.p.copy()).setMag(tile.food));
+				}
+			}
+		}
+		console.log('meanFood:', this.p.copy().add(vector));
+		return vector.normalize();
+	},
+	move() {
+		const maxV = Math.min($svg.x, $svg.y) / 20;
 
-    this.seeFood();
+		const input = [
+			this.hunger,
+			this.health,
+			this.tile.number,
+			this.tile.food,
+		].concat(this.seeFood());
+		console.log('input:', input);
+		const output = this.brain.activate(input);
+		const v = new Vector(output[0], output[1]).sub({x:0.5,y:0.5}).setMag(maxV);
+		console.log('V: %dx%d', v.x, v.y);
+		this.v.set(v.x, v.y);
 
-    const input = [
-      this.tile.x,
-      this.tile.y,
-      this.tile.food,
-    ];
-    const v = this.brain.activate(input);
-    this.v.add({x:v[0] * maxA - maxA / 2, y:v[1] * maxA - maxA / 2});
+		// Teach Creature to move towards center of nearby food
+		const meanFood = this.meanFood();
+		console.log('meanFood normalized:', meanFood);
+		this.brain.propagate(this.learningRate, [ meanFood.x, meanFood.y ]);
 
-    // TODO: Check for Food around Creature and use this.brain.propagate to Learn where to go
-    if (this.tile.food < 0.2 || this.hunger > 0.8) {
-    }
+		this.p.add(this.v);
 
-    this.p.add(this.v);
-
-    ['x', 'y'].forEach((d) => {
-      if (this.p[d] >= $svg[d] - 1) {
-        this.p[d] = $svg[d] - 1;
-        this.v[d] = -1;
-      } else if (this.p[d] <= 0) {
-        this.p[d] = 0;
-        this.v[d] = 1
-      }
-    });
-  },
-  tick() {
-    if (this.health <= 0) {
-      this.die();
-    }
-    this.eat();
-    // Limit 0 <= h <= 1
-    this.health = Math.max(0, Math.min(this.health, 1));
-    this.hunger = Math.max(0, Math.min(this.hunger, 1));
-    this.move();
-  },
-  die() {
-    console.warn('This creature has died!');
-  },
+		['x', 'y'].forEach((d) => {
+			if (this.p[d] >= $svg[d] - 1) {
+				this.p[d] = $svg[d] - 1;
+				this.v[d] = -1;
+			} else if (this.p[d] <= 0) {
+				this.p[d] = 0;
+				this.v[d] = 1
+			}
+		});
+	},
+	tick() {
+		if (this.health <= 0) {
+			this.die();
+		}
+		this.eat();
+		// Limit 0 <= h <= 1
+		this.health = Math.max(0, Math.min(this.health, 1));
+		this.hunger = Math.max(0, Math.min(this.hunger, 1));
+		this.move();
+	},
+	die() {
+		console.warn('This creature has died!');
+	},
 };
 
 Object.defineProperties(Creature.prototype, {
-  minX: {
-    value: 0,
-  },
-  minY: {
-    value: 0,
-  },
-  maxX: {
-    value: $svg.width(),
-  },
-  maxY: {
-    value: $svg.height(),
-  },
-  tile: {
-    get() {
-      const row = Math.floor(this.p.y / $svg.height() * world.length);
-      const col = Math.floor(this.p.x / $svg.width() * world[row].length);
-      return world[row][col];
-    },
-  },
+	minX: {
+		value: 0,
+	},
+	minY: {
+		value: 0,
+	},
+	maxX: {
+		value: $svg.width(),
+	},
+	maxY: {
+		value: $svg.height(),
+	},
+	tile: {
+		get() {
+			const row = Math.floor(this.p.y / $svg.height() * world.length);
+			const col = Math.floor(this.p.x / $svg.width() * world[row].length);
+			return world[row][col];
+		},
+	},
 });
 
 let i = 0;
 const world = [
-  [ 'Field', 'Field', ],
-  [ 'Field', 'Field', 'Field', ],
-  [ 'Field', 'Field', ],
+	[ 'Field', 'Field', ],
+	[ 'Field', 'Field', 'Field', ],
+	[ 'Field', 'Field', ],
 ].map((row, y, w) => row.map((cell, x) => {
-  switch (cell) {
-  case 'Field':
-  default:
-    return new Field(i++, x, y, w.length, row.length, $svg);
-  }
+	switch (cell) {
+	case 'Field':
+	default:
+		return new Field(++i, x, y, w.length, row.length, $svg);
+	}
 }));
 const numTiles = i;
 
 const numCreatures = 1;
 const creatures = [];
 for (let i=0; i<numCreatures; i++) {
-  creatures.push(new Creature(
-    Math.floor(Math.random() * $svg.width() * .8 + $svg.width() * .1), 
-    Math.floor(Math.random() * $svg.height() * .8 + $svg.height() * .1)
-  ));
+	creatures.push(new Creature(
+		Math.floor(Math.random() * $svg.width() * .8 + $svg.width() * .1),
+		Math.floor(Math.random() * $svg.height() * .8 + $svg.height() * .1)
+	));
 }
 
 creatures.sort = function() {
-  return Array.prototype.sort.call(this, (a, b) => a.health * a.speed - b.health * b.speed);
+	return Array.prototype.sort.call(this, (a, b) => a.health * a.speed - b.health * b.speed);
 };
 
+i = 0;
 function tick() {
-  creatures.sort().forEach((c) => {
-    c.tick();
-    console.log('Hunger:', c.hunger);
-    console.log('Health:', c.health);
-  });
-  world.forEach((row) => {
-    row.forEach((cell) => {
-      cell.tick();
-    });
-  });
-  draw();
-  setTimeout(tick, 500);
+	creatures.sort().forEach((c) => {
+		c.tick();
+		console.log('Hunger:', c.hunger);
+		console.log('Health:', c.health);
+	});
+	world.forEach((row) => {
+		row.forEach((cell) => {
+			cell.tick();
+		});
+	});
+	draw();
+	if (i++ < 500) setTimeout(tick, 500);
 }
 
 function draw() {
-  world.forEach((row) => {
-    row.forEach((cell) => {
-      cell.color();
-    });
-  });
-  creatures.forEach((c) => {
-    c.spot.setAttribute('cx', c.p.x);
-    c.spot.setAttribute('cy', c.p.y);
-  });
+	world.forEach((row) => {
+		row.forEach((cell) => {
+			cell.color();
+		});
+	});
+	creatures.forEach((c) => {
+		c.spot.setAttribute('cx', c.p.x);
+		c.spot.setAttribute('cy', c.p.y);
+	});
 }
 
 $(() => {
-  tick();
+	tick();
 });
 
 </script>
