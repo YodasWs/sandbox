@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<title>Kanban!</title>
+<link rel="stylesheet" href="scss/main.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+// Define Drag Event Functions
+var events = {
+	attach: {
+		itemListElement: function() {
+			$(this)
+				.on('dragstart', events.drag.start.itemListElement)
+				.on('dragend', events.drag.end.itemListElement)
+				.on('click', events.click.itemListElement);
+		},
+		ItemList: function() {
+			var $t = $(this);
+			$t.find('[data-action="add"]').on('click', events.click.addAction.itemListElement);
+			$t	.on('dragover', events.drag.over.ItemList)
+				.on('dragleave', events.drag.leave.ItemList)
+				.on('click', events.click.ItemList)
+				.on('drop', events.drag.drop.ItemList);
+			$t.find('[contenteditable="true"]').each(events.attach.contenteditable.ItemList);
+		},
+		formListItem: function() {
+			var $t = $(this);
+			$t.on('click', '[data-action="remove"]', events.click.removeAction.formElement);
+			$t.find('[data-action="add"]').on('click', events.click.addAction.formElement);
+			$t.find('[data-action="close"]').on('click', events.click.closeAction);
+			$t.find('input[type="submit"]').on('click', events.formListItem.submit);
+		},
+		contenteditable: {
+			ItemList: function() {
+				var $t = $(this);
+				$t.on('keypress', events.key.normalize)
+				  .on('keyup', events.key.normalize)
+				  .on('keypress', events.key.press.ItemListEditable)
+				  .on('keyup', events.key.up.ItemListEditable);
+			},
+			itemListElement: function() {
+				var $t = $(this);
+				if (!$t.attr('itemprop')) return;
+				$t.on('keypress', events.key.normalize)
+				  .on('keypress', events.key.press.itemListEditable)
+				  .on('blur', events.blur.itemListEditable);
+			}
+		}
+	},
+	blur: {
+		itemListEditable: function() {
+			// Save Updated Task Name
+			tmpTask[$(this).attr('itemprop')] = $(this).text();
+		},
+		ItemListEditable: function(e) {
+			// TODO: Save Updated List Name
+		}
+	},
+	key: {
+		normalize: function(e) {
+			// Normalize Keycodes
+			if (!e.key) switch (e.which) {
+				case 13:
+					e.key = 'Enter';
+					break;
+				case 27:
+					e.key = 'Escape';
+					break;
+			}
+		},
+		press: {
+			itemListEditable: function(e) {
+				switch (e.key) {
+				case 'Enter':
+					$(e.target).blur();
+					e.preventDefault();
+					if (e.shiftKey) {
+						$(e.target).parent('form').trigger('submit');
+					}
+					break;
+				}
+			},
+			ItemListEditable: function(e) {
+				switch (e.key) {
+				case 'Enter':
+					$(e.target).blur();
+					e.preventDefault();
+					break;
+				}
+			}
+		},
+		up: {
+			ItemListEditable: function(e) {
+				switch (e.key) {
+				case 'Escape':
+					$(e.target).blur();
+					break;
+				}
+			},
+			document: function(e) {
+				switch (e.key) {
+				case 'Escape':
+					if ($('form').is(':visible')) {
+						$($('form [data-action="close"]')[0]).trigger('click');
+					}
+					break;
+				}
+			}
+		}
+	},
+	close: {
+		form: function() {
+			$('form').fadeOut(300, function() {
+				$(this).remove();
+			});
+			events.close.bg();
+		},
+		bg: function() {
+			$('#grey-bg').stop(true, false).fadeOut(400);
+		}
+	},
+	formListItem: {
+		submit: function(e) {
+			e.preventDefault();
+			$.extend(tasks[$('form').data('key')], tmpTask);
+			events.close.form();
+			$('[itemtype$="ItemList"]').each(function() {
+				if ($(this).data('key') != $('form').data('list')) return;
+				$(this).find('[itemprop="itemListElement"]').each(function(i) {
+					if ($(this).data('key') != $('form').data('key')) return;
+					$(this).find("[itemprop='name']").text(tmpTask.name);
+				});
+			});
+		},
+		build: function() {
+			var form = document.importNode(document.querySelector("template#formListItem").content, true).querySelector('form'),
+				$form = $(form).hide();
+			if ($optUsers.html) {
+				$form.find('select[name="assignee"]').html($optUsers.html());
+			} else {
+				$form.find('select[name="assignee"]').closest('label').remove();
+			}
+			document.body.appendChild(form);
+			$(form).each(events.attach.formListItem).find('[contenteditable="true"]').each(events.attach.contenteditable.itemListElement);
+		}
+	},
+	click: {
+		itemListElement: function(e) {
+			var item = $(e.target).closest('[itemprop="itemListElement"]'),
+				task = tasks[item.data('key')],
+				$form, i, frmElement;
+			tmpTask = $.extend({}, task);
+			// Build Form
+			events.formListItem.build();
+			$form = $('form').data('list', $(e.target).closest('[itemtype$="ItemList"]').data('key')).data('key', item.data('key'));
+			// Pre-fill Form
+			for (var i in task) {
+				frmElement = $form.find('[itemprop="' + i + '"], [name="' + i + '"], [name="' + i + '[]"]');
+				if (!frmElement.length) continue;
+				var vals = task[i];
+				if (!task[i].forEach) {
+					vals = [task[i]];
+				}
+				vals.forEach(function(val, j) {
+					var label;
+					if (!frmElement[j]) {
+						frmElement[j] = $(frmElement[j-1]).clone();
+						label = $(frmElement[j-1]).parent('label');
+						label.append(frmElement[j]).append($(label.find('[data-action="remove"]')[0]).clone());
+					}
+					if ($(frmElement[j]).is('input,select')) {
+						$(frmElement[j]).val(val);
+					} else {
+						$(frmElement[j]).text(val);
+					}
+				});
+			}
+			$('form,#grey-bg').fadeIn(300);
+		},
+		closeAction: function(e) {
+			if ($('form:visible').length) events.close.form();
+			events.close.bg();
+			e.stopPropagation();
+		},
+		removeAction: {
+			formElement: function(e) {
+				var $t = $(this),
+					label = $(this).parent('label'),
+					btnAdd = label.find('[data-action="add"]');
+				$t.prev('input,select,textarea').remove();
+				$t.remove();
+				if (label.find('input,select,textarea').length <= 1) {
+					label.find('[data-action="remove"]').hide();
+				}
+				if (btnAdd.is(':nth-child(2)')) {
+					btnAdd.insertAfter(label.find('[data-action="remove"]')[0]);
+				}
+			}
+		},
+		addAction: {
+			itemListElement: function(e) {
+				events.formListItem.build();
+				$('form,#grey-bg').fadeIn(300);
+				e.stopPropagation();
+			},
+			formElement: function(e) {
+				var label = $(this).parent('label'),
+					btnRemove = $(label.find('[data-action="remove"]')[0]).clone();
+					input = $(label.find('input,select,textarea')[0]).clone();
+				label.append(input).append(btnRemove);
+				if (label.find('input,select,textarea').length > 1) {
+					label.find('[data-action="remove"]').show();
+				}
+				input.val('').focus();
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		},
+		ItemList: function(e) {
+		}
+	},
+	drag: {
+		element: {},
+		parentItemList: {},
+		start: {
+			itemListElement: function(e) {
+				events.drag.element = $(e.target).closest('[itemprop="itemListElement"]');
+				events.drag.parentItemList = events.drag.element.closest('[itemtype$="ItemList"]');
+				e.originalEvent.dataTransfer.effectAllowed = 'copyMove';
+				e.originalEvent.dataTransfer.setData('text/html', events.drag.element.prop('outerHTML'));
+			}
+		},
+		end: {
+			itemListElement: function(e) {
+				$('[itemtype$="ItemList"]').removeClass('drop-option');
+			}
+		},
+		over: {
+			ItemList: function(e) {
+				e.preventDefault();
+				var self = $(e.target).closest('[itemtype$="ItemList"]')
+				if (!self.is(events.drag.parentItemList)) {
+					self.addClass('drop-option');
+					e.originalEvent.dataTransfer.dropEffect = 'move';
+				}
+			}
+		},
+		leave: {
+			ItemList: function(e) {
+				$(e.target).closest('[itemtype$="ItemList"]').removeClass('drop-option');
+			}
+		},
+		drop: {
+			ItemList: function(e) {
+				$(e.target).closest('[itemtype$="ItemList"]')
+					.append(e.originalEvent.dataTransfer.getData('text/html'))
+					.each(events.attach.itemListElement)
+					.find('meta[http-equiv]').remove();
+				events.drag.element.trigger('dragend').remove();
+			}
+		}
+	}
+},
+$optUsers = {},
+lists = [],
+tasks = [],
+tmpTask = {},
+users = [],
+meta = {};
+$(document).on('keyup', events.key.normalize).ready(function(){
+	$.ajax({
+		url:'js/meta.json',
+		dataType:'json',
+		success:function(data) {
+			meta = data;
+		}
+	});
+	$.ajax({
+		url:'js/lists.json',
+		dataType:'json',
+		success:function(data) {
+			// Load Template Content
+			var tmpItemList = document.querySelector("template#ItemList").content,
+				tmpListItem = document.querySelector("template#ListItem").content;
+			// Build List HTML
+			data.forEach(function(list) {
+				var domList = document.importNode(tmpItemList, true).querySelector('[itemtype$="ItemList"]');
+				domList.querySelector("[itemprop='name']").innerHTML = list.name;
+				// Build Task HTML
+				if (list.tasks && list.tasks.length) list.tasks.forEach(function(t) {
+					var task = document.importNode(tmpListItem, true).querySelector('[itemtype$="ListItem"]');
+					$(task).data('key', tasks.push(t) - 1);
+					task.querySelector("[itemprop='name']").innerHTML = t.name;
+					domList.appendChild(task);
+				});
+				delete list.tasks;
+				document.body.appendChild(domList);
+				$(domList).data('key', lists.push(list) - 1);
+			});
+			$('[itemprop="itemListElement"]').each(events.attach.itemListElement);
+			$('[itemtype$="ItemList"]').each(events.attach.ItemList);
+		}
+	});
+	// Grab List of Users
+	$.ajax({
+		url:'js/users.json',
+		dataType:'json',
+		success:function(data) {
+			users = data;
+			$optUsers = $('<select><option>');
+			users.forEach(function(user) {
+				$optUsers.append($('<option>').text(user.name).attr('value', user['z-id']));
+			});
+		}
+	});
+	// Attach events
+	$(document).on('keyup', events.key.up.document);
+});
+</script>
+</head>
+<body>
+<header>
+	<h1>Kanban!</h1>
+	<nav>
+	</nav>
+</header>
+<template id="ItemList">
+<section itemscope itemtype="http://schema.org/ItemList">
+	<meta itemprop="itemListOrder" content="http://schema.org/ItemListUnordered" />
+	<a data-action="add" title="Add new task">&#x2795;</a>
+	<h1 itemprop="name" contenteditable="true"></h1>
+</section>
+</template>
+<template id="ListItem">
+<div itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem" draggable="true">
+	<h2 itemprop="name"></h2>
+</div>
+</template>
+<template id="formListItem">
+<form>
+	<a data-action="close">&#x2716;</a>
+	<h2 itemprop="name" contenteditable="true">New Task</h2>
+	<label><span>Assignee:</span><select name="assignee"></select></label>
+	<label>
+		<span>URL:</span>
+		<input type="url" name="url[]"/>
+		<a data-action="remove" title="Remove">&#x2796;</a>
+		<a data-action="add" title="Add New">&#x2795;</a>
+	</label>
+	<label><span>Description:</span><textarea itemprop="description" rows="10"></textarea></label>
+	<input type="button" value="Cancel" data-action="close"/>
+	<input type="submit"/>
+</form>
+</template>
+<div id="grey-bg"></div>
+</body>
+</html>
