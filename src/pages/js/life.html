@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Life</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/synaptic/1.1.4/synaptic.js"></script>
+<style>
+
+:root { font-family: 'Trebuchet MS', sans-serif; }
+html, body {
+	padding: 0;
+	margin: 0;
+}
+h1 {
+	margin: 0;
+	line-height: 4rem;
+	text-align: center;
+}
+
+svg {
+	display: block;
+	width: 100%;
+	height: calc(100vmin - 4rem);
+	min-height: 500px;
+}
+
+rect {
+	stroke: black;
+	stroke-width: 1px;
+	fill: none;
+}
+
+circle {
+	stroke-width: 1px;
+	stroke: black;
+	fill: none;
+	r: 5px;
+}
+
+circle.Field {
+	fill: #228b22;
+	stroke: none;
+	r: 2px;
+}
+
+circle.creature {
+	stroke: none;
+	fill: black;
+	r: 5px;
+}
+
+line {
+	stroke-width: 1px;
+	stroke: grey;
+}
+line.vFood {
+	stroke: black;
+}
+
+</style>
+</head>
+<body>
+<h1>Life</h1>
+
+<svg xmlns="http://www.w3.org/2000/svg"></svg>
+
+<script>
+const ns = 'http://www.w3.org/2000/svg';
+// Vector http://caza.la/synaptic/scripts/homepage/vector.js {{{1
+function Vector(x, y) { this.x = x; this.y = y; }
+Vector.prototype = {
+	set: function(x, y) {
+		this.x = x;
+		this.y = y;
+		return this;
+	},
+	add: function(v) {
+		this.x += v.x;
+		this.y += v.y;
+		return this;
+	},
+	sub: function(v) {
+		this.x -= v.x;
+		this.y -= v.y;
+		return this;
+	},
+	mul: function(s) {
+		this.x *= s;
+		this.y *= s;
+		return this;
+	},
+	div: function(s) {
+		if (!s) throw new Error('Division by zero!');
+		this.x /= s;
+		this.y /= s;
+		return this;
+	},
+	mag: function() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	},
+	toInput: function() {
+		const mag = this.mag();
+		if (!mag) return [ 0, 0, 0, 0 ];
+		return [
+			Math.abs(this.x / mag),
+			Math.abs(this.y / mag),
+			(Math.sign(this.x) + 1) / 2,
+			(Math.sign(this.y) + 1) / 2,
+		];
+	},
+	angle: function() {
+		return Math.atan2(this.y, this.x);
+	},
+	setMag: function(m) {
+		var angle = this.angle();
+		this.x = m * Math.cos(angle);
+		this.y = m * Math.sin(angle);
+		return this;
+	},
+	setAngle: function(a) {
+		var mag = this.mag();
+		this.x = mag * Math.cos(a);
+		this.y = mag * Math.sin(a);
+		return this;
+	},
+	rotate: function(a) {
+		this.setAngle(this.angle() + a);
+		return this;
+	},
+	limit: function(l) {
+		var mag = this.mag();
+		if (mag > l) this.setMag(l);
+		return this;
+	},
+	angleBetween: function(v) {
+		return this.angle() - v.angle();
+	},
+	dot: function(v) {
+		return this.x * v.x + this.y * v.y;
+	},
+	lerp: function(v, amt) {
+		this.x += (v.x - this.x) * amt;
+		this.y += (v.y - this.y) * amt;
+		return this;
+	},
+	dist: function(v) {
+		var dx = this.x - v.x;
+		var dy = this.y - v.y;
+		return Math.max(Number.EPSILON, Math.sqrt(dx * dx + dy * dy));
+	},
+	copy: function() {
+		return new Vector(this.x, this.y);
+	},
+	random: function() {
+		this.set(1,1);
+		this.setAngle(Math.random() * Math.PI * 2);
+		return this;
+	},
+	from: function(v) {
+		return this.copy().sub(v);
+		return v.copy().sub(this);
+	},
+}
+// End Vector 1}}}
+
+const $svg = $('svg');
+$svg.x = $svg.width();
+$svg.y = $svg.height();
+
+const game = {
+	biteSize: 0.05,
+};
+
+function fade(color, fade) {
+	color = color.replace(/^#/, '');
+	const r = color.substr(0, 2);
+	const g = color.substr(2, 2);
+	const b = color.substr(4, 2);
+	return '#' + [ r, g, b ].map((c) => Math.ceil(Number.parseInt('ff', 16) * (1 - fade) + Number.parseInt(c, 16) * fade).toString(16).padStart(2, '0')).join('');
+}
+
+function Tile(number, x, y, numR, numC, $svg) {
+	this.food = x / numC * (numR - y) / numR;
+
+	Object.defineProperties(this, {
+		number: {
+			get() {
+				return number / numTiles;
+			},
+		},
+		row: {
+			value: y,
+		},
+		col: {
+			value: x,
+		},
+		x: {
+			value: x / numC * $svg.x,
+		},
+		y: {
+			value: y / numR * $svg.y,
+		},
+		height: {
+			value: 1 / numR * $svg.y,
+		},
+		width: {
+			value: 1 / numC * $svg.x,
+		},
+		rect: {
+			value: document.createElementNS(ns, 'rect'),
+		},
+	});
+
+	Object.defineProperties(this, {
+		center: {
+			value: new Vector(this.x + this.width / 2, this.y + this.height / 2),
+		},
+		centerPoint: {
+			value: document.createElementNS(ns, 'circle'),
+		},
+	});
+
+	this.centerPoint.setAttribute('cx', this.center.x);
+	this.centerPoint.setAttribute('cy', this.center.y);
+
+	this.rect.setAttribute('x', this.x);
+	this.rect.setAttribute('y', this.y);
+	this.rect.setAttribute('width', this.width);
+	this.rect.setAttribute('height', this.height);
+
+	$svg.append(this.rect);
+	$svg.append(this.centerPoint);
+}
+
+Tile.prototype = {
+	color() {
+		this.rect.style.fill = fade(this.baseColor, this.food);
+	},
+	takeFood(biteSize) {
+		const food = Math.min(this.food, game.biteSize * biteSize);
+		this.food -= food;
+		if (this.food <= 0) {
+			this.food = 0;
+			return 0;
+		}
+		return food;
+	},
+	tick() {
+		this.food += 0.01;
+		this.food = Math.max(0, Math.min(this.food, 1));
+	},
+};
+
+Object.defineProperties(Tile.prototype, {
+});
+
+function Field(number, x, y, numR, numC, $svg) {
+	Tile.call(this, number, x, y, numR, numC, $svg);
+	this.centerPoint.classList.add('Field');
+}
+
+Field.prototype = Object.assign(Tile.prototype, {
+});
+Field.prototype.constructor = Field;
+
+Object.defineProperties(Field.prototype, {
+	baseColor: {
+		value: '#228b22',
+	},
+});
+
+function Creature(x, y) {
+	console.log('adding at %d, %d', x, y);
+	this.brain = new synaptic.Architect.Perceptron(18, 18, 4);
+	this.health = 0.5;
+	this.hunger = 0.5;
+	this.p = new Vector(x, y);
+
+	Object.defineProperties(this, {
+		sight: {
+			value: Math.min($svg.width(), $svg.height()) / 3,
+		},
+		spot: {
+			value: document.createElementNS(ns, 'circle'),
+		},
+		biteSize: {
+			value: 1,
+		},
+		learningRate: {
+			value: 0.3,
+		},
+		vFood: {
+			value: document.createElementNS(ns, 'line'),
+		},
+	});
+
+	this.spot.classList.add('creature');
+	this.spot.setAttribute('cx', this.p.x);
+	this.spot.setAttribute('cy', this.p.y);
+	$svg.append(this.spot);
+
+	this.vFood.classList.add('vFood');
+	$svg.append(this.vFood);
+}
+
+Creature.prototype = {
+	eat() {
+		let food = 0;
+		if (this.hunger > 0) {
+			food = this.tile.takeFood(this.biteSize);
+		}
+		if (food) {
+			this.hunger -= food;
+		} else {
+			this.hunger += game.biteSize;
+		}
+		if (this.hunger > 0.2) {
+			this.health -= 0.05;
+		}
+	},
+	seeFood() {
+		const input = [];
+		for (let row=this.tile.row-1; row<=this.tile.row+1; row++) {
+			for (let col=this.tile.col-1; col<=this.tile.col+1; col++) {
+				if (!world[row] || !world[row][col]) {
+					input.concat([ 0, Math.max($svg.x, $svg.y) * 2 ]);
+					continue;
+				}
+				const tile = world[row][col];
+				input.push(tile.food);
+				input.push(tile.center.dist(this.p) / Math.max($svg.x, $svg.y));
+
+/*
+const vf = tile.center.from(this.p);
+vf.setMag(
+	20000 * tile.food / tile.center.dist(this.p)
+);
+const l = document.createElementNS(ns, 'line');
+l.setAttribute('x1', this.p.x);
+l.setAttribute('y1', this.p.y);
+l.setAttribute('x2', this.p.x + vf.x);
+l.setAttribute('y2', this.p.y + vf.y);
+$svg.append(l);
+/**/
+
+			}
+		}
+		while (input.length < 18) {
+			input.push(0);
+		}
+		return input;
+	},
+	meanFood() {
+		const vector = new Vector(0, 0);
+		for (let row=this.tile.row-1; row<=this.tile.row+1; row++) {
+			for (let col=this.tile.col-1; col<=this.tile.col+1; col++) {
+				if (!world[row] || !world[row][col]) continue;
+				if (world[row][col].food > game.biteSize * this.biteSize) {
+					// Point towards mean of different nearby food sources
+					const tile = world[row][col];
+					vector.add(
+						tile.center.from(this.p).setMag(20000 * tile.food / tile.center.dist(this.p))
+					);
+				}
+			}
+		}
+		return vector;
+	},
+	move() {
+		const maxV = Math.min($svg.x, $svg.y) / 40;
+
+		const input = [
+		].concat(this.seeFood());
+		const output = this.brain.activate(input);
+		const v = new Vector(
+			output[0] * Math.sign(Math.round(2 * output[2] - 1)),
+			output[1] * Math.sign(Math.round(2 * output[3] - 1))
+		).setMag(maxV);
+
+		// Teach Creature to move towards center of nearby food
+		const meanFood = this.meanFood();
+		this.brain.propagate(this.learningRate, meanFood.toInput());
+
+		this.p.add(v);
+
+		const vf = meanFood.setMag(10);
+		this.vFood.setAttribute('x1', this.p.x);
+		this.vFood.setAttribute('y1', this.p.y);
+		this.vFood.setAttribute('x2', this.p.x + vf.x);
+		this.vFood.setAttribute('y2', this.p.y + vf.y);
+
+		['x', 'y'].forEach((d) => {
+			if (this.p[d] >= $svg[d] - 1) {
+				this.p[d] = $svg[d] - 1;
+			} else if (this.p[d] <= 0) {
+				this.p[d] = 0;
+			}
+		});
+	},
+	tick() {
+		if (this.health <= 0) {
+			this.die();
+		}
+		this.eat();
+		// Limit 0 <= h <= 1
+		this.health = Math.max(0, Math.min(this.health, 1));
+		this.hunger = Math.max(0, Math.min(this.hunger, 1));
+		this.move();
+	},
+	die() {
+		console.error('This creature has died!');
+	},
+};
+
+Object.defineProperties(Creature.prototype, {
+	minX: {
+		value: 0,
+	},
+	minY: {
+		value: 0,
+	},
+	maxX: {
+		value: $svg.width(),
+	},
+	maxY: {
+		value: $svg.height(),
+	},
+	tile: {
+		get() {
+			const row = Math.floor(this.p.y / $svg.height() * world.length);
+			const col = Math.floor(this.p.x / $svg.width() * world[row].length);
+			return world[row][col];
+		},
+	},
+});
+
+let i = 0;
+const world = [
+	[ 'Field', 'Field', 'Field', 'Field', 'Field', 'Field', ],
+	[ 'Field', 'Field', 'Field', 'Field', 'Field', 'Field', ],
+	[ 'Field', 'Field', 'Field', 'Field', 'Field', 'Field', ],
+	[ 'Field', 'Field', 'Field', 'Field', 'Field', 'Field', ],
+	[ 'Field', 'Field', 'Field', 'Field', 'Field', 'Field', ],
+].map((row, y, w) => row.map((cell, x) => {
+	switch (cell) {
+	case 'Field':
+	default:
+		return new Field(++i, x, y, w.length, row.length, $svg);
+	}
+}));
+const numTiles = i;
+
+const numCreatures = 10;
+const creatures = [];
+for (let i=0; i<numCreatures; i++) {
+	creatures.push(new Creature(
+		Math.floor(Math.random() * $svg.width() * .8 + $svg.width() * .1),
+		Math.floor(Math.random() * $svg.height() * .8 + $svg.height() * .1)
+	));
+}
+
+creatures.sort = function() {
+	return Array.prototype.sort.call(this, (a, b) => a.health * a.speed - b.health * b.speed);
+};
+
+i = 0;
+function tick() {
+	creatures.sort().forEach((c) => {
+		c.tick();
+		// console.log('Hunger:', c.hunger);
+		// console.log('Health:', c.health);
+	});
+	world.forEach((row) => {
+		row.forEach((cell) => {
+			cell.tick();
+		});
+	});
+	draw();
+	if (i++ < 5000) setTimeout(tick, 0);
+}
+
+function draw() {
+	world.forEach((row) => {
+		row.forEach((cell) => {
+			cell.color();
+		});
+	});
+	creatures.forEach((c) => {
+		c.spot.setAttribute('cx', c.p.x);
+		c.spot.setAttribute('cy', c.p.y);
+	});
+}
+
+$(() => {
+	tick();
+});
+
+</script>
+</body>
+</html>
+<!--
+vim: foldmethod=marker foldlevel=0
+-->

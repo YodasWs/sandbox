@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Machine Learning</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" />
+<style>
+
+:root { font-family: 'Trebuchet MS', sans-serif; }
+h1 { margin-top: 0; }
+
+.vis-timeline .vis-graph-group4.vis-point {
+  stroke-width: 1px;
+  stroke: black;
+  fill: red;
+}
+
+</style>
+</head>
+<body>
+<h1>Machine Learning</h1>
+
+<div id="graph"></div>
+
+<script>
+const priceData = [ // {{{1
+  {date:"2018-5-30",open:15.84,low:15.54,hi:16.3,close:15.76,vol:"1,445,594"},{date:"2018-5-29",open:16.92,low:15.35,hi:16.94,close:15.84,vol:"2,494,915"},{date:"2018-5-25",open:15.66,low:15.2,hi:17.5,close:17.02,vol:"4,405,701"},{date:"2018-5-24",open:16.16,low:14.85,hi:16.16,close:15.56,vol:"4,444,237"},{date:"2018-5-23",open:13.6,low:13.21,hi:16.88,close:16.56,vol:"14,700,460"},{date:"2018-5-22",open:11.78,low:11.51,hi:12.07,close:11.6,vol:"749,189"},{date:"2018-5-21",open:12.32,low:11.64,hi:12.38,close:11.7,vol:"1,202,330"},{date:"2018-5-18",open:12.4,low:12.24,hi:12.62,close:12.26,vol:"392,227"},{date:"2018-5-17",open:12.4,low:12.15,hi:12.45,close:12.39,vol:"367,636"},{date:"2018-5-16",open:12.39,low:12.3,hi:12.51,close:12.4,vol:"417,478"},{date:"2018-5-15",open:12.56,low:12.32,hi:12.56,close:12.38,vol:"365,412"},{date:"2018-5-14",open:12.21,low:12.2,hi:12.8,close:12.66,vol:"672,594"},{date:"2018-5-11",open:12.1,low:12,hi:12.18,close:12.14,vol:"766,541"},{date:"2018-5-10",open:12.3,low:11.5,hi:12.42,close:12.05,vol:"1,059,747"},{date:"2018-5-9",open:12.5,low:12.44,hi:12.96,close:12.93,vol:"446,476"},{date:"2018-5-8",open:12.84,low:12.4,hi:12.86,close:12.47,vol:"386,142"},{date:"2018-5-7",open:12.59,low:12.52,hi:12.96,close:12.84,vol:"354,263"},{date:"2018-5-4",open:12.44,low:12.42,hi:12.66,close:12.49,vol:"342,516"},{date:"2018-5-3",open:12.55,low:12.29,hi:12.81,close:12.42,vol:"694,495"},{date:"2018-5-2",open:12.95,low:12.55,hi:13.1,close:12.57,vol:"419,603"},{date:"2018-5-1",open:12.36,low:12.34,hi:12.96,close:12.95,vol:"495,903"},{date:"2018-4-30",open:12.81,low:12.37,hi:13,close:12.38,vol:"468,597"},{date:"2018-4-27",open:12.56,low:12.41,hi:12.87,close:12.76,vol:"376,066"},{date:"2018-4-26",open:12.55,low:12.33,hi:12.75,close:12.5,vol:"465,664"},{date:"2018-4-25",open:12.21,low:12.11,hi:12.52,close:12.48,vol:"382,653"},{date:"2018-4-24",open:12.43,low:12.06,hi:12.49,close:12.21,vol:"419,823"},{date:"2018-4-23",open:12.32,low:12.15,hi:12.51,close:12.36,vol:"412,307"},{date:"2018-4-20",open:12.32,low:12.09,hi:12.39,close:12.34,vol:"377,221"},{date:"2018-4-19",open:12.6,low:12.28,hi:12.9,close:12.34,vol:"602,330"},{date:"2018-4-18",open:12.58,low:12.56,hi:12.89,close:12.63,vol:"360,690"},{date:"2018-4-17",open:12.34,low:12.22,hi:12.75,close:12.65,vol:"540,341"},{date:"2018-4-16",open:12.52,low:12.16,hi:12.56,close:12.28,vol:"327,535"},{date:"2018-4-13",open:12.51,low:12.21,hi:12.7,close:12.44,vol:"443,181"},{date:"2018-4-12",open:12.42,low:12.15,hi:12.6,close:12.41,vol:"456,605"},{date:"2018-4-11",open:12.25,low:12.2,hi:12.7,close:12.37,vol:"463,459"},{date:"2018-4-10",open:12.07,low:11.93,hi:12.33,close:12.25,vol:"646,615"},{date:"2018-4-9",open:12.06,low:11.86,hi:12.25,close:11.89,vol:"521,237"},{date:"2018-4-6",open:11.92,low:11.73,hi:12.12,close:11.89,vol:"416,137"},{date:"2018-4-5",open:12.37,low:12.01,hi:12.37,close:12.05,vol:"505,848"},{date:"2018-4-4",open:11.5,low:11.46,hi:12.36,close:12.27,vol:"755,065"},{date:"2018-4-3",open:11.85,low:11.46,hi:11.96,close:11.76,vol:"699,678"},{date:"2018-4-2",open:12.37,low:11.62,hi:12.37,close:11.83,vol:"884,502"},{date:"2018-3-29",open:12.16,low:11.96,hi:12.66,close:12.38,vol:"566,092"},{date:"2018-3-28",open:12.31,low:11.98,hi:12.52,close:12.15,vol:"702,263"},{date:"2018-3-27",open:12.94,low:12.15,hi:12.94,close:12.26,vol:"592,931"},{date:"2018-3-26",open:12.33,low:12.25,hi:12.92,close:12.85,vol:"1,012,596"},{date:"2018-3-23",open:12.44,low:12.03,hi:12.58,close:12.09,vol:"678,083"},{date:"2018-3-22",open:12.14,low:12.1,hi:12.83,close:12.44,vol:"720,075"},{date:"2018-3-21",open:11.79,low:11.67,hi:12.54,close:12.32,vol:"1,041,757"},{date:"2018-3-20",open:12.06,low:11.75,hi:12.3,close:11.77,vol:"868,231"},{date:"2018-3-19",open:12.61,low:11.52,hi:12.71,close:12.04,vol:"1,950,112"},{date:"2018-3-16",open:13.1,low:11.9,hi:13.22,close:12.56,vol:"2,804,022"},{date:"2018-3-15",open:13.87,low:13.09,hi:13.97,close:13.31,vol:"1,003,808"},{date:"2018-3-14",open:14.33,low:13.75,hi:14.41,close:13.84,vol:"688,476"},{date:"2018-3-13",open:14.51,low:14.11,hi:14.53,close:14.29,vol:"651,917"},{date:"2018-3-12",open:14.8,low:14.29,hi:14.84,close:14.46,vol:"720,119"},{date:"2018-3-9",open:14.5,low:14.16,hi:14.5,close:14.39,vol:"566,626"},{date:"2018-3-8",open:14.33,low:14.06,hi:14.45,close:14.32,vol:"510,966"},{date:"2018-3-7",open:14.01,low:13.76,hi:14.4,close:14.36,vol:"808,990"},{date:"2018-3-6",open:14.2,low:13.88,hi:14.37,close:14.18,vol:"465,336"},{date:"2018-3-5",open:14.28,low:13.87,hi:14.48,close:14.32,vol:"423,224"},{date:"2018-3-2",open:13.56,low:13.41,hi:14.49,close:14.38,vol:"661,849"},{date:"2018-3-1",open:14.06,low:13.4,hi:14.15,close:13.69,vol:"564,160"},{date:"2018-2-28",open:14.11,low:13.94,hi:14.65,close:13.98,vol:"589,301"},{date:"2018-2-27",open:14.15,low:14,hi:14.37,close:14.08,vol:"448,024"},{date:"2018-2-26",open:14.42,low:13.91,hi:14.5,close:14.2,vol:"499,927"},{date:"2018-2-23",open:13.92,low:13.78,hi:14.36,close:14.33,vol:"460,790"},{date:"2018-2-22",open:13.85,low:13.77,hi:14.22,close:13.87,vol:"494,014"},{date:"2018-2-21",open:13.83,low:13.61,hi:14.3,close:13.81,vol:"500,905"},{date:"2018-2-20",open:14.48,low:13.71,hi:14.68,close:13.81,vol:"757,464"},{date:"2018-2-16",open:14.84,low:14.35,hi:15.07,close:14.48,vol:"767,150"},{date:"2018-2-15",open:14.86,low:14.34,hi:15.48,close:14.84,vol:"1,150,031"},{date:"2018-2-14",open:14.01,low:13.92,hi:14.55,close:14.48,vol:"793,249"},{date:"2018-2-13",open:13.6,low:13.2,hi:14.12,close:14.01,vol:"893,944"},{date:"2018-2-12",open:13.09,low:12.6,hi:13.99,close:13.7,vol:"1,919,808"},{date:"2018-2-9",open:12.39,low:11.62,hi:12.52,close:12.3,vol:"1,335,534"},{date:"2018-2-8",open:12.78,low:12.17,hi:12.9,close:12.2,vol:"871,710"},{date:"2018-2-7",open:12.77,low:12.58,hi:13.16,close:12.72,vol:"718,128"},{date:"2018-2-6",open:12,low:11.9,hi:12.98,close:12.86,vol:"1,465,915"},{date:"2018-2-5",open:13.11,low:12.22,hi:13.33,close:12.25,vol:"2,187,347"},{date:"2018-2-2",open:14.01,low:13.3,hi:14.26,close:13.39,vol:"912,592"},{date:"2018-2-1",open:14.52,low:13.94,hi:14.87,close:14.07,vol:"742,127"},{date:"2018-1-31",open:15.75,low:14.55,hi:15.75,close:14.67,vol:"1,113,517"},{date:"2018-1-30",open:15.33,low:15,hi:15.62,close:15.06,vol:"918,736"},{date:"2018-1-29",open:15.17,low:15.15,hi:15.87,close:15.49,vol:"1,019,321"},{date:"2018-1-26",open:15.44,low:15.07,hi:15.92,close:15.11,vol:"1,111,870"},{date:"2018-1-25",open:16.29,low:15.21,hi:16.75,close:15.36,vol:"2,468,533"},{date:"2018-1-24",open:13.92,low:13.92,hi:16.95,close:16.08,vol:"7,372,760"},{date:"2018-1-23",open:13.47,low:13.26,hi:13.77,close:13.72,vol:"1,128,208"},{date:"2018-1-22",open:13.02,low:13,hi:13.75,close:13.35,vol:"1,491,922"},{date:"2018-1-19",open:12.74,low:12.44,hi:13.11,close:13,vol:"1,105,022"},{date:"2018-1-18",open:12.57,low:12.33,hi:12.64,close:12.44,vol:"457,982"},{date:"2018-1-17",open:12.42,low:12.26,hi:12.79,close:12.55,vol:"853,725"},{date:"2018-1-16",open:12.75,low:12.25,hi:12.79,close:12.32,vol:"1,051,169"},{date:"2018-1-12",open:12.64,low:12.57,hi:12.88,close:12.69,vol:"489,857"},{date:"2018-1-11",open:12.7,low:12.51,hi:12.84,close:12.64,vol:"539,750"},{date:"2018-1-10",open:12.71,low:12.35,hi:12.88,close:12.73,vol:"632,618"},{date:"2018-1-9",open:12.51,low:12.3,hi:12.86,close:12.77,vol:"1,147,198"},{date:"2018-1-8",open:12.54,low:12.3,hi:12.78,close:12.43,vol:"1,072,759"},{date:"2018-1-5",open:12.73,low:12.47,hi:12.95,close:12.54,vol:"1,127,459"},{date:"2018-1-4",open:13.73,low:12.56,hi:13.85,close:12.77,vol:"1,397,529"},{date:"2018-1-3",open:12.81,low:12.75,hi:13.9,close:13.52,vol:"1,947,966"},{date:"2018-1-2",open:12.34,low:12.25,hi:12.85,close:12.84,vol:"1,026,025"}
+]; // }}}1
+
+const config = {
+  iterations: 150,
+  learnRate: 1,
+  degree: 6,
+}
+
+Array.prototype.mean = function mean() {
+  let sum = 0;
+  this.forEach((n) => {
+    sum += typeof n === 'number' ? n : NaN;
+  });
+  return sum / this.length;
+};
+priceData.reverse();
+
+const data = {
+  dailyMean: [],
+  points: [],
+};
+
+function TimeSeries(data, startDate, endDate, degree=config.degree, group=2) {
+  // Parse Start Date
+  if (! (startDate instanceof Date)) {
+    if (typeof startDate === 'string') {
+      startDate = new Date(startDate);
+    }
+  }
+  // Parse End Date
+  if (! (endDate instanceof Date)) {
+    if (typeof endDate === 'string') {
+      endDate = new Date(endDate);
+    }
+  }
+  // Filter Data to Date Range
+  data = data.filter((day) => {
+    return startDate <= new Date(day.date) && new Date(day.date) <= endDate;
+  });
+
+  // Parse Daily Data into Tensors and Plot Points
+  const ip = {
+    step: 2 / (data.length + 1),
+    dayChangeYs: [],
+    meanYs: [],
+    xs: [],
+  };
+  this.dates = [];
+  data.forEach((day, j) => {
+    const y4 = [];
+    const yOC = [];
+    ['close', 'open', 'low', 'hi'].forEach((i) => {
+      y4.push(day[i]);
+    });
+    ['open', 'close'].forEach((i) => {
+      yOC.push(day[i]);
+    });
+    ip.meanYs.push(y4);
+    ip.dayChangeYs.push(yOC);
+    ip.xs.push(j * ip.step - 1); // Normalize to range [-1, 1]
+    this.dates.push(day.date);
+  });
+
+  this.dayChange = {
+    xs: tf.tensor(ip.xs).expandDims(1),
+    ys: tf.tensor(ip.dayChangeYs),
+    group: group + 2,
+  };
+  this.dailyMean = {
+    ys: tf.tensor(ip.meanYs).mean(1),
+    xs: tf.tensor(ip.xs),
+    group,
+  };
+
+  // Initialize Coefficients
+  [
+    [this.dayChange, 'dayChangeYs'],
+    [this.dailyMean, 'meanYs'],
+  ].forEach((d) => {
+    d[0].C = [];
+    tf.tidy(() => {
+      for (let i=0; i<=degree; i++) {
+        d[0].C.push(tf.variable(i === 0 ? tf.tensor(ip[d[1]]).mean() : tf.scalar(0)));
+      }
+    });
+  });
+
+  // this.dayChange.ys.print(true);
+  return Object.defineProperties(this, {
+    group: {
+      value: group,
+    },
+  });
+}
+
+TimeSeries.prototype.predictMean = function predictMean() {
+  return tf.tidy(() => {
+    let y = tf.clone(this.dailyMean.C[0]);
+    for (let i=1; i<this.dailyMean.C.length; i++) {
+      y = y.add(this.dailyMean.C[i].mul(this.dailyMean.xs.pow(tf.scalar(i))))
+    }
+    return y.maximum(min).minimum(max)
+  });
+}
+
+TimeSeries.prototype.predictDayChange = function predictDayChange() {
+  return tf.tidy(() => {
+    let y = tf.clone(this.dayChange.C[0]);
+    for (let i=1; i<this.dayChange.C.length; i++) {
+      y = y.add(this.dayChange.C[i].mul(this.dayChange.xs.pow(tf.scalar(i))))
+    }
+    return y.maximum(min).minimum(max)
+  });
+}
+
+data.allTime = new TimeSeries(priceData, '2018-01-01', '2018-05-31', 6, 3);
+// Segment Data by Month
+data.jan = new TimeSeries(priceData, '2018-01-01', '2018-02-01');
+data.feb = new TimeSeries(priceData, '2018-02-01', '2018-03-01');
+data.mar = new TimeSeries(priceData, '2018-03-01', '2018-04-01');
+data.apr = new TimeSeries(priceData, '2018-04-01', '2018-05-01');
+data.may = new TimeSeries(priceData, '2018-05-01', '2018-06-01');
+console.log(data);
+
+let min = 1000, max = 0;
+priceData.forEach((day, j) => {
+  const y = [];
+  ['close', 'open', 'low', 'hi'].forEach((i) => {
+    data.points.push({x: day.date, y: day[i], group: 0});
+    y.push(day[i]);
+    if (day[i] < min) min = day[i];
+    if (day[i] > max) max = day[i];
+  });
+  data.dailyMean.push({x: day.date, y: y.mean(), group: 1});
+});
+
+min = tf.scalar(min);
+max = tf.scalar(max);
+
+// Set Groups in Graph
+const groups = new vis.DataSet();
+groups.add({
+  id: 0,
+  content: 'Historical Data',
+  options: {
+    drawPoints: true,
+    style: 'points',
+  },
+});
+groups.add({
+  id: 1,
+  content: 'Mean',
+  options: {
+    drawPoints: true,
+    style: 'line',
+  },
+});
+groups.add({
+  id: 2,
+  content: 'Curve Month',
+  options: {
+    drawPoints: false,
+    style: 'line',
+  },
+});
+groups.add({
+  id: 3,
+  content: 'Curve YTD',
+  options: {
+    drawPoints: false,
+    style: 'line',
+  },
+});
+
+// Plot Data and Graph
+async function plot() {
+  const points = [].concat(data.points, data.dailyMean);
+  const graphs = [];
+  const arr = arguments.length === 1 && Array.isArray(arguments[0]) ? arguments[0] : Array.from(arguments);
+  for (let i=0; i<arr.length; i++) {
+    graphs.push(arr[i].predictMean());
+    // graphs.push(arr[i].predictDayChange());
+  }
+  for (let i=0; i<graphs.length; i++) {
+    const val = await graphs[i].data();
+    for (let j in val) {
+      points.push({ x: arr[i].dates[j], y: val[j], group: arr[i].dailyMean.group });
+      // points.push({ x: arr[i].dates[j], y: val[j], group: arr[i].dayChange.group });
+    }
+  }
+
+  // Build Graph
+  const graph2d = new vis.Graph2d(document.getElementById('graph'), null, {
+    sort: false,
+    interpolation: false,
+    showCurrentTime: true,
+    moveable: false,
+    zoomable: false,
+    autoResize: false,
+    hiddenDates: ((d) => {
+      d = new Date(d);
+      d.setDate(d.getDate() - d.getDay() + 6); // Saturday this week
+      const e = new Date(d.toString());
+      e.setDate(e.getDate() + 2);
+      return {
+        start: `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`,
+        end: `${e.getFullYear()}-${e.getMonth()+1}-${e.getDate()}`,
+        repeat: 'weekly',
+      };
+    })(data.points[0].x),
+    legend: {
+      enabled: true,
+      left: { position: 'bottom-left' },
+    },
+    format: {
+      minorLabels: {
+        millisecond:'s.S',
+      },
+      majorLabels: {
+        millisecond:'',
+      },
+    },
+  });
+  graph2d.setGroups(groups);
+
+  graph2d.setItems(points);
+}
+
+plot();
+
+const mons = ['allTime', 'jan', 'feb', 'mar', 'apr', 'may'];
+
+let graphs = [];
+mons.forEach((m) => {
+  graphs.push(data[m]);
+});
+plot(graphs);
+
+mons.forEach((m) => {
+  train(data[m], config.iterations);
+});
+
+graphs = [];
+mons.forEach((m) => {
+  graphs.push(data[m]);
+});
+plot(graphs);
+
+function loss(pred, label) {
+  return tf.tidy(() => label.sub(pred).abs().mean());
+  return tf.tidy(() => tf.losses.absoluteDifference(label, pred));
+  return tf.tidy(() => label.sub(pred).square().mean());
+  return tf.tidy(() => tf.losses.meanSquaredError(label, pred));
+  return pred.sub(label).square().mean();
+}
+
+function train(data, num) {
+  const optimizer = tf.train.adagrad(config.learnRate);
+  const optDayChg = tf.train.adagrad(config.learnRate);
+  for (let i=0; i<num; i++) {
+    optimizer.minimize(() => loss(data.predictMean(), data.dailyMean.ys), true);
+    optDayChg.minimize(() => loss(data.predictDayChange(), data.dayChange.ys), true);
+  }
+}
+
+</script>
+
+</body>
+</html>
+<!--
+vim: foldmethod=marker foldlevel=0
+-->
