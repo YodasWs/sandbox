@@ -1,14 +1,7 @@
 {
 	"name": "sandbox",
-	"sections":[
-	],
-	"modules":[
-		"ngRoute"
-	],
+	"sections":[],
 	"pages":[
-		{
-			"path":"d3/highway",
-			"module":"pageHighway"
-		}
+		"d3/highway"
 	]
 }
